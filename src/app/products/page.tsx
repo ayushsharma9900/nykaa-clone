@@ -1,0 +1,178 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import { products, categories } from '@/data/products';
+import ProductCard from '@/components/ui/ProductCard';
+import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
+
+export default function ProductsPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('featured');
+  const [priceRange, setPriceRange] = useState<string>('');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filteredAndSortedProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter(product => 
+        product.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    // Filter by price range
+    if (priceRange) {
+      const [min, max] = priceRange.split('-').map(Number);
+      filtered = filtered.filter(product => {
+        if (max) {
+          return product.price >= min && product.price <= max;
+        }
+        return product.price >= min;
+      });
+    }
+
+    // Sort products
+    switch (sortBy) {
+      case 'price-low':
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'newest':
+        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      default:
+        // Keep original order for featured
+        break;
+    }
+
+    return filtered;
+  }, [selectedCategory, sortBy, priceRange]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {selectedCategory ? selectedCategory : 'All Products'}
+            </h1>
+            <p className="text-gray-600 mt-1">
+              {filteredAndSortedProducts.length} products found
+            </p>
+          </div>
+
+          {/* Mobile filter toggle */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="lg:hidden flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md"
+          >
+            <AdjustmentsHorizontalIcon className="h-5 w-5" />
+            <span>Filters</span>
+          </button>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Filters */}
+          <div className={`lg:w-64 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="font-semibold text-gray-900 mb-4">Categories</h3>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="category"
+                    value=""
+                    checked={selectedCategory === ''}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="text-pink-600 focus:ring-pink-500"
+                  />
+                  <span className="ml-2 text-sm">All Categories</span>
+                </label>
+                {categories.map((category) => (
+                  <label key={category.id} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="category"
+                      value={category.name}
+                      checked={selectedCategory === category.name}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="text-pink-600 focus:ring-pink-500"
+                    />
+                    <span className="ml-2 text-sm">{category.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="font-semibold text-gray-900 mb-4">Price Range</h3>
+              <div className="space-y-2">
+                {[
+                  { label: 'All Prices', value: '' },
+                  { label: 'Under ₹500', value: '0-500' },
+                  { label: '₹500 - ₹1000', value: '500-1000' },
+                  { label: '₹1000 - ₹2000', value: '1000-2000' },
+                  { label: '₹2000 - ₹5000', value: '2000-5000' },
+                  { label: 'Over ₹5000', value: '5000' }
+                ].map((range) => (
+                  <label key={range.value} className="flex items-center">
+                    <input
+                      type="radio"
+                      name="price"
+                      value={range.value}
+                      checked={priceRange === range.value}
+                      onChange={(e) => setPriceRange(e.target.value)}
+                      className="text-pink-600 focus:ring-pink-500"
+                    />
+                    <span className="ml-2 text-sm">{range.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            {/* Sort dropdown */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                >
+                  <option value="featured">Featured</option>
+                  <option value="newest">Newest</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
+                </select>
+                <ChevronDownIcon className="absolute right-2 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Products Grid */}
+            {filteredAndSortedProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredAndSortedProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">No products found matching your criteria.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
