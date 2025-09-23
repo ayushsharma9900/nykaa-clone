@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { CartProvider } from "@/contexts/CartContext";
+import { WishlistProvider } from "@/contexts/WishlistContext";
+import { ToastProvider } from "@/contexts/ToastContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nykaa Clone - Beauty Redefined",
-  description: "Discover the latest in skincare, makeup, and beauty essentials. Shop from top brands with exclusive offers.",
+  title: "kaayalife – Beauty Redefined",
+  description: "kaayalife is your destination for skincare, makeup, and beauty essentials. Shop top brands with exclusive offers.",
 };
 
 export default function RootLayout({
@@ -28,8 +32,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
-        {children}
+        <ToastProvider>
+          <WishlistProvider>
+            <CartProvider>
+              <Header />
+              {children}
+              <Footer />
+            </CartProvider>
+          </WishlistProvider>
+        </ToastProvider>
       </body>
     </html>
   );

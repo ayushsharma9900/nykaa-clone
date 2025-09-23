@@ -1,17 +1,57 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/types';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
+import { useToast } from '@/contexts/ToastContext';
 import { HeartIcon, StarIcon } from '@heroicons/react/24/outline';
-import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { addToCart, isInCart, getItemQuantity } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { showToast } = useToast();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  
+  const isWishlisted = isInWishlist(product.id);
+  
   const discountedPrice = product.originalPrice 
     ? product.originalPrice - product.price 
     : 0;
+    
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const wasAdded = toggleWishlist(product);
+    const action = wasAdded ? 'Added to' : 'Removed from';
+    showToast(`${action} wishlist: ${product.name}`);
+  };
+  
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!product.inStock) return;
+    
+    setIsAddingToCart(true);
+    
+    // Add to cart using context
+    addToCart(product, 1);
+    showToast(`Added ${product.name} to cart!`);
+    
+    setTimeout(() => {
+      setIsAddingToCart(false);
+    }, 500);
+  };
+  
+  const itemQuantity = getItemQuantity(product.id);
+  const productIsInCart = isInCart(product.id);
   
   const renderStars = (rating: number) => {
     const stars = [];
@@ -43,8 +83,17 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="group relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
       {/* Wishlist button */}
-      <button className="absolute top-2 right-2 z-10 p-2 rounded-full bg-white/80 hover:bg-white transition-colors">
-        <HeartIcon className="h-4 w-4 text-gray-600" />
+      <button 
+        onClick={handleWishlistClick}
+        className={`absolute top-2 right-2 z-10 p-2 rounded-full bg-white/80 hover:bg-white transition-colors ${
+          isWishlisted ? 'text-pink-600' : 'text-gray-600'
+        }`}
+      >
+        {isWishlisted ? (
+          <HeartSolidIcon className="h-4 w-4" />
+        ) : (
+          <HeartIcon className="h-4 w-4" />
+        )}
       </button>
 
       {/* Discount badge */}
@@ -113,10 +162,18 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Add to cart button */}
       <div className="p-4 pt-0">
         <button 
+          onClick={handleAddToCart}
           className="w-full py-2 px-4 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors text-sm font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
-          disabled={!product.inStock}
+          disabled={!product.inStock || isAddingToCart}
         >
-          {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+          {isAddingToCart 
+            ? 'Adding...' 
+            : productIsInCart 
+              ? `In Cart (${itemQuantity})` 
+              : product.inStock 
+                ? 'Add to Cart' 
+                : 'Out of Stock'
+          }
         </button>
       </div>
     </div>

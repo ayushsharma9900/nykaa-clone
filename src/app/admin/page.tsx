@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
+import ProductModal from '@/components/admin/ProductModal';
+import ProductDetailModal from '@/components/admin/ProductDetailModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { Product } from '@/types';
 import { 
   ShoppingBagIcon, 
   UsersIcon, 
@@ -15,7 +19,58 @@ import {
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  
+  const { products, loading, saveProduct, deleteProduct } = useProducts();
+  
+  const handleViewProduct = (productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setShowDetailModal(true);
+    }
+  };
+  
+  const handleEditProduct = (productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setSelectedProduct(product);
+      setShowProductModal(true);
+    }
+  };
+  
+  const handleAddProduct = () => {
+    setSelectedProduct(null);
+    setShowProductModal(true);
+  };
+  
+  const handleDeleteProduct = (productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setProductToDelete(product);
+      setShowDeleteDialog(true);
+    }
+  };
+  
+  const confirmDeleteProduct = () => {
+    if (productToDelete) {
+      deleteProduct(productToDelete.id);
+      setProductToDelete(null);
+    }
+  };
+  
+  const handleSaveProduct = (product: Product) => {
+    saveProduct(product);
+    setSelectedProduct(null);
+  };
+  
+  const handleViewStore = () => {
+    window.open('/', '_blank');
+  };
 
   const stats = [
     {
@@ -62,7 +117,10 @@ export default function AdminDashboard() {
               <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors">
+              <button 
+                onClick={handleViewStore}
+                className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors"
+              >
                 View Store
               </button>
             </div>
@@ -182,7 +240,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Products</h2>
               <button 
-                onClick={() => setShowAddProduct(true)}
+                onClick={handleAddProduct}
                 className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors flex items-center space-x-2"
               >
                 <PlusIcon className="h-5 w-5" />
@@ -253,13 +311,25 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center space-x-2">
-                            <button className="text-indigo-600 hover:text-indigo-900">
+                            <button 
+                              onClick={() => handleViewProduct(product.id)}
+                              className="text-indigo-600 hover:text-indigo-900"
+                              title="View Product"
+                            >
                               <EyeIcon className="h-4 w-4" />
                             </button>
-                            <button className="text-yellow-600 hover:text-yellow-900">
+                            <button 
+                              onClick={() => handleEditProduct(product.id)}
+                              className="text-yellow-600 hover:text-yellow-900"
+                              title="Edit Product"
+                            >
                               <PencilIcon className="h-4 w-4" />
                             </button>
-                            <button className="text-red-600 hover:text-red-900">
+                            <button 
+                              onClick={() => handleDeleteProduct(product.id)}
+                              className="text-red-600 hover:text-red-900"
+                              title="Delete Product"
+                            >
                               <TrashIcon className="h-4 w-4" />
                             </button>
                           </div>
@@ -282,6 +352,39 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+      
+      {/* Modals */}
+      <ProductModal
+        isOpen={showProductModal}
+        onClose={() => {
+          setShowProductModal(false);
+          setSelectedProduct(null);
+        }}
+        onSave={handleSaveProduct}
+        product={selectedProduct}
+      />
+      
+      <ProductDetailModal
+        isOpen={showDetailModal}
+        onClose={() => {
+          setShowDetailModal(false);
+          setSelectedProduct(null);
+        }}
+        product={selectedProduct}
+      />
+      
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        onClose={() => {
+          setShowDeleteDialog(false);
+          setProductToDelete(null);
+        }}
+        onConfirm={confirmDeleteProduct}
+        title="Delete Product"
+        message={`Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        type="danger"
+      />
     </div>
   );
 }

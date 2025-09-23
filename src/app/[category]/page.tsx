@@ -1,46 +1,36 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useMemo } from 'react';
+import { notFound } from 'next/navigation';
 import { products, categories } from '@/data/products';
 import ProductCard from '@/components/ui/ProductCard';
 import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
-export default function ProductsPage() {
-  const searchParams = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+interface CategoryPageProps {
+  params: {
+    category: string;
+  };
+}
+
+export default function CategoryPage({ params }: CategoryPageProps) {
+  const { category } = params;
+  
+  // Find the category by slug
+  const currentCategory = categories.find(cat => cat.slug === category);
+  
+  // If category doesn't exist, show 404
+  if (!currentCategory) {
+    notFound();
+  }
+
   const [sortBy, setSortBy] = useState<string>('featured');
   const [priceRange, setPriceRange] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  
-  useEffect(() => {
-    const search = searchParams.get('search');
-    if (search) {
-      setSearchQuery(search);
-    }
-  }, [searchParams]);
 
   const filteredAndSortedProducts = useMemo(() => {
-    let filtered = [...products];
-
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(query) ||
-        product.brand.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query) ||
-        product.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
-
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(product => 
-        product.category.toLowerCase() === selectedCategory.toLowerCase()
-      );
-    }
+    let filtered = products.filter(product => 
+      product.category.toLowerCase() === currentCategory.name.toLowerCase()
+    );
 
     // Filter by price range
     if (priceRange) {
@@ -73,7 +63,7 @@ export default function ProductsPage() {
     }
 
     return filtered;
-  }, [selectedCategory, sortBy, priceRange, searchQuery]);
+  }, [currentCategory, sortBy, priceRange]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -81,13 +71,8 @@ export default function ProductsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {searchQuery 
-                ? `Search results for "${searchQuery}"` 
-                : selectedCategory 
-                  ? selectedCategory 
-                  : 'All Products'
-              }
+            <h1 className="text-3xl font-bold text-gray-900 capitalize">
+              {currentCategory.name}
             </h1>
             <p className="text-gray-600 mt-1">
               {filteredAndSortedProducts.length} products found
@@ -97,7 +82,7 @@ export default function ProductsPage() {
           {/* Mobile filter toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="lg:hidden flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md"
+            className="lg:hidden flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             <AdjustmentsHorizontalIcon className="h-5 w-5" />
             <span>Filters</span>
@@ -107,36 +92,6 @@ export default function ProductsPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
           <div className={`lg:w-64 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-4">Categories</h3>
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="category"
-                    value=""
-                    checked={selectedCategory === ''}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="text-pink-600 focus:ring-pink-500"
-                  />
-                  <span className="ml-2 text-sm">All Categories</span>
-                </label>
-                {categories.map((category) => (
-                  <label key={category.id} className="flex items-center">
-                    <input
-                      type="radio"
-                      name="category"
-                      value={category.name}
-                      checked={selectedCategory === category.name}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="text-pink-600 focus:ring-pink-500"
-                    />
-                    <span className="ml-2 text-sm">{category.name}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
             <div className="bg-white p-6 rounded-lg shadow-sm">
               <h3 className="font-semibold text-gray-900 mb-4">Price Range</h3>
               <div className="space-y-2">
@@ -193,7 +148,7 @@ export default function ProductsPage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No products found matching your criteria.</p>
+                <p className="text-gray-500 text-lg">No products found in this category.</p>
               </div>
             )}
           </div>

@@ -1,11 +1,31 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { products, categories } from '@/data/products';
 import ProductCard from '@/components/ui/ProductCard';
 
 export default function Home() {
+  const [email, setEmail] = useState('');
+  const [isSubscribing, setIsSubscribing] = useState(false);
+  
   const featuredProducts = products.slice(0, 8);
   const bestSellers = products.filter(p => p.rating >= 4.5).slice(0, 6);
+  
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setIsSubscribing(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      alert(`Thank you for subscribing! We'll send updates to ${email}`);
+      setEmail('');
+      setIsSubscribing(false);
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -128,20 +148,25 @@ export default function Home() {
             Get the latest beauty tips, product launches, and exclusive offers
             delivered straight to your inbox.
           </p>
-          <div className="max-w-md mx-auto flex gap-4">
+          <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex gap-4">
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-md border-0 focus:ring-2 focus:ring-pink-300"
+              required
+              className="flex-1 px-4 py-3 rounded-md border-0 focus:ring-2 focus:ring-pink-300 focus:outline-none"
             />
-            <button className="bg-white text-pink-600 px-6 py-3 rounded-md font-medium hover:bg-gray-50 transition-colors">
-              Subscribe
+            <button 
+              type="submit"
+              disabled={isSubscribing || !email}
+              className="bg-white text-pink-600 px-6 py-3 rounded-md font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubscribing ? 'Subscribing...' : 'Subscribe'}
             </button>
-          </div>
+          </form>
         </div>
       </section>
     </div>
-  );
-}
   );
 }

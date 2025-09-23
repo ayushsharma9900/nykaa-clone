@@ -1,6 +1,6 @@
 import { Product } from '@/types';
 
-export const products: Product[] = [
+const baseProducts: Product[] = [
   {
     id: '1',
     name: 'Lakme Absolute Perfect Radiance Skin Lightening Facewash',
@@ -11,9 +11,9 @@ export const products: Product[] = [
     category: 'Skincare',
     subcategory: 'Face Wash',
     brand: 'Lakme',
-    image: 'https://images.unsplash.com/photo-1556229010-aa1e4ece3c71?w=400',
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
     images: [
-      'https://images.unsplash.com/photo-1556229010-aa1e4ece3c71?w=400',
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
       'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400'
     ],
     inStock: true,
@@ -79,7 +79,7 @@ export const products: Product[] = [
     image: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400',
     images: [
       'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400',
-      'https://images.unsplash.com/photo-1583765486942-2e53996e212d?w=400'
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400'
     ],
     inStock: true,
     stockCount: 25,
@@ -143,9 +143,9 @@ export const products: Product[] = [
     category: 'Skincare',
     subcategory: 'Cleanser',
     brand: 'Cetaphil',
-    image: 'https://images.unsplash.com/photo-1556228578-dd4cf69a1d12?w=400',
+    image: 'https://images.unsplash.com/photo-1556228545-d513b2e6e73f?w=400',
     images: [
-      'https://images.unsplash.com/photo-1556228578-dd4cf69a1d12?w=400',
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
       'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'
     ],
     inStock: true,
@@ -229,9 +229,9 @@ export const products: Product[] = [
     category: 'Makeup',
     subcategory: 'Brow',
     brand: 'Benefit',
-    image: 'https://images.unsplash.com/photo-1583765486942-2e53996e212d?w=400',
+    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400',
     images: [
-      'https://images.unsplash.com/photo-1583765486942-2e53996e212d?w=400',
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400',
       'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400'
     ],
     inStock: true,
@@ -273,9 +273,9 @@ export const products: Product[] = [
     category: 'Skincare',
     subcategory: 'Exfoliant',
     brand: 'Paula\'s Choice',
-    image: 'https://images.unsplash.com/photo-1556229010-aa1e4ece3c71?w=400',
+    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
     images: [
-      'https://images.unsplash.com/photo-1556229010-aa1e4ece3c71?w=400',
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
       'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400'
     ],
     inStock: true,
@@ -294,9 +294,9 @@ export const products: Product[] = [
     category: 'Makeup',
     subcategory: 'Lip Gloss',
     brand: 'Fenty Beauty',
-    image: 'https://images.unsplash.com/photo-1583765486942-2e53996e212d?w=400',
+    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400',
     images: [
-      'https://images.unsplash.com/photo-1583765486942-2e53996e212d?w=400',
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400',
       'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'
     ],
     inStock: true,
@@ -320,7 +320,7 @@ export const products: Product[] = [
     image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
     images: [
       'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-      'https://images.unsplash.com/photo-1556228578-dd4cf69a1d12?w=400'
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400'
     ],
     inStock: true,
     stockCount: 55,
@@ -385,7 +385,7 @@ export const products: Product[] = [
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400',
     images: [
       'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400',
-      'https://images.unsplash.com/photo-1583765486942-2e53996e212d?w=400'
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400'
     ],
     inStock: true,
     stockCount: 47,
@@ -440,6 +440,136 @@ export const products: Product[] = [
     updatedAt: new Date('2024-02-03')
   }
 ];
+
+// Auto-generate synthetic products to reach 50 items per category
+const PER_CATEGORY_TARGET = 50;
+const CATEGORY_LIST = ['Skincare', 'Makeup', 'Hair Care', 'Fragrance', 'Personal Care'] as const;
+
+const brandPools: Record<string, string[]> = {
+  'Skincare': [
+    'Lakme','Neutrogena','Cetaphil','CeraVe','La Roche-Posay',
+    'The Ordinary','Paula\'s Choice','Drunk Elephant','Olay','L\'Oreal Paris'
+  ],
+  'Makeup': [
+    'Maybelline','MAC','Fenty Beauty','NARS','Tarte',
+    'Too Faced','Rare Beauty','Huda Beauty','NYX','Lakme'
+  ],
+  'Hair Care': [
+    'Olaplex','L\'Oreal Professionnel','Schwarzkopf','Matrix','WOW Skin Science',
+    'Mamaearth','Dove','Tresemme','Herbal Essences','Kerastase'
+  ],
+  'Fragrance': [
+    'Calvin Klein','Dior','Chanel','Gucci','Versace',
+    'Hugo Boss','Burberry','Tom Ford','Paco Rabanne','Armaf'
+  ],
+  'Personal Care': [
+    'Dove','Nivea','Himalaya','Mamaearth','Pears',
+    'Dettol','Lifebuoy','Palmolive','Colgate','Sensodyne'
+  ]
+};
+
+const subcatPools: Record<string, string[]> = {
+  'Skincare': ['Cleanser','Serum','Moisturizer','Sunscreen','Toner','Face Wash','Exfoliant','Mask'],
+  'Makeup': ['Foundation','Concealer','Lipstick','Blush','Mascara','Eyeshadow','Brow','Highlighter'],
+  'Hair Care': ['Shampoo','Conditioner','Hair Oil','Serum','Mask','Treatment','Styling'],
+  'Fragrance': ['Eau de Parfum','Eau de Toilette','Body Mist'],
+  'Personal Care': ['Body Wash','Soap','Deodorant','Toothpaste','Mouthwash','Handwash','Lotion']
+};
+
+const imagePools: Record<string, string[]> = {
+  'Skincare': [
+    'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
+    'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400',
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'
+  ],
+  'Makeup': [
+    'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400',
+    'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400',
+    'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400'
+  ],
+  'Hair Care': [
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+    'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
+    'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400'
+  ],
+  'Fragrance': [
+    'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
+    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400',
+    'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400'
+  ],
+  'Personal Care': [
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+    'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
+    'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400'
+  ]
+};
+
+function pick<T>(arr: T[], idx: number): T {
+  return arr[idx % arr.length];
+}
+
+// Count existing per category
+const existingCount: Record<string, number> = CATEGORY_LIST.reduce((acc, cat) => {
+  acc[cat] = baseProducts.filter(p => p.category === cat).length;
+  return acc;
+}, {} as Record<string, number>);
+
+// Determine starting id
+let idCounter = baseProducts.reduce((max, p) => {
+  const n = parseInt(p.id, 10);
+  return Number.isFinite(n) ? Math.max(max, n) : max;
+}, 0);
+
+const synthetic: Product[] = [];
+
+for (const cat of CATEGORY_LIST) {
+  const need = Math.max(0, PER_CATEGORY_TARGET - (existingCount[cat] || 0));
+  for (let j = 1; j <= need; j++) {
+    idCounter += 1;
+    const n = idCounter;
+    const brand = pick(brandPools[cat], n);
+    const subcategory = pick(subcatPools[cat], n);
+    const img1 = pick(imagePools[cat], n);
+    const img2 = pick(imagePools[cat], n + 1);
+
+    // Deterministic price by category
+    const basePrice = cat === 'Skincare' ? 199
+      : cat === 'Makeup' ? 299
+      : cat === 'Hair Care' ? 249
+      : cat === 'Fragrance' ? 999
+      : 99; // Personal Care
+    const price = basePrice + (n % 50) * (cat === 'Fragrance' ? 25 : 10);
+    const hasDiscount = n % 3 !== 0;
+    const originalPrice = hasDiscount ? Math.round(price * (1 + ((n % 7) + 5) / 100)) : undefined;
+    const discount = hasDiscount && originalPrice ? Math.max(1, Math.round(((originalPrice - price) / originalPrice) * 100)) : undefined;
+
+    const created = new Date(2024, 1, 15 + (n % 28)); // Feb 2024
+    const updated = new Date(created.getTime() + (n % 7) * 24 * 60 * 60 * 1000);
+
+    synthetic.push({
+      id: String(n),
+      name: `${brand} ${subcategory} ${j}`,
+      description: `High-quality ${subcategory.toLowerCase()} from ${brand} in our ${cat} range.`,
+      price,
+      originalPrice,
+      discount,
+      category: cat,
+      subcategory,
+      brand,
+      image: img1,
+      images: [img1, img2],
+      inStock: true,
+      stockCount: 10 + (n % 60),
+      rating: Math.min(5, 3.8 + ((n % 13) / 10)),
+      reviewCount: 50 + (n % 400),
+      tags: [cat.toLowerCase(), subcategory.toLowerCase(), brand.toLowerCase()],
+      createdAt: created,
+      updatedAt: updated
+    });
+  }
+}
+
+export const products: Product[] = [...baseProducts, ...synthetic];
 
 export const categories = [
   { id: '1', name: 'Skincare', slug: 'skincare' },

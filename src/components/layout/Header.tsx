@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { 
   MagnifyingGlassIcon,
   ShoppingBagIcon,
@@ -12,8 +14,19 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function Header() {
+  const { state } = useCart();
+  const { state: wishlistState } = useWishlist();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to products page with search query
+      window.location.href = `/products?search=${encodeURIComponent(searchQuery.trim())}`;
+    }
+  };
 
   return (
     <header className="bg-white shadow-sm">
@@ -42,7 +55,7 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold text-pink-600">
-              Nykaa
+              kaayalife
             </Link>
           </div>
 
@@ -64,16 +77,18 @@ export default function Header() {
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products, brands..."
                 className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
-              <button className="absolute right-2 top-2">
+              <button type="submit" className="absolute right-2 top-2 hover:text-pink-600">
                 <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
               </button>
-            </div>
+            </form>
           </div>
 
           {/* Right icons */}
@@ -86,8 +101,13 @@ export default function Header() {
               <MagnifyingGlassIcon className="h-6 w-6" />
             </button>
 
-            <Link href="/wishlist" className="text-gray-600 hover:text-gray-900">
+            <Link href="/wishlist" className="text-gray-600 hover:text-gray-900 relative">
               <HeartIcon className="h-6 w-6" />
+              {wishlistState.itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-pink-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  {wishlistState.itemCount > 99 ? '99+' : wishlistState.itemCount}
+                </span>
+              )}
             </Link>
             
             <Link href="/account" className="text-gray-600 hover:text-gray-900">
@@ -96,9 +116,11 @@ export default function Header() {
             
             <Link href="/cart" className="text-gray-600 hover:text-gray-900 relative">
               <ShoppingBagIcon className="h-6 w-6" />
-              <span className="absolute -top-2 -right-2 bg-pink-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                0
-              </span>
+              {state.itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-pink-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  {state.itemCount > 99 ? '99+' : state.itemCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>
@@ -106,16 +128,19 @@ export default function Header() {
         {/* Mobile Search Bar */}
         {isSearchOpen && (
           <div className="md:hidden py-4">
-            <div className="relative">
+            <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products, brands..."
                 className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                autoFocus
               />
-              <button className="absolute right-2 top-2">
+              <button type="submit" className="absolute right-2 top-2 hover:text-pink-600">
                 <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
               </button>
-            </div>
+            </form>
           </div>
         )}
 
