@@ -8,11 +8,14 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (product: Product) => void;
+  onSave: (product: Product) => Promise<void> | void;
   product?: Product | null;
+  isSubmitting?: boolean;
 }
 
-export default function ProductModal({ isOpen, onClose, onSave, product }: ProductModalProps) {
+export default function ProductModal({ isOpen, onClose, onSave, product, isSubmitting = false }: ProductModalProps) {
+  console.log('ProductModal rendered with:', { isOpen, product: product?.name });
+  
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
     description: '',
@@ -33,7 +36,9 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
   const [tagInput, setTagInput] = useState('');
 
   useEffect(() => {
+    console.log('ProductModal useEffect triggered with product:', product);
     if (product) {
+      console.log('Setting form data with product:', product.name, 'Price:', product.price);
       setFormData({
         ...product,
         images: product.images || ['']
@@ -69,7 +74,18 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
     } else if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+      let numValue = parseFloat(value) || 0;
+      
+      // Apply specific validations for different fields
+      if (name === 'rating') {
+        numValue = Math.max(0, Math.min(5, numValue)); // Clamp between 0 and 5
+      } else if (name === 'reviewCount' || name === 'stockCount') {
+        numValue = Math.max(0, numValue); // Ensure non-negative
+      } else if (name === 'price' || name === 'originalPrice') {
+        numValue = Math.max(0, numValue); // Ensure non-negative prices
+      }
+      
+      setFormData(prev => ({ ...prev, [name]: numValue }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -104,7 +120,7 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
     setFormData(prev => ({ ...prev, tags }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Calculate discount if both prices are provided
@@ -134,8 +150,7 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
       updatedAt: new Date()
     };
 
-    onSave(newProduct);
-    onClose();
+    await onSave(newProduct);
   };
 
   if (!isOpen) return null;
@@ -160,43 +175,43 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
             {/* Basic Info */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
                   Product Name *
                 </label>
                 <input
                   type="text"
                   name="name"
-                  value={formData.name}
+                  value={formData.name || ''}
                   onChange={handleInputChange}
                   required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
                   Brand *
                 </label>
                 <input
                   type="text"
                   name="brand"
-                  value={formData.brand}
+                  value={formData.brand || ''}
                   onChange={handleInputChange}
                   required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
                   Category *
                 </label>
                 <select
                   name="category"
-                  value={formData.category}
+                  value={formData.category || 'Skincare'}
                   onChange={handleInputChange}
                   required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 >
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.name}>
@@ -207,15 +222,15 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
                   Subcategory
                 </label>
                 <input
                   type="text"
                   name="subcategory"
-                  value={formData.subcategory}
+                  value={formData.subcategory || ''}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 />
               </div>
             </div>
@@ -223,23 +238,23 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
             {/* Pricing & Stock */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
                   Price (₹) *
                 </label>
                 <input
                   type="number"
                   name="price"
-                  value={formData.price}
+                  value={formData.price || 0}
                   onChange={handleInputChange}
                   required
                   min="0"
                   step="0.01"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
                   Original Price (₹)
                 </label>
                 <input
@@ -249,22 +264,22 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
                   onChange={handleInputChange}
                   min="0"
                   step="0.01"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
                   Stock Count *
                 </label>
                 <input
                   type="number"
                   name="stockCount"
-                  value={formData.stockCount}
+                  value={formData.stockCount || 0}
                   onChange={handleInputChange}
                   required
                   min="0"
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 />
               </div>
 
@@ -272,11 +287,11 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
                 <input
                   type="checkbox"
                   name="inStock"
-                  checked={formData.inStock}
+                  checked={formData.inStock ?? true}
                   onChange={handleInputChange}
                   className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                 />
-                <label className="ml-2 block text-sm text-gray-700">
+                <label className="ml-2 block text-sm font-medium text-gray-800">
                   In Stock
                 </label>
               </div>
@@ -285,22 +300,22 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
               Description *
             </label>
             <textarea
               name="description"
-              value={formData.description}
+              value={formData.description || ''}
               onChange={handleInputChange}
               required
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
             />
           </div>
 
           {/* Images */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
               Product Images
             </label>
             <div className="space-y-2">
@@ -311,13 +326,13 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
                     value={image}
                     onChange={(e) => handleImageChange(index, e.target.value)}
                     placeholder="Image URL"
-                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                   />
                   {(formData.images || []).length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeImageField(index)}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 hover:text-red-800 px-2 py-1 text-sm font-medium"
                     >
                       Remove
                     </button>
@@ -327,7 +342,7 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
               <button
                 type="button"
                 onClick={addImageField}
-                className="text-pink-600 hover:text-pink-800 text-sm"
+                className="text-pink-600 hover:text-pink-800 text-sm font-medium"
               >
                 + Add Another Image
               </button>
@@ -336,7 +351,7 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
 
           {/* Tags */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
               Tags (comma separated)
             </label>
             <input
@@ -344,39 +359,39 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
               value={tagInput}
               onChange={(e) => handleTagsChange(e.target.value)}
               placeholder="e.g., skincare, moisturizer, anti-aging"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
             />
           </div>
 
           {/* Rating & Reviews */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
                 Rating (0-5)
               </label>
               <input
                 type="number"
                 name="rating"
-                value={formData.rating}
+                value={formData.rating || 0}
                 onChange={handleInputChange}
                 min="0"
                 max="5"
                 step="0.1"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
                 Review Count
               </label>
               <input
                 type="number"
                 name="reviewCount"
-                value={formData.reviewCount}
+                value={formData.reviewCount || 0}
                 onChange={handleInputChange}
                 min="0"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-800 bg-white focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
               />
             </div>
           </div>
@@ -386,15 +401,28 @@ export default function ProductModal({ isOpen, onClose, onSave, product }: Produ
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+              disabled={isSubmitting}
+              className="px-6 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700"
+              disabled={isSubmitting}
+              className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
-              {product ? 'Update Product' : 'Add Product'}
+              {isSubmitting && (
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
+              <span>
+                {isSubmitting 
+                  ? (product ? 'Updating...' : 'Adding...') 
+                  : (product ? 'Update Product' : 'Add Product')
+                }
+              </span>
             </button>
           </div>
         </form>

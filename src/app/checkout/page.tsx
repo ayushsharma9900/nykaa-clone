@@ -160,7 +160,7 @@ export default function CheckoutPage() {
               </div>
 
               {shipping === 0 ? (
-                <p className="mt-4 text-sm text-green-700">You're eligible for FREE shipping!</p>
+                <p className="mt-4 text-sm text-green-700">You&apos;re eligible for FREE shipping!</p>
               ) : (
                 <div className="mt-4 p-3 bg-blue-50 rounded-md">
                   <div className="flex items-center space-x-2 text-sm text-blue-800">

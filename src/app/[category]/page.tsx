@@ -1,19 +1,19 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, use } from 'react';
 import { notFound } from 'next/navigation';
 import { products, categories } from '@/data/products';
 import ProductCard from '@/components/ui/ProductCard';
 import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
 interface CategoryPageProps {
-  params: {
+  params: Promise<{
     category: string;
-  };
+  }>;
 }
 
 export default function CategoryPage({ params }: CategoryPageProps) {
-  const { category } = params;
+  const { category } = use(params);
   
   // Find the category by slug
   const currentCategory = categories.find(cat => cat.slug === category);
@@ -93,7 +93,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           {/* Sidebar Filters */}
           <div className={`lg:w-64 space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-4">Price Range</h3>
+              <h3 className="font-semibold text-pink-600 mb-4">Price Range</h3>
               <div className="space-y-2">
                 {[
                   { label: 'All Prices', value: '' },
@@ -112,7 +112,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                       onChange={(e) => setPriceRange(e.target.value)}
                       className="text-pink-600 focus:ring-pink-500"
                     />
-                    <span className="ml-2 text-sm">{range.label}</span>
+                    <span className="ml-2 text-sm text-pink-600">{range.label}</span>
                   </label>
                 ))}
               </div>
@@ -127,13 +127,13 @@ export default function CategoryPage({ params }: CategoryPageProps) {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 >
-                  <option value="featured">Featured</option>
-                  <option value="newest">Newest</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="rating">Highest Rated</option>
+                  <option value="featured" className="text-pink-600">Featured</option>
+                  <option value="newest" className="text-pink-600">Newest</option>
+                  <option value="price-low" className="text-pink-600">Price: Low to High</option>
+                  <option value="price-high" className="text-pink-600">Price: High to Low</option>
+                  <option value="rating" className="text-pink-600">Highest Rated</option>
                 </select>
                 <ChevronDownIcon className="absolute right-2 top-3 h-4 w-4 text-gray-400 pointer-events-none" />
               </div>

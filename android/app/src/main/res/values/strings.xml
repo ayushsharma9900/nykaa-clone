@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KaayaLife</string>
+    <string name="title_activity_main">KaayaLife</string>
+    <string name="package_name">com.kaayalife.app</string>
+    <string name="custom_url_scheme">com.kaayalife.app</string>
+</resources>

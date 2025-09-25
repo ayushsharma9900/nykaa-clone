@@ -143,7 +143,7 @@ const baseProducts: Product[] = [
     category: 'Skincare',
     subcategory: 'Cleanser',
     brand: 'Cetaphil',
-    image: 'https://images.unsplash.com/photo-1556228545-d513b2e6e73f?w=400',
+    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
     images: [
       'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
       'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'
@@ -438,11 +438,101 @@ const baseProducts: Product[] = [
     tags: ['hair treatment', 'repair', 'damaged hair'],
     createdAt: new Date('2024-02-03'),
     updatedAt: new Date('2024-02-03')
+  },
+  {
+    id: '21',
+    name: 'Chanel Coco Mademoiselle Eau de Parfum',
+    description: 'Elegant and sensual fragrance with oriental notes.',
+    price: 8500,
+    originalPrice: 9500,
+    discount: 11,
+    category: 'Fragrance',
+    subcategory: 'Eau de Parfum',
+    brand: 'Chanel',
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
+    images: [
+      'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400'
+    ],
+    inStock: true,
+    stockCount: 15,
+    rating: 4.9,
+    reviewCount: 567,
+    tags: ['perfume', 'luxury', 'oriental'],
+    createdAt: new Date('2024-02-04'),
+    updatedAt: new Date('2024-02-04')
+  },
+  {
+    id: '22',
+    name: 'Dove Deeply Nourishing Body Wash',
+    description: 'Moisturizing body wash with 1/4 moisturizing cream.',
+    price: 285,
+    originalPrice: 320,
+    discount: 11,
+    category: 'Personal Care',
+    subcategory: 'Body Wash',
+    brand: 'Dove',
+    image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+    images: [
+      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+      'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400'
+    ],
+    inStock: true,
+    stockCount: 78,
+    rating: 4.3,
+    reviewCount: 234,
+    tags: ['body wash', 'moisturizing', 'nourishing'],
+    createdAt: new Date('2024-02-05'),
+    updatedAt: new Date('2024-02-05')
+  },
+  {
+    id: '23',
+    name: 'L\'Oreal Paris Revitalift Serum',
+    description: 'Anti-aging serum with hyaluronic acid and vitamin C.',
+    price: 1450,
+    category: 'Skincare',
+    subcategory: 'Serum',
+    brand: 'L\'Oreal Paris',
+    image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400',
+    images: [
+      'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400',
+      'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400'
+    ],
+    inStock: true,
+    stockCount: 45,
+    rating: 4.5,
+    reviewCount: 289,
+    tags: ['anti-aging', 'hyaluronic acid', 'vitamin c'],
+    createdAt: new Date('2024-02-06'),
+    updatedAt: new Date('2024-02-06')
+  },
+  {
+    id: '24',
+    name: 'Calvin Klein Euphoria Eau de Parfum',
+    description: 'Captivating floral fragrance for modern women.',
+    price: 4200,
+    originalPrice: 4800,
+    discount: 12,
+    category: 'Fragrance',
+    subcategory: 'Eau de Parfum',
+    brand: 'Calvin Klein',
+    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
+    images: [
+      'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400',
+      'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400'
+    ],
+    inStock: true,
+    stockCount: 28,
+    rating: 4.6,
+    reviewCount: 178,
+    tags: ['floral', 'modern', 'captivating'],
+    createdAt: new Date('2024-02-07'),
+    updatedAt: new Date('2024-02-07')
   }
 ];
 
-// Auto-generate synthetic products to reach 50 items per category
-const PER_CATEGORY_TARGET = 50;
+// Auto-generate synthetic products to reach 10 items per category
+const PER_CATEGORY_TARGET = 10;
 const CATEGORY_LIST = ['Skincare', 'Makeup', 'Hair Care', 'Fragrance', 'Personal Care'] as const;
 
 const brandPools: Record<string, string[]> = {

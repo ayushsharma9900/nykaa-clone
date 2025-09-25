@@ -83,10 +83,10 @@ export default function Header() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products, brands..."
-                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md text-pink-600 placeholder-pink-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
               <button type="submit" className="absolute right-2 top-2 hover:text-pink-600">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                <MagnifyingGlassIcon className="h-5 w-5 text-pink-500" />
               </button>
             </form>
           </div>
@@ -134,11 +134,11 @@ export default function Header() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for products, brands..."
-                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md text-pink-600 placeholder-pink-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 autoFocus
               />
               <button type="submit" className="absolute right-2 top-2 hover:text-pink-600">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                <MagnifyingGlassIcon className="h-5 w-5 text-pink-500" />
               </button>
             </form>
           </div>
