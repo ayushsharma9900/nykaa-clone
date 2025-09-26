@@ -125,8 +125,8 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-            <p className="text-gray-600 mt-1">Manage your store configuration and preferences</p>
+            <h1 className="admin-text text-2xl font-bold">Settings</h1>
+            <p className="admin-text-secondary mt-1">Manage your store configuration and preferences</p>
           </div>
           <button
             onClick={handleSaveSettings}
@@ -163,65 +163,65 @@ export default function SettingsPage() {
               {/* General Settings */}
               {activeTab === 'general' && (
                 <div className="p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-6">General Settings</h3>
+                  <h3 className="admin-text text-lg font-medium mb-6">General Settings</h3>
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="admin-text block text-sm font-medium mb-2">
                           Site Name
                         </label>
                         <input
                           type="text"
                           value={settings.general.siteName}
                           onChange={(e) => handleInputChange('general', 'siteName', e.target.value)}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
+                          className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="admin-text block text-sm font-medium mb-2">
                           Contact Email
                         </label>
                         <input
                           type="email"
                           value={settings.general.contactEmail}
                           onChange={(e) => handleInputChange('general', 'contactEmail', e.target.value)}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
+                          className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="admin-text block text-sm font-medium mb-2">
                         Site Description
                       </label>
                       <textarea
                         value={settings.general.siteDescription}
                         onChange={(e) => handleInputChange('general', 'siteDescription', e.target.value)}
                         rows={3}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
+                        className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="admin-text block text-sm font-medium mb-2">
                           Contact Phone
                         </label>
                         <input
                           type="tel"
                           value={settings.general.contactPhone}
                           onChange={(e) => handleInputChange('general', 'contactPhone', e.target.value)}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
+                          className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="admin-text block text-sm font-medium mb-2">
                           Currency
                         </label>
                         <select
                           value={settings.general.currency}
                           onChange={(e) => handleInputChange('general', 'currency', e.target.value)}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 font-medium"
+                          className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         >
                           <option value="INR">Indian Rupee (₹)</option>
                           <option value="USD">US Dollar ($)</option>
@@ -232,13 +232,13 @@ export default function SettingsPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="admin-text block text-sm font-medium mb-2">
                           Timezone
                         </label>
                         <select
                           value={settings.general.timezone}
                           onChange={(e) => handleInputChange('general', 'timezone', e.target.value)}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
+                          className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         >
                           <option value="Asia/Kolkata">Asia/Kolkata</option>
                           <option value="America/New_York">America/New_York</option>
@@ -246,13 +246,13 @@ export default function SettingsPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="admin-text block text-sm font-medium mb-2">
                           Language
                         </label>
                         <select
                           value={settings.general.language}
                           onChange={(e) => handleInputChange('general', 'language', e.target.value)}
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
+                          className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         >
                           <option value="en">English</option>
                           <option value="hi">Hindi</option>
@@ -267,7 +267,7 @@ export default function SettingsPage() {
               {/* Notification Settings */}
               {activeTab === 'notifications' && (
                 <div className="p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-6">Notification Settings</h3>
+                  <h3 className="admin-text text-lg font-medium mb-6">Notification Settings</h3>
                   <div className="space-y-6">
                     <div>
                       <h4 className="text-md font-medium text-gray-900 mb-4">Communication Preferences</h4>

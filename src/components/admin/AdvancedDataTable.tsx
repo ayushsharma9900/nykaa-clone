@@ -97,6 +97,13 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
   title,
   subtitle
 }: AdvancedDataTableProps<T>) {
+  
+  console.log('📊 ADVANCED DATA TABLE PROPS:', {
+    dataCount: data.length,
+    rowActionsCount: rowActions.length,
+    hasOnRowAction: !!onRowAction,
+    rowActions: rowActions.map(r => r.id)
+  });
   const [selectedItems, setSelectedItems] = useState<Set<string | number>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
@@ -221,7 +228,7 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-4 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="admin-input admin-field-bg pl-4 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             )}
@@ -270,7 +277,7 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
                     <select
                       value={filters[option.key] || ''}
                       onChange={(e) => setFilters(prev => ({ ...prev, [option.key]: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="admin-input admin-field-bg w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">All</option>
                       {option.options?.map((opt) => (
@@ -282,7 +289,7 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
                       type={option.type}
                       value={filters[option.key] || ''}
                       onChange={(e) => setFilters(prev => ({ ...prev, [option.key]: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="admin-input admin-field-bg w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   )}
                 </div>
@@ -419,11 +426,15 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
                   ))}
                   {rowActions.length > 0 && (
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {console.log('🛠️ ROW ACTIONS DEBUG:', { rowActionsCount: rowActions.length, hasOnRowAction: !!onRowAction, itemId: item.id })}
                       <div className="flex justify-end space-x-2">
                         {rowActions.map((action) => (
                           <button
                             key={action.id}
-                            onClick={() => onRowAction?.(action.id, item)}
+                            onClick={() => {
+                              console.log('💪 BUTTON CLICKED DIRECTLY:', { actionId: action.id, itemId: item.id });
+                              onRowAction?.(action.id, item);
+                            }}
                             className={`p-1 rounded hover:bg-gray-100 ${
                               action.variant === 'danger' ? 'text-red-600 hover:text-red-900' :
                               action.variant === 'primary' ? 'text-blue-600 hover:text-blue-900' :
@@ -457,7 +468,7 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
               <select
                 value={pagination.pageSize}
                 onChange={(e) => pagination.onPageSizeChange!(parseInt(e.target.value))}
-                className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="admin-input admin-field-bg px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>

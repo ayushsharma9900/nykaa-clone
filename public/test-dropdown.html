@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Dropdown Menu Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background-color: #f9fafb;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        pre { 
+            background: #f3f4f6; 
+            padding: 15px; 
+            border-radius: 5px; 
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .menu-structure {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8fafc;
+            border-left: 4px solid #ec4899;
+            border-radius: 4px;
+        }
+        .level-1 { font-weight: bold; color: #1f2937; margin: 10px 0; }
+        .level-2 { color: #374151; margin-left: 20px; margin: 5px 0 5px 20px; }
+        .level-3 { color: #6b7280; margin-left: 40px; margin: 3px 0 3px 40px; font-size: 14px; }
+        button {
+            background: #ec4899;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #db2777;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #ec4899, #be185d);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Dynamic Dropdown Menu System Test</h1>
+        <p>Testing the hierarchical menu structure for your Nykaa clone website.</p>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCategories">-</div>
+                <div>Total Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="visibleCategories">-</div>
+                <div>Visible in Menu</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="withSubmenus">-</div>
+                <div>With Submenus</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="testHierarchy()">🔄 Test Menu Hierarchy</button>
+            <button onclick="testVisibility()">👁️ Test Visibility</button>
+            <button onclick="clearResults()">🗑️ Clear Results</button>
+        </div>
+
+        <div id="results"></div>
+
+        <div class="menu-structure" id="menuStructure" style="display: none;">
+            <h3>📋 Current Menu Structure:</h3>
+            <div id="hierarchyDisplay"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5001/api';
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `<p><strong>${new Date().toLocaleTimeString()}:</strong> ${message}</p>`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('menuStructure').style.display = 'none';
+        }
+
+        function updateStats(data) {
+            const totalCategories = data.length;
+            const visibleCategories = data.filter(cat => cat.showInMenu).length;
+            const withSubmenus = data.filter(cat => cat.children && cat.children.length > 0).length;
+
+            document.getElementById('totalCategories').textContent = totalCategories;
+            document.getElementById('visibleCategories').textContent = visibleCategories;
+            document.getElementById('withSubmenus').textContent = withSubmenus;
+        }
+
+        function displayHierarchy(categories) {
+            const display = document.getElementById('hierarchyDisplay');
+            const structure = document.getElementById('menuStructure');
+            
+            let html = '';
+            categories.forEach(category => {
+                html += `<div class="level-1">📁 ${category.name} ${category.showInMenu ? '👁️' : '🚫'}</div>`;
+                
+                if (category.children && category.children.length > 0) {
+                    category.children.forEach(child => {
+                        html += `<div class="level-2">📂 ${child.name}</div>`;
+                        
+                        if (child.children && child.children.length > 0) {
+                            child.children.forEach(subchild => {
+                                html += `<div class="level-3">📄 ${subchild.name}</div>`;
+                            });
+                        }
+                    });
+                }
+            });
+            
+            display.innerHTML = html;
+            structure.style.display = 'block';
+        }
+        
+        async function testHierarchy() {
+            log('🔄 Testing hierarchical menu structure...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/menu-management/menu-items?showAll=true`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log(`✅ Successfully loaded menu hierarchy!`, 'success');
+                    log(`📊 Found ${data.data.length} categories total`, 'info');
+                    
+                    const categoriesWithChildren = data.data.filter(cat => 
+                        cat.children && cat.children.length > 0
+                    );
+                    
+                    log(`🌟 ${categoriesWithChildren.length} categories have submenus:`, 'success');
+                    
+                    categoriesWithChildren.forEach(cat => {
+                        const level2Count = cat.children.length;
+                        const level3Count = cat.children.reduce((total, child) => 
+                            total + (child.children ? child.children.length : 0), 0
+                        );
+                        
+                        log(`  • ${cat.name}: ${level2Count} level-2, ${level3Count} level-3 items`, 'info');
+                    });
+                    
+                    updateStats(data.data);
+                    displayHierarchy(data.data);
+                    
+                } else {
+                    log(`❌ API returned error: ${data.message}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Test failed: ${error.message}`, 'error');
+                if (error.message.includes('NetworkError') || error.message.includes('fetch')) {
+                    log('🔧 Make sure the backend server is running on port 5001', 'error');
+                }
+            }
+        }
+        
+        async function testVisibility() {
+            log('👁️ Testing menu visibility settings...', 'info');
+            
+            try {
+                const [allResponse, visibleResponse] = await Promise.all([
+                    fetch(`${API_BASE_URL}/menu-management/menu-items?showAll=true`),
+                    fetch(`${API_BASE_URL}/menu-management/menu-items`)
+                ]);
+                
+                if (!allResponse.ok || !visibleResponse.ok) {
+                    throw new Error('Failed to fetch menu data');
+                }
+                
+                const allData = await allResponse.json();
+                const visibleData = await visibleResponse.json();
+                
+                if (allData.success && visibleData.success) {
+                    const totalCount = allData.data.length;
+                    const visibleCount = visibleData.data.length;
+                    const hiddenCount = totalCount - visibleCount;
+                    
+                    log(`✅ Visibility test completed!`, 'success');
+                    log(`📊 Total categories: ${totalCount}`, 'info');
+                    log(`👁️ Visible in menu: ${visibleCount}`, 'success');
+                    log(`🚫 Hidden from menu: ${hiddenCount}`, 'info');
+                    
+                    if (hiddenCount > 0) {
+                        const hiddenCategories = allData.data.filter(cat => !cat.showInMenu);
+                        log(`Hidden categories: ${hiddenCategories.map(c => c.name).join(', ')}`, 'info');
+                    }
+                    
+                } else {
+                    log(`❌ Visibility test failed`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Visibility test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            log('🚀 Dynamic Dropdown Menu System Loaded', 'success');
+            log('Click the buttons above to test the menu hierarchy and visibility', 'info');
+            
+            // Auto-run hierarchy test
+            setTimeout(testHierarchy, 500);
+        });
+    </script>
+</body>
+</html>

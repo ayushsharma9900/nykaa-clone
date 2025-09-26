@@ -72,16 +72,14 @@ export default function AnalyticsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-            <p className="text-gray-600 mt-1">Track your business performance and insights</p>
+            <h1 className="admin-text text-2xl font-bold">Analytics</h1>
+            <p className="admin-text-secondary mt-1">Track your business performance and insights</p>
           </div>
           <div className="flex items-center space-x-4">
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className={`border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-pink-500 focus:border-pink-500 ${
-                timeRange === '30d' ? 'text-red-600' : 'text-gray-900'
-              }`}
+              className="admin-input admin-field-bg border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
             >
               <option value="7d">Last 7 days</option>
               <option value="30d" className="text-red-600">Last 30 days</option>

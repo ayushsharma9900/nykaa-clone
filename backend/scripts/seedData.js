@@ -125,45 +125,73 @@ const sampleCustomers = [
   }
 ];
 
-// Sample Categories
+// Enhanced Beauty Categories
 const sampleCategories = [
   {
-    name: 'Head Shoulders Shampoo',
-    slug: 'head-shoulders-shampoo',
-    description: 'Professional anti-dandruff shampoo products for healthy hair care',
+    name: 'Skincare',
+    slug: 'skincare',
+    description: 'Complete range of facial and body skincare products including cleansers, moisturizers, serums, and treatments',
     isActive: true,
     sortOrder: 1
   },
   {
-    name: 'Mint',
-    slug: 'mint',
-    description: 'Refreshing mint-based hair and scalp treatment products',
+    name: 'Makeup',
+    slug: 'makeup',
+    description: 'Professional makeup products including foundations, lipsticks, eyeshadows, and beauty tools',
     isActive: true,
     sortOrder: 2
   },
   {
-    name: 'Pantene hair-care',
-    slug: 'pantene-hair-care',
-    description: 'Professional hair care products from Pantene brand',
+    name: 'Hair Care',
+    slug: 'hair-care',
+    description: 'Complete hair care solutions including shampoos, conditioners, styling products, and treatments',
     isActive: true,
     sortOrder: 3
   },
   {
-    name: 'Dark & Lovely Conditioner',
-    slug: 'dark-lovely-conditioner',
-    description: 'Specialized conditioning products for textured hair',
+    name: 'Fragrance',
+    slug: 'fragrance',
+    description: 'Premium fragrances including perfumes, eau de toilettes, and body sprays for men and women',
     isActive: true,
     sortOrder: 4
+  },
+  {
+    name: 'Personal Care',
+    slug: 'personal-care',
+    description: 'Essential personal care products including bath & body, oral care, and hygiene products',
+    isActive: true,
+    sortOrder: 5
+  },
+  {
+    name: 'Men\'s Grooming',
+    slug: 'mens-grooming',
+    description: 'Specialized grooming products for men including beard care, shaving essentials, and skincare',
+    isActive: true,
+    sortOrder: 6
+  },
+  {
+    name: 'Baby Care',
+    slug: 'baby-care',
+    description: 'Gentle and safe products for babies including skincare, bath products, and essentials',
+    isActive: true,
+    sortOrder: 7
+  },
+  {
+    name: 'Wellness',
+    slug: 'wellness',
+    description: 'Health and wellness products including vitamins, supplements, and health essentials',
+    isActive: true,
+    sortOrder: 8
   }
 ];
 
-// Sample Products - Extended set from frontend fallback data
+// Comprehensive Beauty Products
 const sampleProducts = [
   // Skincare Products
   {
     name: 'Lakme Absolute Perfect Radiance Skin Lightening Facewash',
     description: 'A gentle facewash that brightens and lightens skin tone with regular use.',
-    category: 'Mint', // Map to backend category
+    category: 'Skincare',
     price: 175,
     costPrice: 145,
     stock: 50,
@@ -171,12 +199,13 @@ const sampleProducts = [
     totalSold: 89,
     averageRating: 4.2,
     reviewCount: 128,
-    tags: ['face wash', 'brightening', 'skincare']
+    tags: ['face wash', 'brightening', 'skincare'],
+    images: [{ url: '/images/lakme-facewash.jpg', alt: 'Lakme Facewash' }]
   },
   {
     name: 'The Ordinary Niacinamide 10% + Zinc 1%',
     description: 'A high-strength vitamin and mineral blemish formula.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 700,
     costPrice: 480,
     stock: 30,
@@ -184,12 +213,13 @@ const sampleProducts = [
     totalSold: 67,
     averageRating: 4.7,
     reviewCount: 189,
-    tags: ['serum', 'niacinamide', 'acne treatment']
+    tags: ['serum', 'niacinamide', 'acne treatment'],
+    images: [{ url: '/images/ordinary-niacinamide.jpg', alt: 'The Ordinary Niacinamide' }]
   },
   {
     name: 'Neutrogena Ultra Gentle Daily Cleanser',
     description: 'Gentle daily cleanser suitable for sensitive skin.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 395,
     costPrice: 275,
     stock: 40,
@@ -197,12 +227,13 @@ const sampleProducts = [
     totalSold: 43,
     averageRating: 4.3,
     reviewCount: 167,
-    tags: ['cleanser', 'gentle', 'sensitive skin']
+    tags: ['cleanser', 'gentle', 'sensitive skin'],
+    images: [{ url: '/images/neutrogena-cleanser.jpg', alt: 'Neutrogena Cleanser' }]
   },
   {
     name: 'Cetaphil Daily Facial Cleanser',
     description: 'Gentle cleanser for normal to oily skin.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 550,
     costPrice: 385,
     stock: 60,
@@ -210,12 +241,13 @@ const sampleProducts = [
     totalSold: 31,
     averageRating: 4.4,
     reviewCount: 198,
-    tags: ['cleanser', 'daily', 'oily skin']
+    tags: ['cleanser', 'daily', 'oily skin'],
+    images: [{ url: '/images/cetaphil-cleanser.jpg', alt: 'Cetaphil Cleanser' }]
   },
   {
     name: 'La Roche-Posay Anthelios Sunscreen SPF 50',
     description: 'Broad spectrum protection with antioxidants.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 1250,
     costPrice: 875,
     stock: 45,
@@ -223,14 +255,15 @@ const sampleProducts = [
     totalSold: 112,
     averageRating: 4.7,
     reviewCount: 234,
-    tags: ['sunscreen', 'spf 50', 'protection']
+    tags: ['sunscreen', 'spf 50', 'protection'],
+    images: [{ url: '/images/laroche-sunscreen.jpg', alt: 'La Roche Posay Sunscreen' }]
   },
   
-  // Makeup Products (mapped to Head Shoulders Shampoo category)
+  // Makeup Products
   {
     name: 'Maybelline New York Fit Me Matte Foundation',
     description: 'Full coverage matte foundation that lasts up to 12 hours.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 599,
     costPrice: 419,
     stock: 75,
@@ -238,12 +271,13 @@ const sampleProducts = [
     totalSold: 58,
     averageRating: 4.5,
     reviewCount: 256,
-    tags: ['foundation', 'matte', 'full coverage']
+    tags: ['foundation', 'matte', 'full coverage'],
+    images: [{ url: '/images/maybelline-foundation.jpg', alt: 'Maybelline Foundation' }]
   },
   {
     name: 'MAC Lipstick - Ruby Woo',
     description: 'Iconic matte red lipstick with intense color payoff.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 1950,
     costPrice: 1365,
     stock: 25,
@@ -251,12 +285,13 @@ const sampleProducts = [
     totalSold: 43,
     averageRating: 4.8,
     reviewCount: 342,
-    tags: ['lipstick', 'matte', 'red']
+    tags: ['lipstick', 'matte', 'red'],
+    images: [{ url: '/images/mac-ruby-woo.jpg', alt: 'MAC Ruby Woo Lipstick' }]
   },
   {
     name: 'Urban Decay Naked3 Eyeshadow Palette',
     description: '12 rose-hued neutral eyeshadows in matte and shimmer finishes.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 3200,
     costPrice: 2240,
     stock: 15,
@@ -269,7 +304,7 @@ const sampleProducts = [
   {
     name: 'Rare Beauty Liquid Blush',
     description: 'Weightless liquid blush for a natural flush.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 1800,
     costPrice: 1260,
     stock: 35,
@@ -282,7 +317,7 @@ const sampleProducts = [
   {
     name: 'Too Faced Better Than Sex Mascara',
     description: 'Volumizing mascara for dramatic lashes.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 2100,
     costPrice: 1470,
     stock: 47,
@@ -297,7 +332,7 @@ const sampleProducts = [
   {
     name: 'Olaplex No. 3 Hair Perfector',
     description: 'At-home treatment to repair damaged hair.',
-    category: 'Pantene hair-care',
+    category: 'Hair Care',
     price: 2800,
     costPrice: 1960,
     stock: 22,
@@ -310,7 +345,7 @@ const sampleProducts = [
   {
     name: 'Pantene Pro-V Daily Moisture Renewal Shampoo',
     description: 'Nourishing shampoo with Pro-Vitamin B5 for daily moisture',
-    category: 'Pantene hair-care',
+    category: 'Hair Care',
     price: 11.99,
     costPrice: 7.25,
     stock: 200,
@@ -323,7 +358,7 @@ const sampleProducts = [
   {
     name: 'Pantene Gold Series Sulfate-Free Shampoo',
     description: 'Gentle sulfate-free shampoo for textured hair',
-    category: 'Pantene hair-care',
+    category: 'Hair Care',
     price: 15.99,
     costPrice: 9.50,
     stock: 90,
@@ -338,7 +373,7 @@ const sampleProducts = [
   {
     name: 'Dark & Lovely Moisture Plus Conditioner',
     description: 'Rich conditioning formula for dry, damaged hair',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 9.99,
     costPrice: 5.75,
     stock: 110,
@@ -351,7 +386,7 @@ const sampleProducts = [
   {
     name: 'Dark & Lovely Healthy Gloss 5-in-1 Conditioner',
     description: 'Multi-benefit conditioner with 5 hair care benefits in one',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 12.49,
     costPrice: 7.25,
     stock: 85,
@@ -366,7 +401,7 @@ const sampleProducts = [
   {
     name: 'Dove Deeply Nourishing Body Wash',
     description: 'Moisturizing body wash with 1/4 moisturizing cream.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 285,
     costPrice: 200,
     stock: 78,
@@ -381,7 +416,7 @@ const sampleProducts = [
   {
     name: 'Calvin Klein Euphoria Eau de Parfum',
     description: 'Captivating floral fragrance for modern women.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 4200,
     costPrice: 2940,
     stock: 28,
@@ -394,7 +429,7 @@ const sampleProducts = [
   {
     name: 'Chanel Coco Mademoiselle Eau de Parfum',
     description: 'Elegant and sensual fragrance with oriental notes.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 8500,
     costPrice: 5950,
     stock: 15,
@@ -409,7 +444,7 @@ const sampleProducts = [
   {
     name: 'Charlotte Tilbury Magic Cream',
     description: 'Luxury moisturizer for radiant, youthful-looking skin.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 4500,
     costPrice: 3150,
     stock: 20,
@@ -422,7 +457,7 @@ const sampleProducts = [
   {
     name: 'Paula\'s Choice 2% BHA Liquid Exfoliant',
     description: 'Gentle salicylic acid exfoliant for clearer skin.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 2800,
     costPrice: 1960,
     stock: 33,
@@ -437,7 +472,7 @@ const sampleProducts = [
   {
     name: 'CeraVe Hydrating Facial Cleanser',
     description: 'Non-foaming cleanser for normal to dry skin with ceramides.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 650,
     costPrice: 455,
     stock: 55,
@@ -450,7 +485,7 @@ const sampleProducts = [
   {
     name: 'Drunk Elephant C-Firma Day Serum',
     description: 'Vitamin C day serum for firmer, brighter skin.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 6800,
     costPrice: 4760,
     stock: 18,
@@ -463,7 +498,7 @@ const sampleProducts = [
   {
     name: 'Olay Regenerist Micro-Sculpting Cream',
     description: 'Anti-aging moisturizer with amino-peptides and hyaluronic acid.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 1299,
     costPrice: 909,
     stock: 67,
@@ -476,7 +511,7 @@ const sampleProducts = [
   {
     name: 'Garnier Micellar Water',
     description: 'All-in-1 cleanser and makeup remover for sensitive skin.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 399,
     costPrice: 279,
     stock: 120,
@@ -489,7 +524,7 @@ const sampleProducts = [
   {
     name: 'Nivea Creme',
     description: 'Classic moisturizing cream for face, hands and body.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 299,
     costPrice: 209,
     stock: 89,
@@ -504,7 +539,7 @@ const sampleProducts = [
   {
     name: 'NARS Radiant Creamy Concealer',
     description: 'Multi-use concealer with medium to full buildable coverage.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 2200,
     costPrice: 1540,
     stock: 29,
@@ -517,7 +552,7 @@ const sampleProducts = [
   {
     name: 'Tarte Shape Tape Concealer',
     description: 'Full coverage concealer that lasts up to 16 hours.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 2400,
     costPrice: 1680,
     stock: 42,
@@ -530,7 +565,7 @@ const sampleProducts = [
   {
     name: 'Benefit Brow Precisely My Brow Pencil',
     description: 'Ultra-fine tip brow pencil for precise definition.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 2200,
     costPrice: 1540,
     stock: 28,
@@ -543,7 +578,7 @@ const sampleProducts = [
   {
     name: 'Fenty Beauty Gloss Bomb Universal Lip Luminizer',
     description: 'Explosive shine that feels as good as it looks.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 1600,
     costPrice: 1120,
     stock: 38,
@@ -556,7 +591,7 @@ const sampleProducts = [
   {
     name: 'Glossier Cloud Paint',
     description: 'Gel-cream blush for a dewy, natural flush.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 1400,
     costPrice: 980,
     stock: 31,
@@ -569,7 +604,7 @@ const sampleProducts = [
   {
     name: 'L\'Oreal Paris True Match Foundation',
     description: 'Matches skin tone and undertone with buildable coverage.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 799,
     costPrice: 559,
     stock: 67,
@@ -582,7 +617,7 @@ const sampleProducts = [
   {
     name: 'NYX Professional Makeup Butter Gloss',
     description: 'Buttery soft lip gloss with intense color payoff.',
-    category: 'Head Shoulders Shampoo',
+    category: 'Makeup',
     price: 450,
     costPrice: 315,
     stock: 89,
@@ -597,7 +632,7 @@ const sampleProducts = [
   {
     name: 'L\'Oreal Professionnel Serie Expert Vitamino Color Shampoo',
     description: 'Color-protecting shampoo for color-treated hair.',
-    category: 'Pantene hair-care',
+    category: 'Hair Care',
     price: 1299,
     costPrice: 909,
     stock: 45,
@@ -610,7 +645,7 @@ const sampleProducts = [
   {
     name: 'Matrix Biolage Hydrasource Conditioner',
     description: 'Moisturizing conditioner for dry hair with aloe extract.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 1199,
     costPrice: 839,
     stock: 56,
@@ -623,7 +658,7 @@ const sampleProducts = [
   {
     name: 'Schwarzkopf Professional BC Bonacure Repair Rescue Shampoo',
     description: 'Reconstructing shampoo for damaged and over-processed hair.',
-    category: 'Pantene hair-care',
+    category: 'Hair Care',
     price: 1399,
     costPrice: 979,
     stock: 34,
@@ -636,7 +671,7 @@ const sampleProducts = [
   {
     name: 'WOW Skin Science Red Onion Hair Oil',
     description: 'Hair growth oil with red onion extract and essential oils.',
-    category: 'Pantene hair-care',
+    category: 'Hair Care',
     price: 599,
     costPrice: 419,
     stock: 78,
@@ -649,7 +684,7 @@ const sampleProducts = [
   {
     name: 'Mamaearth Onion Hair Mask',
     description: 'Deep conditioning hair mask with onion oil and organic bamboo vinegar.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 399,
     costPrice: 279,
     stock: 67,
@@ -662,7 +697,7 @@ const sampleProducts = [
   {
     name: 'Tresemme Keratin Smooth Shampoo',
     description: 'Smoothing shampoo with keratin for frizz control.',
-    category: 'Pantene hair-care',
+    category: 'Hair Care',
     price: 349,
     costPrice: 244,
     stock: 89,
@@ -675,7 +710,7 @@ const sampleProducts = [
   {
     name: 'Herbal Essences Bio Renew Argan Oil Conditioner',
     description: 'Nourishing conditioner with argan oil for dry hair.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 299,
     costPrice: 209,
     stock: 78,
@@ -690,7 +725,7 @@ const sampleProducts = [
   {
     name: 'Dior Sauvage Eau de Toilette',
     description: 'Fresh and woody fragrance with bergamot and pepper notes.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 6500,
     costPrice: 4550,
     stock: 22,
@@ -703,7 +738,7 @@ const sampleProducts = [
   {
     name: 'Versace Bright Crystal Eau de Toilette',
     description: 'Floral fruity fragrance with pomegranate and peony.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 4800,
     costPrice: 3360,
     stock: 18,
@@ -716,7 +751,7 @@ const sampleProducts = [
   {
     name: 'Hugo Boss Bottled Eau de Toilette',
     description: 'Sophisticated masculine fragrance with apple and cinnamon.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 3200,
     costPrice: 2240,
     stock: 26,
@@ -729,7 +764,7 @@ const sampleProducts = [
   {
     name: 'Gucci Bloom Eau de Parfum',
     description: 'Contemporary floral fragrance with tuberose and jasmine.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 7200,
     costPrice: 5040,
     stock: 15,
@@ -742,7 +777,7 @@ const sampleProducts = [
   {
     name: 'Tom Ford Black Orchid Eau de Parfum',
     description: 'Luxurious oriental fragrance with black orchid and dark chocolate.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 12500,
     costPrice: 8750,
     stock: 8,
@@ -757,7 +792,7 @@ const sampleProducts = [
   {
     name: 'Himalaya Neem Face Wash',
     description: 'Purifying face wash with neem and turmeric for acne-prone skin.',
-    category: 'Mint',
+    category: 'Skincare',
     price: 150,
     costPrice: 105,
     stock: 156,
@@ -770,7 +805,7 @@ const sampleProducts = [
   {
     name: 'Pears Transparent Soap',
     description: 'Gentle transparent soap with glycerin and natural oils.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 45,
     costPrice: 32,
     stock: 234,
@@ -783,7 +818,7 @@ const sampleProducts = [
   {
     name: 'Dettol Original Antiseptic Liquid',
     description: 'Multi-use antiseptic liquid for wound care and household cleaning.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 189,
     costPrice: 132,
     stock: 123,
@@ -796,7 +831,7 @@ const sampleProducts = [
   {
     name: 'Lifebuoy Total 10 Hand Sanitizer',
     description: 'Advanced protection hand sanitizer with silver formula.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 89,
     costPrice: 62,
     stock: 189,
@@ -809,7 +844,7 @@ const sampleProducts = [
   {
     name: 'Palmolive Naturals Milk & Honey Shower Gel',
     description: 'Moisturizing shower gel with milk proteins and honey extracts.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 195,
     costPrice: 137,
     stock: 89,
@@ -824,7 +859,7 @@ const sampleProducts = [
   {
     name: 'Colgate Total Advanced Health Toothpaste',
     description: 'Complete oral care toothpaste with 12-hour protection.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 85,
     costPrice: 60,
     stock: 234,
@@ -837,7 +872,7 @@ const sampleProducts = [
   {
     name: 'Sensodyne Rapid Relief Toothpaste',
     description: 'Fast relief toothpaste for sensitive teeth with stannous fluoride.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 125,
     costPrice: 88,
     stock: 156,
@@ -848,9 +883,9 @@ const sampleProducts = [
     tags: ['sensitive teeth', 'rapid relief', 'fluoride']
   },
   {
-    name: 'Listerine Cool Mint Mouthwash',
+    name: 'Listerine Cool Skincare Mouthwash',
     description: 'Antiseptic mouthwash that kills 99.9% of germs.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 199,
     costPrice: 139,
     stock: 89,
@@ -858,14 +893,14 @@ const sampleProducts = [
     totalSold: 156,
     averageRating: 4.2,
     reviewCount: 234,
-    tags: ['mouthwash', 'antiseptic', 'cool mint']
+    tags: ['mouthwash', 'antiseptic', 'cool Skincare']
   },
 
   // Deodorants
   {
     name: 'Axe Dark Temptation Deodorant Spray',
     description: 'Long-lasting deodorant spray with dark chocolate fragrance.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 299,
     costPrice: 209,
     stock: 67,
@@ -878,7 +913,7 @@ const sampleProducts = [
   {
     name: 'Rexona Women Maximum Protection Antiperspirant',
     description: '96-hour protection antiperspirant deodorant for women.',
-    category: 'Dark & Lovely Conditioner',
+    category: 'Personal Care',
     price: 349,
     costPrice: 244,
     stock: 45,
@@ -886,7 +921,392 @@ const sampleProducts = [
     totalSold: 89,
     averageRating: 4.3,
     reviewCount: 156,
-    tags: ['antiperspirant', '96-hour protection', 'women']
+    tags: ['antiperspirant', '96-hour protection', 'women'],
+    images: [{ url: '/images/rexona-antiperspirant.jpg', alt: 'Rexona Antiperspirant' }]
+  },
+
+  // Men's Grooming Products
+  {
+    name: 'Gillette Fusion5 Razor',
+    description: 'Advanced 5-blade razor for a close and comfortable shave.',
+    category: 'Men\'s Grooming',
+    price: 599,
+    costPrice: 419,
+    stock: 45,
+    sku: 'GIL001',
+    totalSold: 123,
+    averageRating: 4.5,
+    reviewCount: 234,
+    tags: ['razor', '5-blade', 'men', 'shaving'],
+    images: [{ url: '/images/gillette-fusion5.jpg', alt: 'Gillette Fusion5 Razor' }]
+  },
+  {
+    name: 'The Man Company Charcoal Face Wash',
+    description: 'Deep cleansing charcoal face wash for men.',
+    category: 'Men\'s Grooming',
+    price: 299,
+    costPrice: 209,
+    stock: 67,
+    sku: 'TMC001',
+    totalSold: 89,
+    averageRating: 4.2,
+    reviewCount: 156,
+    tags: ['charcoal', 'face wash', 'men', 'cleansing'],
+    images: [{ url: '/images/man-company-charcoal.jpg', alt: 'The Man Company Charcoal Face Wash' }]
+  },
+  {
+    name: 'Beardo Beard Growth Oil',
+    description: 'Natural beard growth oil with essential nutrients.',
+    category: 'Men\'s Grooming',
+    price: 449,
+    costPrice: 314,
+    stock: 34,
+    sku: 'BRD001',
+    totalSold: 67,
+    averageRating: 4.3,
+    reviewCount: 189,
+    tags: ['beard oil', 'growth', 'men', 'natural'],
+    images: [{ url: '/images/beardo-beard-oil.jpg', alt: 'Beardo Beard Growth Oil' }]
+  },
+
+  // Baby Care Products
+  {
+    name: 'Johnson\'s Baby Shampoo',
+    description: 'Gentle, no more tears formula for baby\'s delicate hair.',
+    category: 'Baby Care',
+    price: 189,
+    costPrice: 132,
+    stock: 89,
+    sku: 'JOH001',
+    totalSold: 234,
+    averageRating: 4.6,
+    reviewCount: 345,
+    tags: ['baby', 'shampoo', 'gentle', 'no tears'],
+    images: [{ url: '/images/johnsons-baby-shampoo.jpg', alt: 'Johnson Baby Shampoo' }]
+  },
+  {
+    name: 'Himalaya Baby Lotion',
+    description: 'Nourishing baby lotion with natural ingredients.',
+    category: 'Baby Care',
+    price: 145,
+    costPrice: 102,
+    stock: 78,
+    sku: 'HIM002',
+    totalSold: 156,
+    averageRating: 4.4,
+    reviewCount: 234,
+    tags: ['baby', 'lotion', 'natural', 'nourishing'],
+    images: [{ url: '/images/himalaya-baby-lotion.jpg', alt: 'Himalaya Baby Lotion' }]
+  },
+  {
+    name: 'Pampers Baby Dry Diapers',
+    description: 'All-night protection with 3 Extra Absorb Channels.',
+    category: 'Baby Care',
+    price: 999,
+    costPrice: 699,
+    stock: 45,
+    sku: 'PAM001',
+    totalSold: 89,
+    averageRating: 4.3,
+    reviewCount: 167,
+    tags: ['diapers', 'baby', 'protection', 'dry'],
+    images: [{ url: '/images/pampers-baby-dry.jpg', alt: 'Pampers Baby Dry Diapers' }]
+  },
+
+  // Wellness Products
+  {
+    name: 'HealthKart Multivitamin',
+    description: 'Complete multivitamin with 24 essential nutrients.',
+    category: 'Wellness',
+    price: 799,
+    costPrice: 559,
+    stock: 56,
+    sku: 'HK001',
+    totalSold: 78,
+    averageRating: 4.1,
+    reviewCount: 234,
+    tags: ['multivitamin', 'wellness', 'nutrients', 'health'],
+    images: [{ url: '/images/healthkart-multivitamin.jpg', alt: 'HealthKart Multivitamin' }]
+  },
+  {
+    name: 'Dabur Chyawanprash',
+    description: 'Ayurvedic immunity booster with 40+ herbs and spices.',
+    category: 'Wellness',
+    price: 299,
+    costPrice: 209,
+    stock: 89,
+    sku: 'DAB001',
+    totalSold: 156,
+    averageRating: 4.4,
+    reviewCount: 345,
+    tags: ['ayurvedic', 'immunity', 'herbs', 'traditional'],
+    images: [{ url: '/images/dabur-chyawanprash.jpg', alt: 'Dabur Chyawanprash' }]
+  },
+  {
+    name: 'Neurobion Forte Tablets',
+    description: 'Vitamin B complex supplement for nerve health.',
+    category: 'Wellness',
+    price: 45,
+    costPrice: 32,
+    stock: 234,
+    sku: 'NEU002',
+    totalSold: 567,
+    averageRating: 4.2,
+    reviewCount: 189,
+    tags: ['vitamin b', 'supplement', 'nerve health', 'tablets'],
+    images: [{ url: '/images/neurobion-forte.jpg', alt: 'Neurobion Forte Tablets' }]
+  },
+
+  // Additional Fragrance Products
+  {
+    name: 'Bombay Shaving Company Perfume',
+    description: 'Fresh and woody fragrance for the modern man.',
+    category: 'Fragrance',
+    price: 899,
+    costPrice: 629,
+    stock: 34,
+    sku: 'BSC001',
+    totalSold: 67,
+    averageRating: 4.0,
+    reviewCount: 123,
+    tags: ['perfume', 'woody', 'fresh', 'men'],
+    images: [{ url: '/images/bombay-shaving-perfume.jpg', alt: 'Bombay Shaving Company Perfume' }]
+  },
+  {
+    name: 'Engage Cologne Spray',
+    description: 'Long-lasting cologne spray with captivating fragrance.',
+    category: 'Fragrance',
+    price: 299,
+    costPrice: 209,
+    stock: 78,
+    sku: 'ENG001',
+    totalSold: 189,
+    averageRating: 3.9,
+    reviewCount: 234,
+    tags: ['cologne', 'spray', 'long-lasting', 'captivating'],
+    images: [{ url: '/images/engage-cologne.jpg', alt: 'Engage Cologne Spray' }]
+  },
+  {
+    name: 'Wild Stone Body Perfume',
+    description: 'Refreshing body perfume with long-lasting fragrance.',
+    category: 'Fragrance',
+    price: 199,
+    costPrice: 139,
+    stock: 89,
+    sku: 'WS001',
+    totalSold: 234,
+    averageRating: 3.8,
+    reviewCount: 167,
+    tags: ['body perfume', 'refreshing', 'long-lasting', 'affordable'],
+    images: [{ url: '/images/wildstone-perfume.jpg', alt: 'Wild Stone Body Perfume' }]
+  },
+
+  // Additional Skincare Products
+  {
+    name: 'Bio-Oil Skincare Oil',
+    description: 'Multi-use skincare oil for scars, stretch marks, and uneven skin tone.',
+    category: 'Skincare',
+    price: 899,
+    costPrice: 629,
+    stock: 45,
+    sku: 'BIO001',
+    totalSold: 123,
+    averageRating: 4.5,
+    reviewCount: 298,
+    tags: ['bio-oil', 'scars', 'stretch marks', 'skincare oil'],
+    images: [{ url: '/images/bio-oil.jpg', alt: 'Bio-Oil Skincare Oil' }]
+  },
+  {
+    name: 'Forest Essentials Facial Cleanser',
+    description: 'Ayurvedic facial cleanser with sandalwood and saffron.',
+    category: 'Skincare',
+    price: 1250,
+    costPrice: 875,
+    stock: 30,
+    sku: 'FE001',
+    totalSold: 67,
+    averageRating: 4.7,
+    reviewCount: 145,
+    tags: ['ayurvedic', 'sandalwood', 'saffron', 'luxury'],
+    images: [{ url: '/images/forest-essentials-cleanser.jpg', alt: 'Forest Essentials Facial Cleanser' }]
+  },
+  {
+    name: 'Minimalist Hyaluronic Acid Serum',
+    description: '2% Hyaluronic Acid serum for intense hydration and plumping.',
+    category: 'Skincare',
+    price: 599,
+    costPrice: 419,
+    stock: 78,
+    sku: 'MIN001',
+    totalSold: 189,
+    averageRating: 4.6,
+    reviewCount: 234,
+    tags: ['hyaluronic acid', 'hydration', 'plumping', 'serum'],
+    images: [{ url: '/images/minimalist-ha-serum.jpg', alt: 'Minimalist Hyaluronic Acid Serum' }]
+  },
+
+  // Additional Makeup Products
+  {
+    name: 'Huda Beauty Liquid Matte Lipstick',
+    description: 'Long-wearing liquid lipstick with intense color payoff.',
+    category: 'Makeup',
+    price: 1650,
+    costPrice: 1155,
+    stock: 34,
+    sku: 'HB001',
+    totalSold: 89,
+    averageRating: 4.7,
+    reviewCount: 178,
+    tags: ['liquid lipstick', 'matte', 'long-wearing', 'huda beauty'],
+    images: [{ url: '/images/huda-liquid-lipstick.jpg', alt: 'Huda Beauty Liquid Matte Lipstick' }]
+  },
+  {
+    name: 'Colorbar Perfect Match Concealer',
+    description: 'Full coverage concealer that matches Indian skin tones perfectly.',
+    category: 'Makeup',
+    price: 699,
+    costPrice: 489,
+    stock: 56,
+    sku: 'CB001',
+    totalSold: 134,
+    averageRating: 4.3,
+    reviewCount: 267,
+    tags: ['concealer', 'indian skin tones', 'full coverage', 'colorbar'],
+    images: [{ url: '/images/colorbar-concealer.jpg', alt: 'Colorbar Perfect Match Concealer' }]
+  },
+  {
+    name: 'Lakme Eyeconic Kajal',
+    description: 'Intense black kajal with 22-hour stay power.',
+    category: 'Makeup',
+    price: 275,
+    costPrice: 193,
+    stock: 123,
+    sku: 'LAK002',
+    totalSold: 445,
+    averageRating: 4.2,
+    reviewCount: 567,
+    tags: ['kajal', 'black', '22-hour', 'lakme'],
+    images: [{ url: '/images/lakme-kajal.jpg', alt: 'Lakme Eyeconic Kajal' }]
+  },
+
+  // Additional Hair Care Products
+  {
+    name: 'Moroccanoil Treatment',
+    description: 'Original hair treatment with argan oil for all hair types.',
+    category: 'Hair Care',
+    price: 3200,
+    costPrice: 2240,
+    stock: 25,
+    sku: 'MOR001',
+    totalSold: 78,
+    averageRating: 4.8,
+    reviewCount: 189,
+    tags: ['argan oil', 'hair treatment', 'moroccan', 'luxury'],
+    images: [{ url: '/images/moroccanoil-treatment.jpg', alt: 'Moroccanoil Treatment' }]
+  },
+  {
+    name: 'Khadi Natural Hair Oil',
+    description: 'Ayurvedic hair oil with 18 herbs for hair growth and nourishment.',
+    category: 'Hair Care',
+    price: 349,
+    costPrice: 244,
+    stock: 89,
+    sku: 'KH001',
+    totalSold: 234,
+    averageRating: 4.1,
+    reviewCount: 345,
+    tags: ['ayurvedic', '18 herbs', 'hair growth', 'natural'],
+    images: [{ url: '/images/khadi-hair-oil.jpg', alt: 'Khadi Natural Hair Oil' }]
+  },
+
+  // Additional Men's Grooming Products
+  {
+    name: 'Ustraa Beard Growth Oil',
+    description: 'Premium beard growth oil with 8 natural oils.',
+    category: 'Men\'s Grooming',
+    price: 549,
+    costPrice: 384,
+    stock: 67,
+    sku: 'UST001',
+    totalSold: 156,
+    averageRating: 4.4,
+    reviewCount: 234,
+    tags: ['beard growth', '8 oils', 'premium', 'men'],
+    images: [{ url: '/images/ustraa-beard-oil.jpg', alt: 'Ustraa Beard Growth Oil' }]
+  },
+  {
+    name: 'Park Avenue Deodorant Spray',
+    description: 'Long-lasting deodorant spray with sophisticated fragrance.',
+    category: 'Men\'s Grooming',
+    price: 199,
+    costPrice: 139,
+    stock: 123,
+    sku: 'PA001',
+    totalSold: 345,
+    averageRating: 4.0,
+    reviewCount: 456,
+    tags: ['deodorant', 'long-lasting', 'sophisticated', 'men'],
+    images: [{ url: '/images/park-avenue-deo.jpg', alt: 'Park Avenue Deodorant Spray' }]
+  },
+
+  // Additional Baby Care Products
+  {
+    name: 'Mamaearth Baby Lotion',
+    description: 'Natural baby lotion with oats, milk and calendula.',
+    category: 'Baby Care',
+    price: 299,
+    costPrice: 209,
+    stock: 89,
+    sku: 'ME002',
+    totalSold: 189,
+    averageRating: 4.5,
+    reviewCount: 267,
+    tags: ['baby lotion', 'oats', 'milk', 'calendula', 'natural'],
+    images: [{ url: '/images/mamaearth-baby-lotion.jpg', alt: 'Mamaearth Baby Lotion' }]
+  },
+  {
+    name: 'Sebamed Baby Cleansing Bar',
+    description: 'Extra mild cleansing bar with pH 5.5 for baby\'s delicate skin.',
+    category: 'Baby Care',
+    price: 195,
+    costPrice: 137,
+    stock: 67,
+    sku: 'SB001',
+    totalSold: 123,
+    averageRating: 4.4,
+    reviewCount: 178,
+    tags: ['cleansing bar', 'pH 5.5', 'mild', 'baby'],
+    images: [{ url: '/images/sebamed-baby-bar.jpg', alt: 'Sebamed Baby Cleansing Bar' }]
+  },
+
+  // Additional Wellness Products
+  {
+    name: 'Himalaya Ashwagandha Tablets',
+    description: 'Pure ashwagandha tablets for stress relief and energy boost.',
+    category: 'Wellness',
+    price: 399,
+    costPrice: 279,
+    stock: 156,
+    sku: 'HIM003',
+    totalSold: 234,
+    averageRating: 4.3,
+    reviewCount: 345,
+    tags: ['ashwagandha', 'stress relief', 'energy', 'ayurvedic'],
+    images: [{ url: '/images/himalaya-ashwagandha.jpg', alt: 'Himalaya Ashwagandha Tablets' }]
+  },
+  {
+    name: 'Patanjali Honey',
+    description: 'Pure and natural honey for health and wellness.',
+    category: 'Wellness',
+    price: 189,
+    costPrice: 132,
+    stock: 234,
+    sku: 'PAT001',
+    totalSold: 567,
+    averageRating: 4.1,
+    reviewCount: 678,
+    tags: ['honey', 'pure', 'natural', 'patanjali'],
+    images: [{ url: '/images/patanjali-honey.jpg', alt: 'Patanjali Honey' }]
   }
 ];
 

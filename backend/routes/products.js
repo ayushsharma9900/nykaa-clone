@@ -1,6 +1,7 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const { protect, authorize } = require('../middleware/auth');
+const { uploadSingle, uploadMultiple, handleUploadError } = require('../middleware/upload');
 const Product = require('../models/Product');
 
 const router = express.Router();
@@ -246,6 +247,351 @@ router.get('/', [
   }
 });
 
+// BULK OPERATIONS (must come before parameterized routes)
+
+// @desc    Bulk update product status
+// @route   PATCH /api/products/bulk/status
+// @access  Private (manager and admin only)
+router.patch('/bulk/status', authorize('manager', 'admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required'),
+  body('isActive').isBoolean().withMessage('isActive must be boolean')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds, isActive } = req.body;
+
+    const result = await Product.updateMany(
+      { _id: { $in: productIds } },
+      { isActive }
+    );
+
+    res.json({
+      success: true,
+      message: `${result.modifiedCount} products ${isActive ? 'activated' : 'deactivated'} successfully`,
+      data: {
+        matchedCount: result.matchedCount,
+        modifiedCount: result.modifiedCount
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @desc    Bulk delete products (soft delete)
+// @route   DELETE /api/products/bulk
+// @access  Private (admin only)
+router.delete('/bulk', authorize('admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds } = req.body;
+
+    const result = await Product.updateMany(
+      { _id: { $in: productIds } },
+      { isActive: false }
+    );
+
+    res.json({
+      success: true,
+      message: `${result.modifiedCount} products deleted successfully`,
+      data: {
+        matchedCount: result.matchedCount,
+        modifiedCount: result.modifiedCount
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @desc    Bulk update product inventory
+// @route   PATCH /api/products/bulk/inventory
+// @access  Private (manager and admin only)
+router.patch('/bulk/inventory', authorize('manager', 'admin'), [
+  body('updates').isArray({ min: 1 }).withMessage('Updates array is required'),
+  body('updates.*.productId').isMongoId().withMessage('Valid product ID is required'),
+  body('updates.*.stock').isInt({ min: 0 }).withMessage('Stock must be a non-negative integer')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { updates } = req.body;
+    let successCount = 0;
+    let failureCount = 0;
+    const results = [];
+
+    for (const update of updates) {
+      try {
+        const product = await Product.findByIdAndUpdate(
+          update.productId,
+          { stock: update.stock },
+          { new: true, runValidators: true }
+        );
+
+        if (product) {
+          successCount++;
+          results.push({
+            productId: update.productId,
+            success: true,
+            name: product.name,
+            newStock: product.stock
+          });
+        } else {
+          failureCount++;
+          results.push({
+            productId: update.productId,
+            success: false,
+            error: 'Product not found'
+          });
+        }
+      } catch (error) {
+        failureCount++;
+        results.push({
+          productId: update.productId,
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Bulk inventory update completed: ${successCount} successful, ${failureCount} failed`,
+      data: {
+        successCount,
+        failureCount,
+        results
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @desc    Bulk change product category
+// @route   PATCH /api/products/bulk/category
+// @access  Private (manager and admin only)
+router.patch('/bulk/category', authorize('manager', 'admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required'),
+  body('category').trim().notEmpty().withMessage('Category is required')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds, category } = req.body;
+
+    // Check if category exists and is active
+    const Category = require('../models/Category');
+    const categoryExists = await Category.findOne({ name: category, isActive: true });
+    if (!categoryExists) {
+      // Get list of available categories for helpful error message
+      const availableCategories = await Category.find({ isActive: true }, 'name').lean();
+      const categoryNames = availableCategories.map(cat => cat.name).join(', ');
+      
+      return res.status(400).json({
+        success: false,
+        message: `Invalid category "${category}". Category does not exist or is inactive. Available categories: ${categoryNames}`
+      });
+    }
+
+    const result = await Product.updateMany(
+      { _id: { $in: productIds } },
+      { category }
+    );
+
+    res.json({
+      success: true,
+      message: `${result.modifiedCount} products moved to ${category} category successfully`,
+      data: {
+        matchedCount: result.matchedCount,
+        modifiedCount: result.modifiedCount,
+        category
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @desc    Bulk update product prices
+// @route   PATCH /api/products/bulk/pricing
+// @access  Private (manager and admin only)
+router.patch('/bulk/pricing', authorize('manager', 'admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required'),
+  body('priceChange').isObject().withMessage('Price change configuration is required'),
+  body('priceChange.type').isIn(['percentage', 'fixed']).withMessage('Price change type must be percentage or fixed'),
+  body('priceChange.value').isNumeric().withMessage('Price change value must be numeric')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds, priceChange } = req.body;
+    let successCount = 0;
+    let failureCount = 0;
+    const results = [];
+
+    const products = await Product.find({ _id: { $in: productIds } });
+
+    for (const product of products) {
+      try {
+        let newPrice;
+        let newCostPrice;
+
+        if (priceChange.type === 'percentage') {
+          const multiplier = 1 + (parseFloat(priceChange.value) / 100);
+          newPrice = Math.round(product.price * multiplier * 100) / 100;
+          newCostPrice = Math.round(product.costPrice * multiplier * 100) / 100;
+        } else {
+          newPrice = product.price + parseFloat(priceChange.value);
+          newCostPrice = product.costPrice + parseFloat(priceChange.value);
+        }
+
+        // Ensure prices don't go below 0
+        newPrice = Math.max(0, newPrice);
+        newCostPrice = Math.max(0, newCostPrice);
+
+        await Product.findByIdAndUpdate(
+          product._id,
+          { price: newPrice, costPrice: newCostPrice },
+          { runValidators: true }
+        );
+
+        successCount++;
+        results.push({
+          productId: product._id,
+          success: true,
+          name: product.name,
+          oldPrice: product.price,
+          newPrice,
+          oldCostPrice: product.costPrice,
+          newCostPrice
+        });
+      } catch (error) {
+        failureCount++;
+        results.push({
+          productId: product._id,
+          success: false,
+          error: error.message
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Bulk pricing update completed: ${successCount} successful, ${failureCount} failed`,
+      data: {
+        successCount,
+        failureCount,
+        results,
+        priceChange
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// UPLOAD ROUTES (must come before parameterized routes)
+
+// @desc    Upload single product image
+// @route   POST /api/products/upload/image
+// @access  Private (manager and admin only)
+router.post('/upload/image', authorize('manager', 'admin'), (req, res, next) => {
+  uploadSingle(req, res, (err) => {
+    if (err) {
+      return handleUploadError(err, req, res, next);
+    }
+    
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file provided'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Image uploaded successfully',
+      data: {
+        url: req.file.path,
+        publicId: req.file.filename,
+        originalName: req.file.originalname
+      }
+    });
+  });
+});
+
+// @desc    Upload multiple product images
+// @route   POST /api/products/upload/images
+// @access  Private (manager and admin only)
+router.post('/upload/images', authorize('manager', 'admin'), (req, res, next) => {
+  uploadMultiple(req, res, (err) => {
+    if (err) {
+      return handleUploadError(err, req, res, next);
+    }
+    
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image files provided'
+      });
+    }
+    
+    const uploadedImages = req.files.map(file => ({
+      url: file.path,
+      publicId: file.filename,
+      originalName: file.originalname
+    }));
+    
+    res.json({
+      success: true,
+      message: `${req.files.length} images uploaded successfully`,
+      data: uploadedImages
+    });
+  });
+});
+
+// PARAMETERIZED ROUTES (must come after specific routes)
+
 // @desc    Get single product
 // @route   GET /api/products/:id
 // @access  Private
@@ -298,9 +644,13 @@ router.post('/', authorize('manager', 'admin'), [
     const Category = require('../models/Category');
     const category = await Category.findOne({ name: req.body.category, isActive: true });
     if (!category) {
+      // Get list of available categories for helpful error message
+      const availableCategories = await Category.find({ isActive: true }, 'name').lean();
+      const categoryNames = availableCategories.map(cat => cat.name).join(', ');
+      
       return res.status(400).json({
         success: false,
-        message: 'Invalid category. Category does not exist or is inactive.'
+        message: `Invalid category "${req.body.category}". Category does not exist or is inactive. Available categories: ${categoryNames}`
       });
     }
 
@@ -355,9 +705,13 @@ router.put('/:id', authorize('manager', 'admin'), [
       const Category = require('../models/Category');
       const category = await Category.findOne({ name: req.body.category, isActive: true });
       if (!category) {
+        // Get list of available categories for helpful error message
+        const availableCategories = await Category.find({ isActive: true }, 'name').lean();
+        const categoryNames = availableCategories.map(cat => cat.name).join(', ');
+        
         return res.status(400).json({
           success: false,
-          message: 'Invalid category. Category does not exist or is inactive.'
+          message: `Invalid category "${req.body.category}". Category does not exist or is inactive. Available categories: ${categoryNames}`
         });
       }
     }
@@ -472,99 +826,33 @@ router.patch('/:id/toggle-status', authorize('manager', 'admin'), async (req, re
 // @access  Private (admin only)
 router.delete('/:id', authorize('admin'), async (req, res, next) => {
   try {
+    console.log('Delete request for product ID:', req.params.id);
+    
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { isActive: false },
-      { new: true }
+      { new: true, runValidators: false } // Don't run validators for delete operation
     );
 
     if (!product) {
+      console.log('Product not found:', req.params.id);
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
 
+    console.log('Product deleted successfully:', product.name);
     res.json({
       success: true,
       message: 'Product deleted successfully'
     });
   } catch (error) {
+    console.error('Delete error:', error.message);
+    console.error('Error details:', error);
     next(error);
   }
 });
 
-// @desc    Bulk update product status
-// @route   PATCH /api/products/bulk/status
-// @access  Private (manager and admin only)
-router.patch('/bulk/status', authorize('manager', 'admin'), [
-  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required'),
-  body('isActive').isBoolean().withMessage('isActive must be boolean')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { productIds, isActive } = req.body;
-
-    const result = await Product.updateMany(
-      { _id: { $in: productIds } },
-      { isActive }
-    );
-
-    res.json({
-      success: true,
-      message: `${result.modifiedCount} products ${isActive ? 'activated' : 'deactivated'} successfully`,
-      data: {
-        matchedCount: result.matchedCount,
-        modifiedCount: result.modifiedCount
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Bulk delete products (soft delete)
-// @route   DELETE /api/products/bulk
-// @access  Private (admin only)
-router.delete('/bulk', authorize('admin'), [
-  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { productIds } = req.body;
-
-    const result = await Product.updateMany(
-      { _id: { $in: productIds } },
-      { isActive: false }
-    );
-
-    res.json({
-      success: true,
-      message: `${result.modifiedCount} products deleted successfully`,
-      data: {
-        matchedCount: result.matchedCount,
-        modifiedCount: result.modifiedCount
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
 
 module.exports = router;

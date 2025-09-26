@@ -209,8 +209,39 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', authorize('manager', 'admin'), [
   body('name').trim().notEmpty().withMessage('Category name is required'),
   body('description').trim().notEmpty().withMessage('Category description is required'),
-  body('slug').optional().isString().withMessage('Slug must be a string'),
-  body('image').optional().isURL().withMessage('Image must be a valid URL'),
+  body('slug').optional().custom((value, { req }) => {
+    // If slug is not provided, generate it from name
+    if (!value && req.body.name) {
+      req.body.slug = req.body.name
+        .toLowerCase()
+        .replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+    return true;
+  }),
+  body('image').optional().custom((value) => {
+    if (!value || value.trim() === '') return true;
+    // Allow URLs (http/https)
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        throw new Error('Invalid URL format');
+      }
+    }
+    // Allow relative paths for local files
+    if (value.includes('/') || value.includes('\\')) {
+      return true;
+    }
+    // Allow simple filenames
+    if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(value)) {
+      return true;
+    }
+    throw new Error('Image must be a valid URL or file path');
+  }),
   body('isActive').optional().isBoolean().withMessage('isActive must be boolean'),
   body('sortOrder').optional().isInt().withMessage('Sort order must be an integer')
 ], async (req, res, next) => {
@@ -234,6 +265,17 @@ router.post('/', authorize('manager', 'admin'), [
         success: false,
         message: 'Category with this name already exists'
       });
+    }
+
+    // Check if slug already exists
+    if (req.body.slug) {
+      const existingSlug = await Category.findOne({ slug: req.body.slug });
+      if (existingSlug) {
+        return res.status(400).json({
+          success: false,
+          message: 'Category with this slug already exists'
+        });
+      }
     }
 
     const category = await Category.create(req.body);
@@ -260,8 +302,39 @@ router.post('/', authorize('manager', 'admin'), [
 router.put('/:id', authorize('manager', 'admin'), [
   body('name').optional().trim().notEmpty().withMessage('Category name cannot be empty'),
   body('description').optional().trim().notEmpty().withMessage('Category description cannot be empty'),
-  body('slug').optional().isString().withMessage('Slug must be a string'),
-  body('image').optional().isURL().withMessage('Image must be a valid URL'),
+  body('slug').optional().custom((value, { req }) => {
+    // If name is being updated but slug is not provided, generate slug from name
+    if (!value && req.body.name) {
+      req.body.slug = req.body.name
+        .toLowerCase()
+        .replace(/[^a-z0-9 -]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+    }
+    return true;
+  }),
+  body('image').optional().custom((value) => {
+    if (!value || value.trim() === '') return true;
+    // Allow URLs (http/https)
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        throw new Error('Invalid URL format');
+      }
+    }
+    // Allow relative paths for local files
+    if (value.includes('/') || value.includes('\\')) {
+      return true;
+    }
+    // Allow simple filenames
+    if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(value)) {
+      return true;
+    }
+    throw new Error('Image must be a valid URL or file path');
+  }),
   body('isActive').optional().isBoolean().withMessage('isActive must be boolean'),
   body('sortOrder').optional().isInt().withMessage('Sort order must be an integer')
 ], async (req, res, next) => {
@@ -286,6 +359,21 @@ router.put('/:id', authorize('manager', 'admin'), [
         return res.status(400).json({
           success: false,
           message: 'Category with this name already exists'
+        });
+      }
+    }
+
+    // Check if slug already exists (excluding current category)
+    if (req.body.slug) {
+      const existingSlug = await Category.findOne({
+        slug: req.body.slug,
+        _id: { $ne: req.params.id }
+      });
+      
+      if (existingSlug) {
+        return res.status(400).json({
+          success: false,
+          message: 'Category with this slug already exists'
         });
       }
     }

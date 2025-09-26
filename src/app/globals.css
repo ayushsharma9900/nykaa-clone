@@ -24,3 +24,274 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Admin Panel Input Styles */
+.admin-input {
+  color: #0f172a !important; /* Very dark slate text for maximum readability */
+  background-color: #f8fafc !important; /* Light gray-blue background */
+  font-weight: 500 !important; /* Medium weight for better visibility */
+}
+
+.admin-input::placeholder {
+  color: #64748b !important; /* Medium gray placeholder */
+}
+
+.admin-input:focus {
+  color: #0f172a !important; /* Maintain dark text on focus */
+  background-color: #f1f5f9 !important; /* Slightly darker on focus */
+}
+
+/* Admin field background class */
+.admin-field-bg {
+  background-color: #f8fafc !important; /* Light gray-blue background */
+}
+
+.admin-field-bg:focus {
+  background-color: #f1f5f9 !important; /* Slightly darker on focus */
+}
+
+/* Admin text styling for labels and content */
+.admin-text {
+  color: #0f172a !important; /* Very dark slate for labels and content */
+  font-weight: 500 !important;
+}
+
+.admin-text-secondary {
+  color: #475569 !important; /* Medium slate for secondary text */
+  font-weight: 400 !important;
+}
+
+.admin-text-muted {
+  color: #64748b !important; /* Light slate for muted text */
+}
+
+/* Admin panel global input styling */
+[data-admin-panel] input,
+[data-admin-panel] textarea,
+[data-admin-panel] select {
+  color: #0f172a !important;
+  background-color: #f8fafc !important;
+  font-weight: 500 !important;
+}
+
+[data-admin-panel] input:focus,
+[data-admin-panel] textarea:focus,
+[data-admin-panel] select:focus {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+[data-admin-panel] input::placeholder,
+[data-admin-panel] textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Admin panel text colors for better readability */
+[data-admin-panel] label {
+  color: #0f172a !important;
+  font-weight: 500 !important;
+}
+
+[data-admin-panel] .text-gray-900 {
+  color: #0f172a !important;
+}
+
+[data-admin-panel] .text-gray-700 {
+  color: #334155 !important;
+}
+
+[data-admin-panel] .text-gray-600 {
+  color: #475569 !important;
+}
+
+[data-admin-panel] .text-gray-500 {
+  color: #64748b !important;
+}
+
+/* Comprehensive admin panel text visibility */
+[data-admin-panel] * {
+  color: #0f172a !important;
+}
+
+[data-admin-panel] .bg-gray-50,
+[data-admin-panel] .bg-gray-100 {
+  color: #0f172a !important;
+}
+
+/* Force visibility for commonly faded elements */
+[data-admin-panel] .text-gray-300,
+[data-admin-panel] .text-gray-200 {
+  color: #475569 !important;
+}
+
+/* Enhanced visibility for modal and detail text */
+.admin-modal-text {
+  color: #0f172a !important;
+  font-weight: 500 !important;
+}
+
+.admin-modal-text-secondary {
+  color: #1e293b !important; /* Darker than previous secondary text */
+  font-weight: 400 !important;
+}
+
+.admin-modal-text-muted {
+  color: #475569 !important; /* Darker muted text */
+}
+
+/* Modal-specific overrides for better visibility */
+.admin-modal .text-gray-600 {
+  color: #334155 !important; /* Much darker gray */
+}
+
+.admin-modal .text-gray-500 {
+  color: #475569 !important; /* Darker gray */
+}
+
+.admin-modal .text-gray-400 {
+  color: #64748b !important; /* Visible gray */
+}
+
+/* Ensure all modal content text is visible */
+[data-admin-modal] p,
+[data-admin-modal] span,
+[data-admin-modal] div {
+  color: #0f172a !important;
+}
+
+[data-admin-modal] .text-gray-600 {
+  color: #334155 !important;
+}
+
+[data-admin-modal] .text-gray-500 {
+  color: #475569 !important;
+}
+
+[data-admin-modal] .text-gray-400 {
+  color: #64748b !important;
+}
+
+/* Aggressive text visibility fixes for all admin modals */
+.admin-modal *,
+[data-admin-modal] * {
+  color: #0f172a !important;
+}
+
+/* Preserve specific styling for certain elements */
+.admin-modal .text-green-600,
+[data-admin-modal] .text-green-600 {
+  color: #059669 !important;
+}
+
+.admin-modal .text-red-600,
+[data-admin-modal] .text-red-600 {
+  color: #dc2626 !important;
+}
+
+.admin-modal .text-yellow-400,
+[data-admin-modal] .text-yellow-400 {
+  color: #facc15 !important;
+}
+
+.admin-modal .text-blue-600,
+[data-admin-modal] .text-blue-600 {
+  color: #2563eb !important;
+}
+
+.admin-modal .text-pink-600,
+[data-admin-modal] .text-pink-600 {
+  color: #db2777 !important;
+}
+
+/* Ensure buttons and interactive elements remain visible */
+.admin-modal button,
+[data-admin-modal] button {
+  color: inherit !important;
+}
+
+/* Force all paragraph and span text to be dark */
+.admin-modal p,
+.admin-modal span,
+.admin-modal div,
+.admin-modal h1,
+.admin-modal h2,
+.admin-modal h3,
+.admin-modal h4,
+.admin-modal h5,
+.admin-modal h6,
+[data-admin-modal] p,
+[data-admin-modal] span,
+[data-admin-modal] div,
+[data-admin-modal] h1,
+[data-admin-modal] h2,
+[data-admin-modal] h3,
+[data-admin-modal] h4,
+[data-admin-modal] h5,
+[data-admin-modal] h6 {
+  color: #0f172a !important;
+  font-weight: 500 !important;
+}
+
+/* Specific fixes for order information sections */
+.admin-modal .bg-gray-50 *,
+.admin-modal .bg-gray-100 *,
+[data-admin-modal] .bg-gray-50 *,
+[data-admin-modal] .bg-gray-100 * {
+  color: #0f172a !important;
+  font-weight: 500 !important;
+}
+
+/* Fix for any remaining faded elements */
+.admin-modal [class*="text-gray"],
+[data-admin-modal] [class*="text-gray"] {
+  color: #0f172a !important;
+}
+
+/* Ensure visibility in all backgrounds */
+.admin-modal .bg-white *,
+[data-admin-modal] .bg-white * {
+  color: #0f172a !important;
+}
+
+/* Comprehensive Tailwind text color overrides for admin modals */
+.admin-modal .text-gray-50,
+.admin-modal .text-gray-100,
+.admin-modal .text-gray-200,
+.admin-modal .text-gray-300,
+.admin-modal .text-gray-400,
+.admin-modal .text-gray-500,
+.admin-modal .text-gray-600,
+.admin-modal .text-gray-700,
+.admin-modal .text-gray-800,
+.admin-modal .text-gray-900,
+[data-admin-modal] .text-gray-50,
+[data-admin-modal] .text-gray-100,
+[data-admin-modal] .text-gray-200,
+[data-admin-modal] .text-gray-300,
+[data-admin-modal] .text-gray-400,
+[data-admin-modal] .text-gray-500,
+[data-admin-modal] .text-gray-600,
+[data-admin-modal] .text-gray-700,
+[data-admin-modal] .text-gray-800,
+[data-admin-modal] .text-gray-900 {
+  color: #0f172a !important;
+  font-weight: 500 !important;
+}
+
+/* Override any slate colors that might be faded */
+.admin-modal .text-slate-300,
+.admin-modal .text-slate-400,
+.admin-modal .text-slate-500,
+.admin-modal .text-slate-600,
+[data-admin-modal] .text-slate-300,
+[data-admin-modal] .text-slate-400,
+[data-admin-modal] .text-slate-500,
+[data-admin-modal] .text-slate-600 {
+  color: #0f172a !important;
+}
+
+/* Nuclear option: force all text elements to be visible */
+.admin-modal *:not(svg):not(button):not(input):not(select):not(textarea),
+[data-admin-modal] *:not(svg):not(button):not(input):not(select):not(textarea) {
+  color: #0f172a !important;
+}

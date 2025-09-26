@@ -4,21 +4,33 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useMenuItems } from '@/hooks/useMenuItems';
+import MegaDropdown from '@/components/ui/MegaDropdown';
 import { 
   MagnifyingGlassIcon,
   ShoppingBagIcon,
   UserIcon,
   HeartIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
 
 export default function Header() {
   const { state } = useCart();
   const { state: wishlistState } = useWishlist();
+  const { menuItems, loading: menuLoading } = useMenuItems();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({}); // mobile submenu state
+  
+  // Top-level menu items already come hierarchical from API (with children)
+  const navMenuItems = menuItems; // roots with children
+  
+  const toggleExpand = (id: string) => {
+    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+  };
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,20 +71,19 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            <Link href="/skincare" className="text-gray-700 hover:text-pink-600 font-medium">
-              Skincare
-            </Link>
-            <Link href="/makeup" className="text-gray-700 hover:text-pink-600 font-medium">
-              Makeup
-            </Link>
-            <Link href="/hair-care" className="text-gray-700 hover:text-pink-600 font-medium">
-              Hair Care
-            </Link>
-            <Link href="/fragrance" className="text-gray-700 hover:text-pink-600 font-medium">
-              Fragrance
-            </Link>
+          {/* Desktop Navigation - Enhanced mega dropdown */}
+          <nav className="hidden md:flex space-x-4">
+            {menuLoading ? (
+              <div className="flex space-x-4">
+                {[...Array(6)].map((_, i) => (
+                  <MegaDropdown key={i} category={{} as any} isLoading={true} />
+                ))}
+              </div>
+            ) : (
+              navMenuItems.map((category) => (
+                <MegaDropdown key={category._id} category={category} />
+              ))
+            )}
           </nav>
 
           {/* Search Bar - Desktop */}
@@ -144,38 +155,75 @@ export default function Header() {
           </div>
         )}
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Navigation Menu - Dynamic with collapsible submenus */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="py-4 space-y-4">
-              <Link 
-                href="/skincare" 
-                className="block text-gray-700 hover:text-pink-600 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Skincare
-              </Link>
-              <Link 
-                href="/makeup" 
-                className="block text-gray-700 hover:text-pink-600 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Makeup
-              </Link>
-              <Link 
-                href="/hair-care" 
-                className="block text-gray-700 hover:text-pink-600 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Hair Care
-              </Link>
-              <Link 
-                href="/fragrance" 
-                className="block text-gray-700 hover:text-pink-600 font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Fragrance
-              </Link>
+            <div className="py-4 space-y-2">
+              {menuLoading ? (
+                <div className="space-y-3">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                  ))}
+                </div>
+              ) : (
+                navMenuItems.map((category) => (
+                  <div key={category._id} className="">
+                    <div className="flex items-center justify-between">
+                      <Link 
+                        href={`/${category.slug}`} 
+                        className="block text-gray-700 hover:text-pink-600 font-medium py-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {category.name}
+                      </Link>
+                      {category.children && category.children.length > 0 && (
+                        <button 
+                          className="text-gray-500 hover:text-gray-700 px-2"
+                          onClick={() => toggleExpand(category._id)}
+                          aria-label="Toggle submenu"
+                        >
+                          <ChevronDownIcon 
+                            className={`h-5 w-5 transition-transform ${expanded[category._id] ? 'rotate-180' : ''}`} 
+                          />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Collapsible children (level 1) */}
+                    {category.children && category.children.length > 0 && expanded[category._id] && (
+                      <div className="pl-4 border-l border-gray-200 ml-2">
+                        {category.children.map((child) => (
+                          <div key={child._id} className="py-1">
+                            <Link 
+                              href={`/${child.slug}`} 
+                              className="block text-gray-600 hover:text-pink-600 text-sm py-1"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {child.name}
+                            </Link>
+                            {/* Level 2 children */}
+                            {child.children && child.children.length > 0 && (
+                              <ul className="pl-4 ml-2 border-l border-gray-100">
+                                {child.children.map((sub) => (
+                                  <li key={sub._id} className="py-1">
+                                    <Link 
+                                      href={`/${sub.slug}`} 
+                                      className="block text-gray-500 hover:text-pink-600 text-sm"
+                                      onClick={() => setIsMenuOpen(false)}
+                                    >
+                                      {sub.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}

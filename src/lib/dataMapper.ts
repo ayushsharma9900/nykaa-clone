@@ -119,18 +119,19 @@ export function mapBackendToFrontend(backendProduct: BackendProduct): Product {
   };
 }
 
-// Category mapping functions
+// Category mapping functions - Updated for new category structure
 function mapFrontendCategoryToBackend(frontendCategory: string): string | null {
+  // Since our backend now uses proper category names, we can do direct mapping
   const categoryMap: Record<string, string> = {
-    'Skincare': 'Mint',
-    'Makeup': 'Head Shoulders Shampoo',
-    'Hair Care': 'Pantene hair-care',
-    'Haircare': 'Pantene hair-care',
-    'Shampoo': 'Head Shoulders Shampoo',
-    'Conditioner': 'Dark & Lovely Conditioner',
-    'Fragrance': 'Dark & Lovely Conditioner',
-    'Beauty': 'Mint',
-    'Personal Care': 'Mint'
+    'Beauty': 'Skincare',
+    'Cosmetics': 'Makeup',
+    'Hair': 'Hair Care',
+    'Haircare': 'Hair Care',
+    'Perfume': 'Fragrance',
+    'Grooming': 'Men\'s Grooming',
+    'Baby': 'Baby Care',
+    'Health': 'Wellness',
+    'Personal': 'Personal Care'
   };
   
   // Try exact match first, then case-insensitive match
@@ -150,14 +151,19 @@ function mapFrontendCategoryToBackend(frontendCategory: string): string | null {
 }
 
 function mapBackendCategoryToFrontend(backendCategory: string): string {
+  // Since our backend categories are now proper names, return them directly
   const categoryMap: Record<string, string> = {
-    'Head Shoulders Shampoo': 'Hair Care',
-    'Mint': 'Skincare',
-    'Pantene hair-care': 'Hair Care',
-    'Dark & Lovely Conditioner': 'Hair Care',
+    'Men\'s Grooming': 'Men\'s Grooming',
+    'Baby Care': 'Baby Care',
+    'Hair Care': 'Hair Care',
+    'Personal Care': 'Personal Care',
+    'Skincare': 'Skincare',
+    'Makeup': 'Makeup',
+    'Fragrance': 'Fragrance',
+    'Wellness': 'Wellness'
   };
   
-  return categoryMap[backendCategory] || 'Skincare';
+  return categoryMap[backendCategory] || backendCategory;
 }
 
 // Helper functions

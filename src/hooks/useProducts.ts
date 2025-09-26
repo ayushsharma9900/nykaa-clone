@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Product } from '@/types';
-import { products as fallbackProducts } from '@/data/products';
 import { apiService } from '@/lib/api';
 import { mapBackendToFrontend, mapFrontendToBackend } from '@/lib/dataMapper';
 
@@ -11,7 +10,7 @@ export function useProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch products from API or use fallback data
+  // Fetch products from API dynamically
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -24,10 +23,10 @@ export function useProducts() {
       } else {
         throw new Error('Invalid API response');
       }
-    } catch (err) {
-      console.warn('Failed to fetch from API, using fallback data:', err);
-      setError('Using offline data');
-      setProducts(fallbackProducts);
+    } catch (err: any) {
+      console.error('Failed to fetch products from API:', err);
+      setError(err.message || 'Failed to fetch products. Please ensure the backend server is running.');
+      setProducts([]); // Clear products on error
     } finally {
       setLoading(false);
     }
@@ -51,17 +50,9 @@ export function useProducts() {
       } else {
         throw new Error('Failed to create product');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to add product:', err);
-      // Fallback to local state update
-      const newProduct = {
-        ...product,
-        id: Date.now().toString(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      setProducts(prev => [...prev, newProduct]);
-      return newProduct;
+      throw new Error(err.message || 'Failed to create product');
     }
   };
 
@@ -85,16 +76,9 @@ export function useProducts() {
       } else {
         throw new Error('Failed to update product');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to update product:', err);
-      // Fallback to local state update
-      const updated = { ...updatedProduct, updatedAt: new Date() };
-      setProducts(prev => 
-        prev.map(product => 
-          product.id === updatedProduct.id ? updated : product
-        )
-      );
-      return updated;
+      throw new Error(err.message || 'Failed to update product');
     }
   };
 
@@ -104,16 +88,17 @@ export function useProducts() {
       const response = await apiService.deleteProduct(productId);
       
       if (response.success) {
+        // Remove from local state immediately for UI responsiveness
         setProducts(prev => prev.filter(product => product.id !== productId));
+        // Also refresh from server to ensure consistency
+        await fetchProducts();
         return true;
       } else {
         throw new Error('Failed to delete product');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete product:', err);
-      // Fallback to local state update
-      setProducts(prev => prev.filter(product => product.id !== productId));
-      return true;
+      throw new Error(err.message || 'Failed to delete product');
     }
   };
 

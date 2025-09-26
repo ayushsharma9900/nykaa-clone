@@ -229,8 +229,8 @@ export default function CustomersPage() {
         <div>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
-              <p className="text-gray-600 mt-1">Manage your customer base and relationships</p>
+              <h1 className="admin-text text-2xl font-bold">Customers</h1>
+              <p className="admin-text-secondary mt-1">Manage your customer base and relationships</p>
             </div>
           </div>
 
@@ -296,7 +296,7 @@ export default function CustomersPage() {
                 placeholder="Search customers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-pink-400 text-pink-600 focus:outline-none focus:placeholder-pink-300 focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
+                className="admin-input admin-field-bg block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 placeholder-pink-400 focus:outline-none focus:placeholder-pink-300 focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
               />
             </div>
 
@@ -306,7 +306,7 @@ export default function CustomersPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-pink-500 focus:border-pink-500 text-pink-600"
+                className="admin-input admin-field-bg border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-pink-500 focus:border-pink-500"
               >
                 <option value="" className="text-pink-600">All Status</option>
                 <option value="active" className="text-pink-600">Active</option>
@@ -465,7 +465,7 @@ export default function CustomersPage() {
       {/* Customer Detail Modal */}
       {showCustomerModal && selectedCustomer && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="admin-modal bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" data-admin-modal>
             <div className="flex items-center justify-between p-6 border-b">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">

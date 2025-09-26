@@ -1,17 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { products, categories } from '@/data/products';
 import ProductCard from '@/components/ui/ProductCard';
+import DynamicCategoriesGrid from '@/components/ui/DynamicCategoriesGrid';
+import { useCategories } from '@/hooks/useCategories';
+import { useProducts } from '@/hooks/useProducts';
+
+// Helper function to get appropriate icon for each category
+function getCategoryIcon(categoryName: string): string {
+  const name = categoryName.toLowerCase();
+  if (name.includes('makeup') || name.includes('cosmetic')) return '💄';
+  if (name.includes('skin') || name.includes('face')) return '🧴';
+  if (name.includes('hair')) return '🧴';
+  if (name.includes('fragrance') || name.includes('perfume')) return '🌸';
+  if (name.includes('oil')) return '💧';
+  if (name.includes('personal') || name.includes('care')) return '🧼';
+  if (name.includes('nail')) return '💅';
+  if (name.includes('body')) return '🧴';
+  return '💄'; // Default icon
+}
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
   
+  // Fetch categories and products dynamically from API
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  const { products, loading: productsLoading, error: productsError } = useProducts();
+  
   const featuredProducts = products.slice(0, 8);
   const bestSellers = products.filter(p => p.rating >= 4.5).slice(0, 6);
+  
+  // Categories are now handled by the DynamicCategoriesGrid component
   
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,28 +91,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Dynamic Categories - Show ALL Active Categories */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-8">
-            Shop by Category
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/${category.slug}`}
-                className="group text-center"
-              >
-                <div className="bg-pink-50 rounded-full w-20 h-20 mx-auto mb-3 flex items-center justify-center group-hover:bg-pink-100 transition-colors">
-                  <span className="text-2xl text-pink-600">💄</span>
-                </div>
-                <h3 className="font-medium text-gray-900 group-hover:text-pink-600 transition-colors">
-                  {category.name}
-                </h3>
-              </Link>
-            ))}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Shop by Category
+            </h2>
+            <p className="text-gray-600">
+              Explore our complete range of beauty categories
+            </p>
           </div>
+          
+          <DynamicCategoriesGrid
+            categories={categories}
+            loading={categoriesLoading}
+            error={categoriesError}
+            showViewAll={true}
+            maxDisplay={8}
+            gridCols="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
+          />
         </div>
       </section>
 
@@ -108,11 +128,23 @@ export default function Home() {
               View All →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          
+          {productsLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+            </div>
+          ) : productsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-500 mb-4">Failed to load products: {productsError}</p>
+              <p className="text-gray-500">Please check that the backend server is running.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -130,11 +162,23 @@ export default function Home() {
               View All →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bestSellers.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          
+          {productsLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+            </div>
+          ) : productsError ? (
+            <div className="text-center py-8">
+              <p className="text-red-500 mb-4">Failed to load products: {productsError}</p>
+              <p className="text-gray-500">Please check that the backend server is running.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bestSellers.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

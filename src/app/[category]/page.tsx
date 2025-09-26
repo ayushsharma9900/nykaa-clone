@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo, use } from 'react';
+import { useState, useMemo, use, useEffect } from 'react';
 import { notFound } from 'next/navigation';
-import { products, categories } from '@/data/products';
+import { useCategories } from '@/hooks/useCategories';
+import { useProducts } from '@/hooks/useProducts';
 import ProductCard from '@/components/ui/ProductCard';
 import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
@@ -15,19 +16,25 @@ interface CategoryPageProps {
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { category } = use(params);
   
-  // Find the category by slug
-  const currentCategory = categories.find(cat => cat.slug === category);
+  const { categories } = useCategories();
+  const { products, loading: productsLoading, error: productsError } = useProducts();
   
-  // If category doesn't exist, show 404
-  if (!currentCategory) {
-    notFound();
-  }
-
   const [sortBy, setSortBy] = useState<string>('featured');
   const [priceRange, setPriceRange] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Find the category by slug from API
+  const currentCategory = categories.find(cat => cat.slug === category);
+  
+  // If category doesn't exist, show 404
+  if (!currentCategory && categories.length > 0) {
+    notFound();
+  }
 
   const filteredAndSortedProducts = useMemo(() => {
+    if (!currentCategory) return [];
+    
+    // Use only API products (fully dynamic)
     let filtered = products.filter(product => 
       product.category.toLowerCase() === currentCategory.name.toLowerCase()
     );
@@ -63,7 +70,20 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     }
 
     return filtered;
-  }, [currentCategory, sortBy, priceRange]);
+  }, [currentCategory, sortBy, priceRange, products]);
+
+  // Show loading state while categories are being fetched
+  if (categories.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -72,11 +92,16 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 capitalize">
-              {currentCategory.name}
+              {currentCategory?.name || 'Category'}
             </h1>
             <p className="text-gray-600 mt-1">
-              {filteredAndSortedProducts.length} products found
+              {productsLoading ? 'Loading...' : `${filteredAndSortedProducts.length} products found`}
             </p>
+            {productsError && (
+              <p className="text-red-500 text-sm mt-1">
+                Error loading products: {productsError}
+              </p>
+            )}
           </div>
 
           {/* Mobile filter toggle */}

@@ -47,12 +47,12 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Admin Login
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to access the admin dashboard
-          </p>
+            <h2 className="admin-text mt-6 text-3xl font-extrabold">
+              Admin Login
+            </h2>
+            <p className="admin-text-secondary mt-2 text-sm">
+              Sign in to access the admin dashboard
+            </p>
         </div>
       </div>
 
@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="admin-text block text-sm font-medium">
                 Email address
               </label>
               <div className="mt-1">
@@ -87,14 +87,14 @@ export default function AdminLoginPage() {
                   required
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                  className="admin-input admin-field-bg appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500"
                   placeholder="Enter your email"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="admin-text block text-sm font-medium">
                 Password
               </label>
               <div className="mt-1">
@@ -106,7 +106,7 @@ export default function AdminLoginPage() {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-pink-500 focus:border-pink-500"
+                  className="admin-input admin-field-bg appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500"
                   placeholder="Enter your password"
                 />
               </div>

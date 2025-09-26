@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Authentication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #c82333;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .current-data {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Nykaa Clone - Clear Authentication</h1>
+        
+        <div class="info">
+            <strong>Issue:</strong> "No user found with this token" error occurs when your browser has stored an old/invalid JWT token. This utility helps you clear the authentication data.
+        </div>
+
+        <h3>Current Storage Data:</h3>
+        <div id="currentData" class="current-data">Loading...</div>
+
+        <button onclick="clearAuth()">🗑️ Clear Authentication Data</button>
+        <button onclick="showCurrentData()">🔍 Refresh Current Data</button>
+        
+        <div id="result"></div>
+
+        <div class="info" style="margin-top: 30px;">
+            <strong>After clearing:</strong>
+            <ol>
+                <li>Visit <a href="http://localhost:3000/admin/login" target="_blank">http://localhost:3000/admin/login</a></li>
+                <li>Use test credentials: <code>admin@dashtar.com</code> / <code>password123</code></li>
+                <li>Login should work without the token error</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function showCurrentData() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            const currentDataDiv = document.getElementById('currentData');
+            
+            let output = '';
+            if (token) {
+                output += `TOKEN: ${token.substring(0, 50)}...\n\n`;
+            } else {
+                output += 'TOKEN: (not found)\n\n';
+            }
+            
+            if (user) {
+                output += `USER DATA: ${user}\n\n`;
+            } else {
+                output += 'USER DATA: (not found)\n\n';
+            }
+            
+            output += `TOTAL LOCALSTORAGE ITEMS: ${localStorage.length}\n`;
+            output += `ALL KEYS: ${Object.keys(localStorage).join(', ')}`;
+            
+            currentDataDiv.textContent = output;
+        }
+
+        function clearAuth() {
+            // Clear authentication data
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            // Clear any other auth-related items
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.includes('auth') || key.includes('token') || key.includes('user'))) {
+                    keysToRemove.push(key);
+                }
+            }
+            
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            
+            // Show success message
+            document.getElementById('result').innerHTML = `
+                <div class="success">
+                    ✅ Authentication data cleared successfully!<br>
+                    Removed: token, user data${keysToRemove.length > 2 ? `, and ${keysToRemove.length - 2} other auth items` : ''}
+                </div>
+            `;
+            
+            // Refresh display
+            showCurrentData();
+        }
+
+        // Show current data on page load
+        showCurrentData();
+    </script>
+</body>
+</html>

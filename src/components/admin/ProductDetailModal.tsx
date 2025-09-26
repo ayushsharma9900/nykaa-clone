@@ -42,9 +42,9 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="admin-modal bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto" data-admin-modal>
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold">Product Details</h2>
+          <h2 className="admin-modal-text text-xl font-semibold">Product Details</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -83,13 +83,13 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
             {/* Product Info */}
             <div className="space-y-6">
               <div>
-                <p className="text-sm text-gray-500 uppercase tracking-wide mb-1">
+                <p className="admin-modal-text-muted text-sm uppercase tracking-wide mb-1">
                   {product.brand}
                 </p>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                <h1 className="admin-modal-text text-2xl font-bold mb-2">
                   {product.name}
                 </h1>
-                <p className="text-gray-600">
+                <p className="admin-modal-text-secondary">
                   {product.description}
                 </p>
               </div>
@@ -99,7 +99,7 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
                 <div className="flex items-center">
                   {renderStars(product.rating)}
                 </div>
-                <span className="text-sm text-gray-600">
+                <span className="admin-modal-text-secondary text-sm">
                   {product.rating} ({product.reviewCount} reviews)
                 </span>
               </div>
@@ -107,12 +107,12 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
               {/* Pricing */}
               <div className="space-y-2">
                 <div className="flex items-center space-x-3">
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="admin-modal-text text-3xl font-bold">
                     ₹{product.price}
                   </span>
                   {product.originalPrice && (
                     <>
-                      <span className="text-lg text-gray-500 line-through">
+                      <span className="admin-modal-text-muted text-lg line-through">
                         ₹{product.originalPrice}
                       </span>
                       {product.discount && (
@@ -138,7 +138,7 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
                   }`}>
                     {product.inStock ? 'In Stock' : 'Out of Stock'}
                   </span>
-                  <span className="text-sm text-gray-600">
+                  <span className="admin-modal-text-secondary text-sm">
                     {product.stockCount} units available
                   </span>
                 </div>
@@ -147,13 +147,13 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
               {/* Category & Subcategory */}
               <div className="space-y-2">
                 <div>
-                  <span className="text-sm font-medium text-gray-700">Category: </span>
-                  <span className="text-sm text-gray-600">{product.category}</span>
+                  <span className="admin-modal-text text-sm font-medium">Category: </span>
+                  <span className="admin-modal-text-secondary text-sm">{product.category}</span>
                 </div>
                 {product.subcategory && (
                   <div>
-                    <span className="text-sm font-medium text-gray-700">Subcategory: </span>
-                    <span className="text-sm text-gray-600">{product.subcategory}</span>
+                    <span className="admin-modal-text text-sm font-medium">Subcategory: </span>
+                    <span className="admin-modal-text-secondary text-sm">{product.subcategory}</span>
                   </div>
                 )}
               </div>
@@ -161,7 +161,7 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
               {/* Tags */}
               {product.tags && product.tags.length > 0 && (
                 <div>
-                  <span className="text-sm font-medium text-gray-700 block mb-2">Tags:</span>
+                  <span className="admin-modal-text text-sm font-medium block mb-2">Tags:</span>
                   <div className="flex flex-wrap gap-2">
                     {product.tags.map((tag, index) => (
                       <span
@@ -177,13 +177,13 @@ export default function ProductDetailModal({ isOpen, onClose, product }: Product
 
               {/* Dates */}
               <div className="pt-4 border-t space-y-1">
-                <div className="text-xs text-gray-500">
+                <div className="admin-modal-text-muted text-xs">
                   <span className="font-medium">Created:</span> {new Date(product.createdAt).toLocaleDateString()}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="admin-modal-text-muted text-xs">
                   <span className="font-medium">Updated:</span> {new Date(product.updatedAt).toLocaleDateString()}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="admin-modal-text-muted text-xs">
                   <span className="font-medium">Product ID:</span> {product.id}
                 </div>
               </div>

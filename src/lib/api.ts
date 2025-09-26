@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -169,6 +169,107 @@ class ApiService {
     if (limit) params.append('limit', limit.toString());
     
     return this.request(`/products/alerts/low-stock${params.toString() ? `?${params.toString()}` : ''}`);
+  }
+
+  async uploadProductImage(file: File) {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    try {
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${BACKEND_URL}/api/products/upload/image`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      throw error;
+    }
+  }
+
+  async uploadProductImages(files: File[]) {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+    
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    try {
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+      const response = await fetch(`${BACKEND_URL}/api/products/upload/images`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Images upload failed:', error);
+      throw error;
+    }
+  }
+
+  // Bulk operations for products
+  async bulkUpdateProductStatus(productIds: string[], isActive: boolean) {
+    return this.request('/products/bulk/status', {
+      method: 'PATCH',
+      body: JSON.stringify({ productIds, isActive }),
+    });
+  }
+
+  async bulkDeleteProducts(productIds: string[]) {
+    return this.request('/products/bulk', {
+      method: 'DELETE',
+      body: JSON.stringify({ productIds }),
+    });
+  }
+
+  async bulkUpdateInventory(updates: Array<{ productId: string; stock: number }>) {
+    return this.request('/products/bulk/inventory', {
+      method: 'PATCH',
+      body: JSON.stringify({ updates }),
+    });
+  }
+
+  async bulkChangeCategory(productIds: string[], category: string) {
+    return this.request('/products/bulk/category', {
+      method: 'PATCH',
+      body: JSON.stringify({ productIds, category }),
+    });
+  }
+
+  async bulkUpdatePricing(
+    productIds: string[], 
+    priceChange: { type: 'percentage' | 'fixed'; value: number }
+  ) {
+    return this.request('/products/bulk/pricing', {
+      method: 'PATCH',
+      body: JSON.stringify({ productIds, priceChange }),
+    });
   }
 
   // Auth methods

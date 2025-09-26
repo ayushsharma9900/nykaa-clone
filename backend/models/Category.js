@@ -9,7 +9,6 @@ const categorySchema = new mongoose.Schema({
   },
   slug: {
     type: String,
-    required: [true, 'Category slug is required'],
     unique: true,
     lowercase: true
   },
@@ -26,6 +25,18 @@ const categorySchema = new mongoose.Schema({
     default: true
   },
   sortOrder: {
+    type: Number,
+    default: 0
+  },
+  menuOrder: {
+    type: Number,
+    default: 0
+  },
+  showInMenu: {
+    type: Boolean,
+    default: true
+  },
+  menuLevel: {
     type: Number,
     default: 0
   },
@@ -49,6 +60,13 @@ categorySchema.virtual('productCount', {
   localField: 'name',
   foreignField: 'category',
   count: true
+});
+
+// Virtual for subcategories
+categorySchema.virtual('subcategories', {
+  ref: 'Category',
+  localField: '_id',
+  foreignField: 'parentId'
 });
 
 // Ensure virtual fields are serialized

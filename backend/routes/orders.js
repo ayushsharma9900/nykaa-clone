@@ -16,7 +16,7 @@ router.use(protect);
 router.get('/', [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
-  query('status').optional().isIn(['pending', 'processing', 'delivered', 'cancelled']).withMessage('Invalid status'),
+  query('status').optional().isIn(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']).withMessage('Invalid status'),
   query('paymentMethod').optional().isIn(['cash', 'card', 'credit']).withMessage('Invalid payment method'),
   query('sortBy').optional().isIn(['orderDate', 'total', 'invoiceNumber']).withMessage('Invalid sort field'),
   query('sortOrder').optional().isIn(['asc', 'desc']).withMessage('Sort order must be asc or desc')
@@ -54,6 +54,7 @@ router.get('/', [
     // Get orders
     const orders = await Order.find(filter)
       .populate('customer', 'name email')
+      .populate('items.product', 'name images')
       .sort(sort)
       .skip(skip)
       .limit(limit);
@@ -233,7 +234,7 @@ router.post('/', authorize('staff', 'manager', 'admin'), [
 // @route   PATCH /api/orders/:id/status
 // @access  Private (staff and above)
 router.patch('/:id/status', authorize('staff', 'manager', 'admin'), [
-  body('status').isIn(['pending', 'processing', 'delivered', 'cancelled']).withMessage('Invalid status'),
+  body('status').isIn(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']).withMessage('Invalid status'),
   body('trackingNumber').optional().isString().withMessage('Tracking number must be a string'),
   body('deliveryDate').optional().isISO8601().withMessage('Invalid delivery date format')
 ], async (req, res, next) => {
@@ -273,6 +274,101 @@ router.patch('/:id/status', authorize('staff', 'manager', 'admin'), [
     res.json({
       success: true,
       message: 'Order status updated successfully',
+      data: updatedOrder
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @desc    Update order (comprehensive update)
+// @route   PUT /api/orders/:id
+// @access  Private (staff and above)
+router.put('/:id', authorize('staff', 'manager', 'admin'), [
+  body('status').optional().isIn(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']).withMessage('Invalid status'),
+  body('paymentStatus').optional().isIn(['pending', 'paid', 'failed', 'refunded']).withMessage('Invalid payment status'),
+  body('customerName').optional().isString().notEmpty().withMessage('Customer name cannot be empty'),
+  body('customerEmail').optional().isEmail().withMessage('Invalid customer email'),
+  body('customerPhone').optional().isString().withMessage('Customer phone must be a string'),
+  body('shippingAddress.street').optional().isString().withMessage('Street address must be a string'),
+  body('shippingAddress.city').optional().isString().withMessage('City must be a string'),
+  body('shippingAddress.state').optional().isString().withMessage('State must be a string'),
+  body('shippingAddress.zipCode').optional().isString().withMessage('ZIP code must be a string'),
+  body('shippingAddress.country').optional().isString().withMessage('Country must be a string'),
+  body('notes').optional().isString().withMessage('Notes must be a string'),
+  body('trackingNumber').optional().isString().withMessage('Tracking number must be a string')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const order = await Order.findById(req.params.id).populate('customer');
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    const {
+      status,
+      paymentStatus,
+      customerName,
+      customerEmail,
+      customerPhone,
+      shippingAddress,
+      notes,
+      trackingNumber
+    } = req.body;
+
+    // Build update object
+    const updateData = {};
+    if (status !== undefined) updateData.status = status;
+    if (paymentStatus !== undefined) updateData.paymentStatus = paymentStatus;
+    if (customerName !== undefined) updateData.customerName = customerName;
+    if (notes !== undefined) updateData.notes = notes;
+    if (trackingNumber !== undefined) updateData.trackingNumber = trackingNumber;
+    
+    // Handle shipping address update
+    if (shippingAddress) {
+      updateData.shippingAddress = {
+        ...order.shippingAddress,
+        ...shippingAddress
+      };
+    }
+
+    // Set delivery date if status is changed to delivered
+    if (status === 'delivered' && order.status !== 'delivered') {
+      updateData.deliveryDate = new Date();
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('customer', 'name email phone')
+     .populate('items.product', 'name sku images');
+
+    // If customer information is updated, also update the customer record
+    if (customerEmail !== undefined || customerPhone !== undefined) {
+      const customerUpdates = {};
+      if (customerEmail !== undefined) customerUpdates.email = customerEmail;
+      if (customerPhone !== undefined) customerUpdates.phone = customerPhone;
+      
+      if (Object.keys(customerUpdates).length > 0) {
+        await Customer.findByIdAndUpdate(order.customer._id, customerUpdates);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Order updated successfully',
       data: updatedOrder
     });
   } catch (error) {

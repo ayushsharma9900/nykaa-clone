@@ -13,7 +13,8 @@ import {
   FolderIcon,
   TagIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  Bars3BottomLeftIcon
 } from '@heroicons/react/24/outline';
 
 interface AdminLayoutProps {
@@ -27,6 +28,7 @@ const navigation = [
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCartIcon },
   { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
   { name: 'Categories', href: '/admin/categories', icon: FolderIcon },
+  { name: 'Menu Management', href: '/admin/menu-management', icon: Bars3BottomLeftIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: ChartBarIcon },
   { name: 'Settings', href: '/admin/settings', icon: CogIcon },
 ];
@@ -75,7 +77,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" data-admin-panel>
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />

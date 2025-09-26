@@ -25,6 +25,7 @@
     "@capacitor/splash-screen": "^7.0.3",
     "@capacitor/status-bar": "^7.0.3",
     "@headlessui/react": "^2.2.8",
+    "@hello-pangea/dnd": "^18.0.1",
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.16.2",
     "bcryptjs": "^3.0.2",
