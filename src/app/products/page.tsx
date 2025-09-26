@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { products, categories } from '@/data/products';
 import ProductCard from '@/components/ui/ProductCard';
+import { useProducts } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
 import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
+  const { products, loading: productsLoading, error: productsError } = useProducts();
+  const { categories, loading: categoriesLoading } = useCategories();
+  
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('featured');
   const [priceRange, setPriceRange] = useState<string>('');
@@ -20,6 +24,9 @@ export default function ProductsPage() {
       setSearchQuery(search);
     }
   }, [searchParams]);
+  
+  // Filter only active categories
+  const activeCategories = categories.filter(cat => cat.isActive);
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
@@ -75,6 +82,19 @@ export default function ProductsPage() {
     return filtered;
   }, [selectedCategory, sortBy, priceRange, searchQuery]);
 
+  // Show loading state
+  if (productsLoading || categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,6 +112,11 @@ export default function ProductsPage() {
             <p className="text-gray-600 mt-1">
               {filteredAndSortedProducts.length} products found
             </p>
+            {productsError && (
+              <p className="text-red-500 text-sm mt-1">
+                Error loading products: {productsError}
+              </p>
+            )}
           </div>
 
           {/* Mobile filter toggle */}
@@ -121,8 +146,8 @@ export default function ProductsPage() {
                   />
                   <span className="ml-2 text-sm text-pink-600">All Categories</span>
                 </label>
-                {categories.map((category) => (
-                  <label key={category.id} className="flex items-center">
+                {activeCategories.map((category) => (
+                  <label key={category._id} className="flex items-center">
                     <input
                       type="radio"
                       name="category"
@@ -131,7 +156,9 @@ export default function ProductsPage() {
                       onChange={(e) => setSelectedCategory(e.target.value)}
                       className="text-pink-600 focus:ring-pink-500"
                     />
-                    <span className="ml-2 text-sm text-pink-600">{category.name}</span>
+                    <span className="ml-2 text-sm text-pink-600">
+                      {category.name} {category.productCount ? `(${category.productCount})` : ''}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -200,5 +227,21 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+          </div>
+        </div>
+      </div>
+    }>
+      <ProductsContent />
+    </Suspense>
   );
 }

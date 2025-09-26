@@ -4,7 +4,7 @@ import { useState, use } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { products } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/contexts/ToastContext';
@@ -27,18 +27,30 @@ interface ProductPageProps {
 
 export default function ProductPage({ params }: ProductPageProps) {
   const { id } = use(params);
-  const product = products.find(p => p.id === id);
+  const { products, loading } = useProducts();
   const { addToCart, isInCart, getItemQuantity } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
   
-  if (!product) {
-    notFound();
-  }
-
+  // Initialize state hooks at the top
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+      </div>
+    );
+  }
+  
+  const product = products.find(p => p.id === id);
+  
+  if (!product) {
+    notFound();
+  }
   
   const isWishlisted = isInWishlist(product.id);
 

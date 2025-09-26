@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Product } from '@/types';
-import { products as fallbackProducts } from '@/data/products';
 import { apiService } from '@/lib/api';
 import { mapBackendToFrontend, mapFrontendToBackend } from '@/lib/dataMapper';
 import { validateProductForAPI, logValidationResults } from '@/lib/productValidation';
@@ -19,29 +18,31 @@ export function useAdminProducts() {
       setError(null);
       
       // Use admin endpoint with maximum allowed limit to get all products
-      const response = await apiService.getAllProductsForAdmin({ limit: 100 });
+      // Only show active products by default (inactive products can be viewed separately)
+      const response = await apiService.getAllProductsForAdmin({ limit: 100, status: 'active' });
       if (response.success && response.data && Array.isArray(response.data)) {
         const mappedProducts = response.data.map(mapBackendToFrontend);
         setProducts(mappedProducts);
       } else {
         throw new Error('Invalid API response');
       }
-    } catch (err) {
-      console.warn('Failed to fetch from admin API, using regular API:', err);
+    } catch (err: any) {
+      console.error('Failed to fetch from admin API, trying regular API:', err);
       
-      // Fallback to regular products API with maximum allowed limit
+      // Fallback to regular products API
       try {
         const response = await apiService.getProducts({ limit: 100 });
         if (response.success && response.data && Array.isArray(response.data)) {
           const mappedProducts = response.data.map(mapBackendToFrontend);
           setProducts(mappedProducts);
+          setError('Using regular API (admin API unavailable)');
         } else {
           throw new Error('Invalid API response');
         }
-      } catch (fallbackErr) {
-        console.warn('Failed to fetch from API, using fallback data:', fallbackErr);
-        setError('Using offline data - API connection failed');
-        setProducts(fallbackProducts);
+      } catch (fallbackErr: any) {
+        console.error('Failed to fetch from both APIs:', fallbackErr);
+        setError(fallbackErr.message || 'Failed to fetch products. Please ensure the backend server is running.');
+        setProducts([]);
       }
     } finally {
       setLoading(false);
@@ -66,17 +67,9 @@ export function useAdminProducts() {
       } else {
         throw new Error('Failed to create product');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to add product:', err);
-      // Fallback to local state update
-      const newProduct = {
-        ...product,
-        id: Date.now().toString(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      setProducts(prev => [...prev, newProduct]);
-      return newProduct;
+      throw new Error(err.message || 'Failed to create product');
     }
   };
 
@@ -100,16 +93,9 @@ export function useAdminProducts() {
       } else {
         throw new Error('Failed to update product');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to update product:', err);
-      // Fallback to local state update
-      const updated = { ...updatedProduct, updatedAt: new Date() };
-      setProducts(prev => 
-        prev.map(product => 
-          product.id === updatedProduct.id ? updated : product
-        )
-      );
-      return updated;
+      throw new Error(err.message || 'Failed to update product');
     }
   };
 
@@ -119,16 +105,17 @@ export function useAdminProducts() {
       const response = await apiService.deleteProduct(productId);
       
       if (response.success) {
+        // Remove from local state immediately for UI responsiveness
         setProducts(prev => prev.filter(product => product.id !== productId));
+        // Also refresh from server to ensure consistency
+        await fetchProducts();
         return true;
       } else {
         throw new Error('Failed to delete product');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete product:', err);
-      // Fallback to local state update
-      setProducts(prev => prev.filter(product => product.id !== productId));
-      return true;
+      throw new Error(err.message || 'Failed to delete product');
     }
   };
 
