@@ -12,7 +12,10 @@
     "dev:full": "concurrently \"npm run dev:backend\" \"npm run dev\"",
     "backend": "cd backend && npm start",
     "cap:build": "npm run build:mobile && npx cap copy",
-    "cap:android": "npx cap open android"
+    "cap:android": "npx cap open android",
+    "seed": "cd backend && node scripts/seedData.js",
+    "seed:menu": "cd backend && node scripts/seedMenuCategories.js",
+    "seed:all": "cd backend && node scripts/seedData.js && node scripts/seedMenuCategories.js"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
