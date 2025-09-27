@@ -87,3 +87,9 @@ export function logValidationResults(product: Product, result: ValidationResult)
     console.log('✅ Product validation passed:', product.name);
   }
 }
+
+// Default export for easier imports
+export default {
+  validateProductForAPI,
+  logValidationResults
+};

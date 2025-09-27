@@ -222,3 +222,9 @@ function generatePlaceholderImage(category: string): string {
   
   return imageMap[category] || 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400';
 }
+
+// Default export for easier imports
+export default {
+  mapFrontendToBackend,
+  mapBackendToFrontend
+};

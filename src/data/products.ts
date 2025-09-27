@@ -668,3 +668,13 @@ export const categories = [
   { id: '4', name: 'Fragrance', slug: 'fragrance' },
   { id: '5', name: 'Personal Care', slug: 'personal-care' }
 ];
+
+// Default export for easier imports
+export default {
+  products,
+  categories,
+  baseProducts,
+  brandPools,
+  subcatPools,
+  imagePools
+};
