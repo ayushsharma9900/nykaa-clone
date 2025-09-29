@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useMemo, use, useEffect } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, useSearchParams } from 'next/navigation';
 import { useCategories } from '@/hooks/useCategories';
+import { usePagination } from '@/hooks/usePagination';
 import { apiService } from '@/lib/api';
 import { mapBackendToFrontend } from '@/lib/dataMapper';
 import ProductCard from '@/components/ui/ProductCard';
+import Pagination from '@/components/ui/Pagination';
 import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
 interface CategoryPageProps {
@@ -16,61 +18,125 @@ interface CategoryPageProps {
 
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { category } = use(params);
+  const searchParams = useSearchParams();
   
   const { categories } = useCategories();
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
   
-  const [sortBy, setSortBy] = useState<string>('featured');
-  const [priceRange, setPriceRange] = useState<string>('');
+  // Use new pagination hook
+  const pagination = usePagination({
+    initialPage: parseInt(searchParams?.get('page') || '1'),
+    initialPageSize: parseInt(searchParams?.get('limit') || '20'),
+    pageSizeOptions: [10, 20, 50, 100]
+  });
+  
+  const [sortBy, setSortBy] = useState<string>(searchParams?.get('sort') || 'featured');
+  const [priceRange, setPriceRange] = useState<string>(searchParams?.get('priceRange') || '');
   const [showFilters, setShowFilters] = useState(false);
   
   // Find the category by slug from API
   const currentCategory = categories.find(cat => cat.slug === category);
   
   // Fetch products for this category
-  useEffect(() => {
-    const fetchCategoryProducts = async () => {
-      if (!currentCategory) return;
-      
-      try {
-        setProductsLoading(true);
-        setProductsError(null);
-        
-        // Use category slug for API call (backend will map it to name)
-        const response = await apiService.getProducts({ 
-          category: category, // Pass the slug
-          limit: 100 
-        });
-        
-        if (response.success && response.data) {
-          const mappedProducts = response.data.map(mapBackendToFrontend);
-          setProducts(mappedProducts);
-        } else {
-          throw new Error(response.message || 'Failed to fetch products');
-        }
-      } catch (err) {
-        console.error('Failed to fetch category products:', err);
-        setProductsError(err instanceof Error ? err.message : 'Failed to fetch products');
-        setProducts([]);
-      } finally {
-        setProductsLoading(false);
-      }
-    };
+  const fetchCategoryProducts = async (page = pagination.paginationState.currentPage, limit = pagination.paginationState.pageSize, sort = sortBy) => {
+    if (!currentCategory) return;
     
+    try {
+      setProductsLoading(true);
+      setProductsError(null);
+      
+      // Map frontend sort to backend sort
+      let backendSortBy = 'createdAt';
+      let sortOrder = 'desc';
+      
+      switch (sort) {
+        case 'price-low':
+          backendSortBy = 'price';
+          sortOrder = 'asc';
+          break;
+        case 'price-high':
+          backendSortBy = 'price';
+          sortOrder = 'desc';
+          break;
+        case 'rating':
+          backendSortBy = 'averageRating';
+          sortOrder = 'desc';
+          break;
+        case 'newest':
+          backendSortBy = 'createdAt';
+          sortOrder = 'desc';
+          break;
+        default:
+          // Keep featured/default sorting
+          break;
+      }
+      
+      // Use category slug for API call (backend will map it to name)
+      const response = await apiService.getProducts({ 
+        category: category, // Pass the slug
+        page,
+        limit,
+        sortBy: backendSortBy,
+        sortOrder: sortOrder as 'asc' | 'desc'
+      });
+      
+      if (response.success && response.data) {
+        const mappedProducts = response.data.map(mapBackendToFrontend);
+        setProducts(mappedProducts);
+        
+        // Update pagination info
+        if (response.pagination) {
+          pagination.updateTotalItems(response.pagination.totalProducts);
+        }
+      } else {
+        throw new Error(response.message || 'Failed to fetch products');
+      }
+    } catch (err) {
+      console.error('Failed to fetch category products:', err);
+      setProductsError(err instanceof Error ? err.message : 'Failed to fetch products');
+      setProducts([]);
+      pagination.updateTotalItems(0);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     fetchCategoryProducts();
   }, [category, currentCategory]);
+  
+  // Update products when sort or pagination changes
+  useEffect(() => {
+    if (currentCategory) {
+      fetchCategoryProducts(pagination.paginationState.currentPage, pagination.paginationState.pageSize, sortBy);
+    }
+  }, [sortBy, pagination.paginationState.currentPage, pagination.paginationState.pageSize, currentCategory]);
   
   // If category doesn't exist, show 404
   if (!currentCategory && categories.length > 0) {
     notFound();
   }
-
-  const filteredAndSortedProducts = useMemo(() => {
-    if (!currentCategory || !products) return [];
+  
+  // Pagination handlers - now managed by pagination hook
+  const handlePageChange = (page: number) => {
+    pagination.goToPage(page);
+  };
+  
+  const handlePageSizeChange = (newPageSize: number) => {
+    pagination.changePageSize(newPageSize);
+  };
+  
+  const handleSortChange = (newSortBy: string) => {
+    setSortBy(newSortBy);
+    pagination.goToFirstPage();
+  };
+  
+  // Apply client-side price range filtering to server results
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
     
-    // Products are already filtered by category from API
     let filtered = [...products];
 
     // Filter by price range
@@ -84,27 +150,8 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       });
     }
 
-    // Sort products
-    switch (sortBy) {
-      case 'price-low':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        break;
-      default:
-        // Keep original order for featured
-        break;
-    }
-
     return filtered;
-  }, [currentCategory, sortBy, priceRange, products]);
+  }, [products, priceRange]);
 
   // Show loading state while categories are being fetched
   if (categories.length === 0) {
@@ -129,7 +176,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               {currentCategory?.name || 'Category'}
             </h1>
             <p className="text-gray-600 mt-1">
-              {productsLoading ? 'Loading...' : `${filteredAndSortedProducts.length} products found`}
+              {productsLoading ? 'Loading...' : `${pagination.paginationState.totalItems} products found`}
             </p>
             {productsError && (
               <p className="text-red-500 text-sm mt-1">
@@ -185,7 +232,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               <div className="relative">
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => handleSortChange(e.target.value)}
                   className="appearance-none bg-white border border-gray-300 rounded-md px-4 py-2 pr-8 text-pink-600 focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 >
                   <option value="featured" className="text-pink-600">Featured</option>
@@ -199,15 +246,33 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             </div>
 
             {/* Products Grid */}
-            {filteredAndSortedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredAndSortedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+            {filteredProducts.length > 0 ? (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+                
+                {/* Pagination */}
+                {pagination.paginationState.totalPages > 1 && (
+                  <Pagination
+                    currentPage={pagination.paginationState.currentPage}
+                    totalPages={pagination.paginationState.totalPages}
+                    totalItems={pagination.paginationState.totalItems}
+                    itemsPerPage={pagination.paginationState.pageSize}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                    showPageSize={true}
+                    pageSizeOptions={[10, 20, 50, 100]}
+                  />
+                )}
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No products found in this category.</p>
+                <p className="text-gray-500 text-lg">
+                  {productsLoading ? 'Loading products...' : 'No products found in this category.'}
+                </p>
               </div>
             )}
           </div>

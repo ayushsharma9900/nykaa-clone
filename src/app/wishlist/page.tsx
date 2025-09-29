@@ -1,10 +1,13 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/contexts/ToastContext';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/ui/Pagination';
 import { 
   HeartIcon,
   ShoppingBagIcon,
@@ -18,6 +21,23 @@ export default function WishlistPage() {
   const { addToCart } = useCart();
   const { showToast } = useToast();
   const wishlistItems = wishlistState.items;
+  
+  // Pagination for large wishlist
+  const pagination = usePagination({
+    initialPageSize: 12,
+    pageSizeOptions: [8, 12, 24, 48],
+    updateURL: false // Don't update URL for wishlist pagination
+  });
+  
+  // Update total items when wishlist changes
+  pagination.updateTotalItems(wishlistItems.length);
+  
+  // Paginate wishlist items
+  const paginatedItems = useMemo(() => {
+    const startIndex = (pagination.paginationState.currentPage - 1) * pagination.paginationState.pageSize;
+    const endIndex = startIndex + pagination.paginationState.pageSize;
+    return wishlistItems.slice(startIndex, endIndex);
+  }, [wishlistItems, pagination.paginationState.currentPage, pagination.paginationState.pageSize]);
 
   const handleAddToCart = (productId: string, productName: string) => {
     const wishlistItem = wishlistItems.find(item => item.productId === productId);
@@ -107,7 +127,7 @@ export default function WishlistPage() {
 
         {/* Wishlist Items */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {wishlistItems.map((item) => (
+          {paginatedItems.map((item) => (
             <div key={item.id} className="group relative bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
               {/* Remove from wishlist button */}
               <button 
@@ -205,6 +225,22 @@ export default function WishlistPage() {
             </div>
           ))}
         </div>
+        
+        {/* Pagination - only show if there are more than pageSize items */}
+        {wishlistItems.length > pagination.paginationState.pageSize && (
+          <div className="mt-8">
+            <Pagination
+              currentPage={pagination.paginationState.currentPage}
+              totalPages={pagination.paginationState.totalPages}
+              totalItems={pagination.paginationState.totalItems}
+              itemsPerPage={pagination.paginationState.pageSize}
+              onPageChange={pagination.goToPage}
+              onPageSizeChange={pagination.changePageSize}
+              showPageSize={true}
+              pageSizeOptions={[8, 12, 24, 48]}
+            />
+          </div>
+        )}
 
         {/* Continue Shopping */}
         <div className="text-center mt-12">

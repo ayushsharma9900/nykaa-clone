@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
-const { connectDB } = require('./config/mysql-database');
+const { connectDB } = require('./config/sqlite-database');
 const errorHandler = require('./middleware/errorHandler');
 
 // Route imports
@@ -59,7 +59,7 @@ app.use('/api/settings', settingsRoutes);
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
-    const { pool } = require('./config/mysql-database');
+    const { pool } = require('./config/sqlite-database');
     const connection = await pool.getConnection();
     connection.release();
     
@@ -68,7 +68,7 @@ app.get('/api/health', async (req, res) => {
       message: 'Nykaa Clone Backend API is running',
       database: {
         status: 'connected',
-        type: 'MySQL'
+        type: 'SQLite'
       },
       timestamp: new Date().toISOString()
     });
@@ -78,7 +78,7 @@ app.get('/api/health', async (req, res) => {
       message: 'Nykaa Clone Backend API is running',
       database: {
         status: 'disconnected',
-        type: 'MySQL',
+        type: 'SQLite',
         error: error.message
       },
       timestamp: new Date().toISOString()
@@ -97,7 +97,7 @@ app.use('*', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

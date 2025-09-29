@@ -1,32 +1,58 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Product } from '@/types';
+import { Product, PaginationInfo } from '@/types';
 import { apiService } from '@/lib/api';
 import { mapBackendToFrontend, mapFrontendToBackend } from '@/lib/dataMapper';
 
-export function useProducts() {
+interface ProductFilters {
+  page?: number;
+  limit?: number;
+  category?: string;
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  sortBy?: 'name' | 'price' | 'createdAt' | 'totalSold' | 'averageRating';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export function useProducts(initialFilters?: ProductFilters) {
   const [products, setProducts] = useState<Product[]>([]);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState<ProductFilters>({
+    page: 1,
+    limit: 20,
+    ...initialFilters
+  });
 
-  // Fetch products from API dynamically
-  const fetchProducts = async () => {
+  // Fetch products from API with filters and pagination
+  const fetchProducts = async (newFilters?: ProductFilters) => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await apiService.getProducts({ limit: 100 });
+      const currentFilters = { ...filters, ...newFilters };
+      const response = await apiService.getProducts(currentFilters);
+      
       if (response.success && response.data && Array.isArray(response.data)) {
         const mappedProducts = response.data.map(mapBackendToFrontend);
         setProducts(mappedProducts);
+        
+        // Set pagination info if available
+        if (response.pagination) {
+          setPagination(response.pagination);
+        }
       } else {
         throw new Error('Invalid API response');
       }
     } catch (err: any) {
       console.error('Failed to fetch products from API:', err);
       setError(err.message || 'Failed to fetch products. Please ensure the backend server is running.');
-      setProducts([]); // Clear products on error
+      setProducts([]);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
@@ -117,15 +143,36 @@ export function useProducts() {
     }
   };
 
+  // Update filters and refetch
+  const updateFilters = (newFilters: Partial<ProductFilters>) => {
+    const updatedFilters = { ...filters, ...newFilters };
+    setFilters(updatedFilters);
+    fetchProducts(updatedFilters);
+  };
+
+  // Pagination helpers
+  const goToPage = (page: number) => {
+    updateFilters({ page });
+  };
+
+  const changePageSize = (limit: number) => {
+    updateFilters({ page: 1, limit }); // Reset to first page when changing page size
+  };
+
   return {
     products,
+    pagination,
     loading,
     error,
+    filters,
     addProduct,
     updateProduct,
     deleteProduct,
     getProduct,
     saveProduct,
+    updateFilters,
+    goToPage,
+    changePageSize,
     refreshProducts: fetchProducts
   };
 }

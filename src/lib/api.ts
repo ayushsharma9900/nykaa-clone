@@ -305,8 +305,26 @@ class ApiService {
   }
 
   // Customer methods
-  async getCustomers() {
-    return this.request('/customers');
+  async getCustomers(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: 'active' | 'inactive';
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const endpoint = `/customers${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
   }
 
   async getCustomer(id: string) {
@@ -321,8 +339,27 @@ class ApiService {
   }
 
   // Order methods
-  async getOrders() {
-    return this.request('/orders');
+  async getOrders(params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    paymentStatus?: string;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const queryParams = new URLSearchParams();
+    
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const endpoint = `/orders${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    return this.request(endpoint);
   }
 
   async getOrder(id: string) {

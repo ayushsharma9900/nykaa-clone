@@ -1,7 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/ui/Pagination';
 import { 
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -118,6 +121,7 @@ interface Order {
 // Removed mock orders - will load from backend
 
 export default function OrdersPage() {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,6 +133,13 @@ export default function OrdersPage() {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination for orders
+  const pagination = usePagination({
+    initialPage: parseInt(searchParams?.get('page') || '1'),
+    initialPageSize: parseInt(searchParams?.get('limit') || '10'),
+    pageSizeOptions: [5, 10, 25, 50]
+  });
   const [editFormData, setEditFormData] = useState({
     status: '',
     paymentStatus: '',
@@ -142,38 +153,51 @@ export default function OrdersPage() {
     country: ''
   });
 
-  // Load orders on component mount
-  useEffect(() => {
-    const loadOrders = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchOrders();
-        if (response.success && response.data) {
-          setOrders(response.data);
-        }
-      } catch (error) {
-        console.error('Error loading orders:', error);
-        setError(error instanceof Error ? error.message : 'Failed to load orders');
-      } finally {
-        setLoading(false);
+  // Load orders on component mount and when pagination changes
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchOrders();
+      if (response.success && response.data) {
+        setOrders(response.data);
+        pagination.updateTotalItems(response.data.length);
       }
-    };
+    } catch (error) {
+      console.error('Error loading orders:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadOrders();
   }, []);
 
   // Filter orders based on search and filters
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (order.customer?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = !statusFilter || order.status === statusFilter;
-    const matchesPayment = !paymentFilter || order.paymentStatus === paymentFilter;
-    
-    return matchesSearch && matchesStatus && matchesPayment;
-  });
+  const filteredOrders = useMemo(() => {
+    return orders.filter(order => {
+      const matchesSearch = 
+        order.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.customer?.email || '').toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = !statusFilter || order.status === statusFilter;
+      const matchesPayment = !paymentFilter || order.paymentStatus === paymentFilter;
+      
+      return matchesSearch && matchesStatus && matchesPayment;
+    });
+  }, [orders, searchTerm, statusFilter, paymentFilter]);
+  
+  // Update pagination when filtered orders change
+  pagination.updateTotalItems(filteredOrders.length);
+  
+  // Get paginated orders
+  const paginatedOrders = useMemo(() => {
+    const startIndex = (pagination.paginationState.currentPage - 1) * pagination.paginationState.pageSize;
+    const endIndex = startIndex + pagination.paginationState.pageSize;
+    return filteredOrders.slice(startIndex, endIndex);
+  }, [filteredOrders, pagination.paginationState.currentPage, pagination.paginationState.pageSize]);
 
   const getStatusBadge = (status: Order['status']) => {
     const statusConfig = {
@@ -416,7 +440,7 @@ export default function OrdersPage() {
                 {filteredOrders.length} Orders
               </h3>
               <div className="text-sm text-gray-500">
-                {filteredOrders.length} of {orders.length} orders shown
+                Showing {paginatedOrders.length} of {filteredOrders.length} filtered orders ({orders.length} total)
               </div>
             </div>
           </div>
@@ -466,7 +490,7 @@ export default function OrdersPage() {
                         </div>
                       </td>
                     </tr>
-                  ) : filteredOrders.map((order) => (
+                  ) : paginatedOrders.map((order) => (
                     <tr key={order._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
@@ -538,6 +562,22 @@ export default function OrdersPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+          
+          {/* Pagination - only show if there are multiple pages */}
+          {pagination.paginationState.totalPages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200">
+              <Pagination
+                currentPage={pagination.paginationState.currentPage}
+                totalPages={pagination.paginationState.totalPages}
+                totalItems={pagination.paginationState.totalItems}
+                itemsPerPage={pagination.paginationState.pageSize}
+                onPageChange={pagination.goToPage}
+                onPageSizeChange={pagination.changePageSize}
+                showPageSize={true}
+                pageSizeOptions={[5, 10, 25, 50]}
+              />
             </div>
           )}
         </div>

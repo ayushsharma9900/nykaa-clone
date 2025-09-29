@@ -77,3 +77,19 @@ export interface Category {
   parentId?: string;
   children?: Category[];
 }
+
+export interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalProducts: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  data: T[];
+  pagination: PaginationInfo;
+  message?: string;
+  errors?: any[];
+}

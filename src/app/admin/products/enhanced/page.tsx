@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdvancedDataTable, { Column, BulkAction } from '@/components/admin/AdvancedDataTable';
+import { usePagination } from '@/hooks/usePagination';
 import ProductModal from '@/components/admin/ProductModal';
 import ProductDetailModal from '@/components/admin/ProductDetailModal';
 import { apiService } from '@/lib/api';
@@ -40,6 +42,7 @@ interface BackendProduct {
 export default function EnhancedProductsPage() {
   console.log('🚀 ENHANCED PRODUCTS PAGE LOADING');
   
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Array<{ _id: string; name: string; isActive: boolean }>>([]);
   const [loading, setLoading] = useState(true);
@@ -51,15 +54,15 @@ export default function EnhancedProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Pagination state
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 25,
-    total: 0
+  // Use new pagination hook
+  const pagination = usePagination({
+    initialPage: parseInt(searchParams?.get('page') || '1'),
+    initialPageSize: parseInt(searchParams?.get('limit') || '25'),
+    pageSizeOptions: [10, 25, 50, 100]
   });
 
   // Fetch products from backend
-  const fetchProducts = useCallback(async (page = 1, pageSize = 25, filters: Record<string, any> = {}) => {
+  const fetchProducts = useCallback(async (page = pagination.paginationState.currentPage, pageSize = pagination.paginationState.pageSize, filters: Record<string, any> = {}) => {
     try {
       setLoading(true);
       setError(null);
@@ -82,13 +85,9 @@ export default function EnhancedProductsPage() {
         
         // Update pagination - assuming backend returns pagination info
         if ((response as any).pagination) {
-          setPagination({
-            current: (response as any).pagination.currentPage || page,
-            pageSize: (response as any).pagination.pageSize || pageSize,
-            total: (response as any).pagination.totalProducts || 0
-          });
+          pagination.updateTotalItems((response as any).pagination.totalProducts || 0);
         } else {
-          setPagination(prev => ({ ...prev, current: page, total: mappedProducts.length }));
+          pagination.updateTotalItems(mappedProducts.length);
         }
       } else {
         throw new Error(response.message || 'Failed to fetch products');
@@ -135,6 +134,11 @@ export default function EnhancedProductsPage() {
     fetchProducts();
     fetchCategories();
   }, [fetchProducts, fetchCategories]);
+
+  // Refetch when pagination state changes
+  useEffect(() => {
+    fetchProducts(pagination.paginationState.currentPage, pagination.paginationState.pageSize);
+  }, [pagination.paginationState.currentPage, pagination.paginationState.pageSize]);
 
   // Table columns definition
   const columns: Column<Product>[] = useMemo(() => [
@@ -540,16 +544,16 @@ export default function EnhancedProductsPage() {
   }, [products, pagination.current, pagination.pageSize, fetchProducts]);
 
   const handlePageChange = useCallback((page: number) => {
-    fetchProducts(page, pagination.pageSize);
-  }, [pagination.pageSize, fetchProducts]);
+    pagination.goToPage(page);
+  }, [pagination]);
 
   const handlePageSizeChange = useCallback((pageSize: number) => {
-    fetchProducts(1, pageSize);
-  }, [fetchProducts]);
+    pagination.changePageSize(pageSize);
+  }, [pagination]);
 
   const handleFilter = useCallback((filters: Record<string, any>) => {
-    fetchProducts(1, pagination.pageSize, filters);
-  }, [pagination.pageSize, fetchProducts]);
+    fetchProducts(1, pagination.paginationState.pageSize, filters);
+  }, [pagination.paginationState.pageSize, fetchProducts]);
 
   const handleExport = useCallback(async (format: 'csv' | 'excel' | 'pdf') => {
     try {
@@ -601,9 +605,9 @@ export default function EnhancedProductsPage() {
           columns={columns}
           loading={loading}
           pagination={{
-            current: pagination.current,
-            total: pagination.total,
-            pageSize: pagination.pageSize,
+            current: pagination.paginationState.currentPage,
+            total: pagination.paginationState.totalItems,
+            pageSize: pagination.paginationState.pageSize,
             onPageChange: handlePageChange,
             onPageSizeChange: handlePageSizeChange
           }}
