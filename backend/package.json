@@ -1,7 +1,7 @@
 {
   "name": "dashtar-backend",
   "version": "1.0.0",
-  "description": "Backend API for Dashtar e-commerce dashboard",
+  "description": "Backend API for Nykaa Clone e-commerce application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -19,9 +19,10 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
-    "mongoose": "^7.5.0",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0"
+    "multer-storage-cloudinary": "^4.0.0",
+    "mysql2": "^3.6.0",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
@@ -31,7 +32,7 @@
     "dashboard",
     "api",
     "express",
-    "mongodb"
+    "mysql"
   ],
   "author": "Your Name",
   "license": "MIT"

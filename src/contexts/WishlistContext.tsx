@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useRef, ReactNode } from 'react';
 import { Product } from '@/types';
 
 export interface WishlistItem {
@@ -85,6 +85,7 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(wishlistReducer, initialState);
+  const isInitialLoad = useRef(true);
 
   // Load wishlist from localStorage on mount
   useEffect(() => {
@@ -110,12 +111,17 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error loading wishlist from localStorage:', error);
     }
+    
+    // Mark initial load as complete
+    isInitialLoad.current = false;
   }, []);
 
-  // Save wishlist to localStorage whenever it changes
+  // Save wishlist to localStorage whenever it changes (but not on initial load)
   useEffect(() => {
-    const WISHLIST_KEY = 'kaayalife-wishlist';
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(state));
+    if (!isInitialLoad.current) {
+      const WISHLIST_KEY = 'kaayalife-wishlist';
+      localStorage.setItem(WISHLIST_KEY, JSON.stringify(state));
+    }
   }, [state]);
 
   const addToWishlist = (product: Product) => {

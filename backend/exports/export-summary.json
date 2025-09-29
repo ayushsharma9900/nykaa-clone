@@ -1,0 +1,11 @@
+{
+  "exportDate": "2025-09-27T06:18:17.442Z",
+  "totalRecords": 104,
+  "collections": {
+    "users": 3,
+    "products": 80,
+    "orders": 8,
+    "categories": 8,
+    "customers": 5
+  }
+}

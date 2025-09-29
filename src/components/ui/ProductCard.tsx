@@ -19,11 +19,43 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  
+  // Generate category-based fallback image
+  const getFallbackImage = (category: string): string => {
+    const fallbackMap: Record<string, string> = {
+      'Makeup': 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format',
+      'Skincare': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format',
+      'Hair Care': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format',
+      'Fragrance': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format',
+      'Personal Care': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
+      "Men's Grooming": 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
+      'Wellness': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format'
+    };
+    return fallbackMap[category] || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format';
+  };
+  
+  // Get the best available image source
+  const getImageSource = (): string => {
+    if (!imageError && product.image) {
+      return product.image;
+    }
+    // If primary image failed, try the first alternative image
+    if (!imageError && product.images && product.images.length > 1) {
+      return product.images[1];
+    }
+    // Fall back to category-specific image
+    return getFallbackImage(product.category);
+  };
   
   const isWishlisted = isInWishlist(product.id);
   
   const discountedPrice = product.originalPrice 
     ? product.originalPrice - product.price 
+    : 0;
+  
+  const discountPercentage = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
     
   const handleWishlistClick = (e: React.MouseEvent) => {
@@ -41,13 +73,18 @@ export default function ProductCard({ product }: ProductCardProps) {
     
     setIsAddingToCart(true);
     
-    // Add to cart using context
-    addToCart(product, 1);
-    showToast(`Added ${product.name} to cart!`);
-    
-    setTimeout(() => {
-      setIsAddingToCart(false);
-    }, 500);
+    try {
+      // Add to cart using context
+      addToCart(product, 1);
+      showToast(`Added ${product.name} to cart!`);
+    } catch (error) {
+      console.error('Failed to add product to cart:', error);
+      showToast('Failed to add product to cart. Please try again.', 'error');
+    } finally {
+      setTimeout(() => {
+        setIsAddingToCart(false);
+      }, 500);
+    }
   };
   
   const itemQuantity = getItemQuantity(product.id);
@@ -88,6 +125,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         className={`absolute top-2 right-2 z-10 p-2 rounded-full bg-white/80 hover:bg-white transition-colors ${
           isWishlisted ? 'text-pink-600' : 'text-gray-600'
         }`}
+        aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+        title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
       >
         {isWishlisted ? (
           <HeartSolidIcon className="h-4 w-4" />
@@ -97,21 +136,33 @@ export default function ProductCard({ product }: ProductCardProps) {
       </button>
 
       {/* Discount badge */}
-      {product.discount && (
+      {(product.discount || discountPercentage > 0) && (
         <div className="absolute top-2 left-2 z-10 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-          {product.discount}% OFF
+          {product.discount || discountPercentage}% OFF
         </div>
       )}
 
       <Link href={`/product/${product.id}`}>
         {/* Product image */}
-        <div className="aspect-square relative overflow-hidden rounded-t-lg">
+        <div className="aspect-square relative overflow-hidden rounded-t-lg bg-gray-100">
           <Image
-            src={product.image}
-            alt={product.name}
+            src={getImageSource()}
+            alt={product.name || 'Product image'}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-200"
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            onError={(e) => {
+              console.log('Image failed to load:', getImageSource(), 'for product:', product.name);
+              if (!imageError) {
+                setImageError(true);
+                // Force re-render with fallback image
+                const img = e.target as HTMLImageElement;
+                img.src = getFallbackImage(product.category);
+              }
+            }}
+            priority={false}
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx4f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyLidUUKAl0t0lBU1K5YdvTz"
           />
         </div>
 
@@ -123,7 +174,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           </p>
 
           {/* Product name */}
-          <h3 className="font-medium text-gray-900 text-sm leading-5 mb-2 line-clamp-2">
+          <h3 className="font-medium text-gray-900 text-sm leading-5 mb-2 overflow-hidden" 
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical' as const
+              }}>
             {product.name}
           </h3>
 
@@ -165,6 +221,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={handleAddToCart}
           className="w-full py-2 px-4 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors text-sm font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
           disabled={!product.inStock || isAddingToCart}
+          aria-label={`Add ${product.name} to cart`}
         >
           {isAddingToCart 
             ? 'Adding...' 

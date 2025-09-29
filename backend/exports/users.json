@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Manager User",
+    "email": "manager@dashtar.com",
+    "role": "manager",
+    "isActive": true,
+    "avatar": null,
+    "createdAt": "2025-09-27T05:50:09.155Z",
+    "updatedAt": "2025-09-27T05:50:09.155Z",
+    "__v": 0,
+    "id": "68d77b115da1b812da48b5a9"
+  },
+  {
+    "name": "Staff User",
+    "email": "staff@dashtar.com",
+    "role": "staff",
+    "isActive": true,
+    "avatar": null,
+    "createdAt": "2025-09-27T05:50:09.156Z",
+    "updatedAt": "2025-09-27T05:50:09.156Z",
+    "__v": 0,
+    "id": "68d77b115da1b812da48b5aa"
+  },
+  {
+    "name": "Admin User",
+    "email": "admin@dashtar.com",
+    "role": "admin",
+    "isActive": true,
+    "avatar": null,
+    "createdAt": "2025-09-27T05:50:09.155Z",
+    "updatedAt": "2025-09-27T05:50:09.155Z",
+    "__v": 0,
+    "id": "68d77b115da1b812da48b5a8"
+  }
+]

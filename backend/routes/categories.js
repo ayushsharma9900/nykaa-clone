@@ -1,24 +1,18 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const { body, validationResult, query } = require('express-validator');
 const { protect, authorize } = require('../middleware/auth');
-const Category = require('../models/Category');
-const Product = require('../models/Product');
+const { query: dbQuery } = require('../config/mysql-database');
 
 const router = express.Router();
 
 // All routes are protected
 router.use(protect);
 
-// Admin routes (must come before parameterized routes)
-// @desc    Get all categories for admin (including inactive)
-// @route   GET /api/categories/admin/all
-// @access  Private (admin and manager only)
-router.get('/admin/all', authorize('manager', 'admin'), [
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
-  query('status').optional().isIn(['active', 'inactive']).withMessage('Status must be active or inactive'),
-  query('search').optional().isString().withMessage('Search must be a string')
+// @desc    Get all categories for menu (active only)
+// @route   GET /api/categories/menu
+// @access  Public (but protected by middleware)
+router.get('/menu', [
+  query('showAll').optional().isBoolean().withMessage('showAll must be boolean')
 ], async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -30,66 +24,42 @@ router.get('/admin/all', authorize('manager', 'admin'), [
       });
     }
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
+    console.log('🔍 Menu items request - showAll:', req.query.showAll);
 
-    // Build filter object (don't filter by isActive for admin)
-    const filter = {};
+    // Build SQL query
+    const sql = `
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        image,
+        isActive,
+        sortOrder,
+        menuOrder,
+        showInMenu,
+        menuLevel,
+        parentId,
+        createdAt,
+        updatedAt,
+        (SELECT COUNT(*) FROM products WHERE category = categories.name) as productCount
+      FROM categories
+     WHERE showInMenu = ? ORDER BY menuOrder ASC, menuLevel ASC, name ASC
+    `;
     
-    if (req.query.status === 'active') {
-      filter.isActive = true;
-    } else if (req.query.status === 'inactive') {
-      filter.isActive = false;
-    }
+    console.log('📋 Using SQL: ', sql);
+    console.log('📋 With params:', [ true ]);
+
+    const categories = await dbQuery(sql, [true]);
     
-    if (req.query.search) {
-      filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } }
-      ];
-    }
-
-    // Get categories with product counts
-    const categories = await Category.find(filter)
-      .sort({ sortOrder: 1, createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select('-__v');
-
-    // Get product counts for each category
-    const categoriesWithCounts = await Promise.all(
-      categories.map(async (category) => {
-        const productCount = await Product.countDocuments({
-          category: category.name
-        });
-        const activeProductCount = await Product.countDocuments({
-          category: category.name,
-          isActive: true
-        });
-        return {
-          ...category.toJSON(),
-          productCount,
-          activeProductCount
-        };
-      })
-    );
-
-    const totalCategories = await Category.countDocuments(filter);
-    const totalPages = Math.ceil(totalCategories / limit);
+    console.log(`📊 Found ${categories.length} categories`);
 
     res.json({
       success: true,
-      data: categoriesWithCounts,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalCategories,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1
-      }
+      data: categories
     });
   } catch (error) {
+    console.error('Error fetching menu categories:', error);
     next(error);
   }
 });
@@ -115,49 +85,57 @@ router.get('/', [
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    // Build filter object
-    const filter = {};
+    // Build WHERE clause
+    let whereClause = 'WHERE 1=1';
+    const params = [];
     
     if (req.query.active !== undefined) {
-      filter.isActive = req.query.active === 'true';
+      whereClause += ' AND isActive = ?';
+      params.push(req.query.active === 'true');
     }
     
     if (req.query.search) {
-      filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } }
-      ];
+      whereClause += ' AND (name LIKE ? OR description LIKE ?)';
+      const searchTerm = `%${req.query.search}%`;
+      params.push(searchTerm, searchTerm);
     }
 
     // Get categories with product counts
-    const categories = await Category.find(filter)
-      .sort({ sortOrder: 1, createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select('-__v');
+    const sql = `
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        image,
+        isActive,
+        sortOrder,
+        menuOrder,
+        showInMenu,
+        menuLevel,
+        parentId,
+        createdAt,
+        updatedAt,
+        (SELECT COUNT(*) FROM products WHERE category = categories.name AND isActive = 1) as productCount
+      FROM categories 
+      ${whereClause}
+      ORDER BY sortOrder ASC, createdAt DESC
+      LIMIT ? OFFSET ?
+    `;
 
-    // Get product counts for each category
-    const categoriesWithCounts = await Promise.all(
-      categories.map(async (category) => {
-        const productCount = await Product.countDocuments({
-          category: category.name,
-          isActive: true
-        });
-        return {
-          ...category.toJSON(),
-          productCount
-        };
-      })
-    );
+    const categories = await dbQuery(sql, [...params, limit, offset]);
 
-    const totalCategories = await Category.countDocuments(filter);
+    // Get total count for pagination
+    const countSql = `SELECT COUNT(*) as total FROM categories ${whereClause}`;
+    const [countResult] = await dbQuery(countSql, params);
+    const totalCategories = countResult.total;
     const totalPages = Math.ceil(totalCategories / limit);
 
     res.json({
       success: true,
-      data: categoriesWithCounts,
+      data: categories,
       pagination: {
         currentPage: page,
         totalPages,
@@ -167,6 +145,7 @@ router.get('/', [
       }
     });
   } catch (error) {
+    console.error('Error fetching categories:', error);
     next(error);
   }
 });
@@ -176,7 +155,27 @@ router.get('/', [
 // @access  Private
 router.get('/:id', async (req, res, next) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const sql = `
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        image,
+        isActive,
+        sortOrder,
+        menuOrder,
+        showInMenu,
+        menuLevel,
+        parentId,
+        createdAt,
+        updatedAt,
+        (SELECT COUNT(*) FROM products WHERE category = categories.name AND isActive = 1) as productCount
+      FROM categories 
+      WHERE id = ?
+    `;
+
+    const [category] = await dbQuery(sql, [req.params.id]);
 
     if (!category) {
       return res.status(404).json({
@@ -185,65 +184,28 @@ router.get('/:id', async (req, res, next) => {
       });
     }
 
-    // Get product count for this category
-    const productCount = await Product.countDocuments({
-      category: category.name,
-      isActive: true
-    });
-
     res.json({
       success: true,
-      data: {
-        ...category.toJSON(),
-        productCount
-      }
+      data: category
     });
   } catch (error) {
+    console.error('Error fetching category:', error);
     next(error);
   }
 });
 
 // @desc    Create new category
 // @route   POST /api/categories
-// @access  Private (manager and admin only)
+// @access  Private (admin and manager only)
 router.post('/', authorize('manager', 'admin'), [
   body('name').trim().notEmpty().withMessage('Category name is required'),
-  body('description').trim().notEmpty().withMessage('Category description is required'),
-  body('slug').optional().custom((value, { req }) => {
-    // If slug is not provided, generate it from name
-    if (!value && req.body.name) {
-      req.body.slug = req.body.name
-        .toLowerCase()
-        .replace(/[^a-z0-9 -]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-    }
-    return true;
-  }),
-  body('image').optional().custom((value) => {
-    if (!value || value.trim() === '') return true;
-    // Allow URLs (http/https)
-    if (value.startsWith('http://') || value.startsWith('https://')) {
-      try {
-        new URL(value);
-        return true;
-      } catch {
-        throw new Error('Invalid URL format');
-      }
-    }
-    // Allow relative paths for local files
-    if (value.includes('/') || value.includes('\\')) {
-      return true;
-    }
-    // Allow simple filenames
-    if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(value)) {
-      return true;
-    }
-    throw new Error('Image must be a valid URL or file path');
-  }),
+  body('slug').trim().notEmpty().withMessage('Category slug is required'),
+  body('description').trim().notEmpty().withMessage('Description is required'),
   body('isActive').optional().isBoolean().withMessage('isActive must be boolean'),
-  body('sortOrder').optional().isInt().withMessage('Sort order must be an integer')
+  body('sortOrder').optional().isInt().withMessage('sortOrder must be integer'),
+  body('menuOrder').optional().isInt().withMessage('menuOrder must be integer'),
+  body('showInMenu').optional().isBoolean().withMessage('showInMenu must be boolean'),
+  body('menuLevel').optional().isInt().withMessage('menuLevel must be integer')
 ], async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -255,236 +217,112 @@ router.post('/', authorize('manager', 'admin'), [
       });
     }
 
-    // Check if category name already exists
-    const existingCategory = await Category.findOne({ 
-      name: { $regex: new RegExp(`^${req.body.name}$`, 'i') }
-    });
-    
-    if (existingCategory) {
+    const { v4: uuidv4 } = require('uuid');
+    const categoryId = uuidv4();
+
+    const {
+      name,
+      slug,
+      description,
+      image,
+      isActive = true,
+      sortOrder = 0,
+      menuOrder = 0,
+      showInMenu = true,
+      menuLevel = 0,
+      parentId
+    } = req.body;
+
+    // Check if category name or slug already exists
+    const existingCategory = await dbQuery(
+      'SELECT id FROM categories WHERE name = ? OR slug = ?',
+      [name, slug]
+    );
+
+    if (existingCategory.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'Category with this name already exists'
+        message: 'Category name or slug already exists'
       });
     }
 
-    // Check if slug already exists
-    if (req.body.slug) {
-      const existingSlug = await Category.findOne({ slug: req.body.slug });
-      if (existingSlug) {
-        return res.status(400).json({
-          success: false,
-          message: 'Category with this slug already exists'
-        });
-      }
-    }
+    const sql = `
+      INSERT INTO categories (
+        id, name, slug, description, image, isActive, 
+        sortOrder, menuOrder, showInMenu, menuLevel, parentId
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-    const category = await Category.create(req.body);
+    await dbQuery(sql, [
+      categoryId, name, slug, description, image, isActive,
+      sortOrder, menuOrder, showInMenu, menuLevel, parentId
+    ]);
+
+    // Get the created category
+    const [newCategory] = await dbQuery(
+      'SELECT * FROM categories WHERE id = ?',
+      [categoryId]
+    );
 
     res.status(201).json({
       success: true,
       message: 'Category created successfully',
-      data: category
+      data: newCategory
     });
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: 'Category with this name or slug already exists'
-      });
-    }
+    console.error('Error creating category:', error);
     next(error);
   }
 });
 
-// @desc    Update category
-// @route   PUT /api/categories/:id
-// @access  Private (manager and admin only)
-router.put('/:id', authorize('manager', 'admin'), [
-  body('name').optional().trim().notEmpty().withMessage('Category name cannot be empty'),
-  body('description').optional().trim().notEmpty().withMessage('Category description cannot be empty'),
-  body('slug').optional().custom((value, { req }) => {
-    // If name is being updated but slug is not provided, generate slug from name
-    if (!value && req.body.name) {
-      req.body.slug = req.body.name
-        .toLowerCase()
-        .replace(/[^a-z0-9 -]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '');
-    }
-    return true;
-  }),
-  body('image').optional().custom((value) => {
-    if (!value || value.trim() === '') return true;
-    // Allow URLs (http/https)
-    if (value.startsWith('http://') || value.startsWith('https://')) {
-      try {
-        new URL(value);
-        return true;
-      } catch {
-        throw new Error('Invalid URL format');
-      }
-    }
-    // Allow relative paths for local files
-    if (value.includes('/') || value.includes('\\')) {
-      return true;
-    }
-    // Allow simple filenames
-    if (/\.(jpg|jpeg|png|gif|webp|svg)$/i.test(value)) {
-      return true;
-    }
-    throw new Error('Image must be a valid URL or file path');
-  }),
-  body('isActive').optional().isBoolean().withMessage('isActive must be boolean'),
-  body('sortOrder').optional().isInt().withMessage('Sort order must be an integer')
-], async (req, res, next) => {
+// @desc    Get all categories for admin (including inactive)
+// @route   GET /api/categories/admin/all
+// @access  Private (admin and manager only)
+router.get('/admin/all', authorize('manager', 'admin'), async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
 
-    // Check if name already exists (excluding current category)
-    if (req.body.name) {
-      const existingCategory = await Category.findOne({
-        name: { $regex: new RegExp(`^${req.body.name}$`, 'i') },
-        _id: { $ne: req.params.id }
-      });
-      
-      if (existingCategory) {
-        return res.status(400).json({
-          success: false,
-          message: 'Category with this name already exists'
-        });
-      }
-    }
+    const categories = await dbQuery(`
+      SELECT 
+        id,
+        name,
+        slug,
+        description,
+        image,
+        isActive,
+        sortOrder,
+        menuOrder,
+        showInMenu,
+        menuLevel,
+        parentId,
+        createdAt,
+        updatedAt,
+        (SELECT COUNT(*) FROM products WHERE category = categories.name) as productCount,
+        (SELECT COUNT(*) FROM products WHERE category = categories.name AND isActive = 1) as activeProductCount
+      FROM categories 
+      ORDER BY sortOrder ASC, createdAt DESC
+      LIMIT ? OFFSET ?
+    `, [limit, offset]);
 
-    // Check if slug already exists (excluding current category)
-    if (req.body.slug) {
-      const existingSlug = await Category.findOne({
-        slug: req.body.slug,
-        _id: { $ne: req.params.id }
-      });
-      
-      if (existingSlug) {
-        return res.status(400).json({
-          success: false,
-          message: 'Category with this slug already exists'
-        });
-      }
-    }
-
-    const category = await Category.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!category) {
-      return res.status(404).json({
-        success: false,
-        message: 'Category not found'
-      });
-    }
-
-    // Get product count for updated category
-    const productCount = await Product.countDocuments({
-      category: category.name,
-      isActive: true
-    });
+    const [countResult] = await dbQuery('SELECT COUNT(*) as total FROM categories');
+    const totalCategories = countResult.total;
+    const totalPages = Math.ceil(totalCategories / limit);
 
     res.json({
       success: true,
-      message: 'Category updated successfully',
-      data: {
-        ...category.toJSON(),
-        productCount
+      data: categories,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCategories,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
       }
     });
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: 'Category with this name or slug already exists'
-      });
-    }
-    next(error);
-  }
-});
-
-// @desc    Toggle category active status
-// @route   PATCH /api/categories/:id/toggle-status
-// @access  Private (manager and admin only)
-router.patch('/:id/toggle-status', authorize('manager', 'admin'), async (req, res, next) => {
-  try {
-    const category = await Category.findById(req.params.id);
-
-    if (!category) {
-      return res.status(404).json({
-        success: false,
-        message: 'Category not found'
-      });
-    }
-
-    category.isActive = !category.isActive;
-    await category.save();
-
-    // Get product count for updated category
-    const productCount = await Product.countDocuments({
-      category: category.name,
-      isActive: true
-    });
-
-    res.json({
-      success: true,
-      message: `Category ${category.isActive ? 'activated' : 'deactivated'} successfully`,
-      data: {
-        ...category.toJSON(),
-        productCount
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Delete category
-// @route   DELETE /api/categories/:id
-// @access  Private (admin only)
-router.delete('/:id', authorize('admin'), async (req, res, next) => {
-  try {
-    const category = await Category.findById(req.params.id);
-
-    if (!category) {
-      return res.status(404).json({
-        success: false,
-        message: 'Category not found'
-      });
-    }
-
-    // Check if category has products
-    const productCount = await Product.countDocuments({
-      category: category.name
-    });
-
-    if (productCount > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot delete category. It contains ${productCount} products. Please move or delete the products first.`
-      });
-    }
-
-    await Category.findByIdAndDelete(req.params.id);
-
-    res.json({
-      success: true,
-      message: 'Category deleted successfully'
-    });
-  } catch (error) {
+    console.error('Error fetching admin categories:', error);
     next(error);
   }
 });
@@ -494,150 +332,33 @@ router.delete('/:id', authorize('admin'), async (req, res, next) => {
 // @access  Private
 router.get('/meta/stats', async (req, res, next) => {
   try {
-    const totalCategories = await Category.countDocuments();
-    const activeCategories = await Category.countDocuments({ isActive: true });
-    
-    const categoryStats = await Category.aggregate([
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'name',
-          foreignField: 'category',
-          as: 'products'
-        }
-      },
-      {
-        $addFields: {
-          productCount: { $size: '$products' },
-          activeProducts: {
-            $size: {
-              $filter: {
-                input: '$products',
-                cond: { $eq: ['$$this.isActive', true] }
-              }
-            }
-          }
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          totalProducts: { $sum: '$productCount' },
-          totalActiveProducts: { $sum: '$activeProducts' }
-        }
-      }
-    ]);
+    const [statsResult] = await dbQuery(`
+      SELECT 
+        COUNT(*) as totalCategories,
+        SUM(CASE WHEN isActive = 1 THEN 1 ELSE 0 END) as activeCategories,
+        SUM(CASE WHEN isActive = 0 THEN 1 ELSE 0 END) as inactiveCategories
+      FROM categories
+    `);
 
-    const stats = categoryStats[0] || { totalProducts: 0, totalActiveProducts: 0 };
+    const [productStatsResult] = await dbQuery(`
+      SELECT 
+        COUNT(*) as totalProducts,
+        SUM(CASE WHEN isActive = 1 THEN 1 ELSE 0 END) as totalActiveProducts
+      FROM products
+    `);
 
     res.json({
       success: true,
       data: {
-        totalCategories,
-        activeCategories,
-        inactiveCategories: totalCategories - activeCategories,
-        totalProducts: stats.totalProducts,
-        totalActiveProducts: stats.totalActiveProducts
+        totalCategories: statsResult.totalCategories || 0,
+        activeCategories: statsResult.activeCategories || 0,
+        inactiveCategories: statsResult.inactiveCategories || 0,
+        totalProducts: productStatsResult.totalProducts || 0,
+        totalActiveProducts: productStatsResult.totalActiveProducts || 0
       }
     });
   } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Bulk update category status
-// @route   PATCH /api/categories/bulk/status
-// @access  Private (manager and admin only)
-router.patch('/bulk/status', authorize('manager', 'admin'), [
-  body('categoryIds').isArray({ min: 1 }).withMessage('Category IDs array is required'),
-  body('isActive').isBoolean().withMessage('isActive must be boolean')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { categoryIds, isActive } = req.body;
-
-    const result = await Category.updateMany(
-      { _id: { $in: categoryIds } },
-      { isActive }
-    );
-
-    res.json({
-      success: true,
-      message: `${result.modifiedCount} categories ${isActive ? 'activated' : 'deactivated'} successfully`,
-      data: {
-        matchedCount: result.matchedCount,
-        modifiedCount: result.modifiedCount
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Bulk delete categories
-// @route   DELETE /api/categories/bulk
-// @access  Private (admin only)
-router.delete('/bulk', authorize('admin'), [
-  body('categoryIds').isArray({ min: 1 }).withMessage('Category IDs array is required')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { categoryIds } = req.body;
-
-    // Check if any categories have products
-    const categoriesWithProducts = await Category.aggregate([
-      {
-        $match: { _id: { $in: categoryIds.map(id => new mongoose.Types.ObjectId(id)) } }
-      },
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'name',
-          foreignField: 'category',
-          as: 'products'
-        }
-      },
-      {
-        $match: { 'products.0': { $exists: true } }
-      }
-    ]);
-
-    if (categoriesWithProducts.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot delete categories that contain products. Found ${categoriesWithProducts.length} categories with products.`,
-        data: categoriesWithProducts.map(cat => ({ _id: cat._id, name: cat.name, productCount: cat.products.length }))
-      });
-    }
-
-    const result = await Category.deleteMany(
-      { _id: { $in: categoryIds } }
-    );
-
-    res.json({
-      success: true,
-      message: `${result.deletedCount} categories deleted successfully`,
-      data: {
-        deletedCount: result.deletedCount
-      }
-    });
-  } catch (error) {
+    console.error('Error fetching category stats:', error);
     next(error);
   }
 });

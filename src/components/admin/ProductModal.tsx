@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Product } from '@/types';
 import { useCategories } from '@/hooks/useCategories';
 import { apiService } from '@/lib/api';
@@ -18,14 +18,15 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
   console.log('ProductModal rendered with:', { isOpen, product: product?.name });
   
   const { categories } = useCategories();
-  const activeCategories = categories.filter(cat => cat.isActive);
+  const activeCategories = useMemo(() => categories.filter(cat => cat.isActive), [categories]);
+  const defaultCategoryName = useMemo(() => activeCategories[0]?.name || 'Skincare', [activeCategories]);
   
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
     description: '',
     price: 0,
     originalPrice: undefined,
-    category: activeCategories[0]?.name || 'Skincare',
+    category: '',
     subcategory: '',
     brand: '',
     image: '',
@@ -41,37 +42,47 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
   const [uploadingImages, setUploadingImages] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
 
+  const resetForm = useCallback(() => {
+    setFormData({
+      name: '',
+      description: '',
+      price: 0,
+      originalPrice: undefined,
+      category: defaultCategoryName,
+      subcategory: '',
+      brand: '',
+      image: '',
+      images: [''],
+      inStock: true,
+      stockCount: 0,
+      rating: 0,
+      reviewCount: 0,
+      tags: [],
+      discount: undefined
+    });
+    setTagInput('');
+    setImageUploadError(null);
+  }, [defaultCategoryName]);
+
   useEffect(() => {
     console.log('ProductModal useEffect triggered with product:', product);
     if (product) {
       console.log('Setting form data with product:', product.name, 'Price:', product.price);
       setFormData({
         ...product,
-        images: product.images || ['']
+        images: product.images && product.images.length > 0 ? product.images : ['']
       });
       setTagInput(product.tags?.join(', ') || '');
-    } else {
-      // Reset form for new product
-      setFormData({
-        name: '',
-        description: '',
-        price: 0,
-        originalPrice: undefined,
-        category: activeCategories[0]?.name || 'Skincare',
-        subcategory: '',
-        brand: '',
-        image: '',
-        images: [''],
-        inStock: true,
-        stockCount: 0,
-        rating: 0,
-        reviewCount: 0,
-        tags: [],
-        discount: undefined
-      });
-      setTagInput('');
+      setImageUploadError(null);
     }
   }, [product]);
+
+  useEffect(() => {
+    if (isOpen && !product) {
+      // Reset form for new product when opening the modal
+      resetForm();
+    }
+  }, [isOpen, product, resetForm]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -85,8 +96,19 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
       // Apply specific validations for different fields
       if (name === 'rating') {
         numValue = Math.max(0, Math.min(5, numValue)); // Clamp between 0 and 5
-      } else if (name === 'reviewCount' || name === 'stockCount') {
+      } else if (name === 'reviewCount') {
         numValue = Math.max(0, numValue); // Ensure non-negative
+      } else if (name === 'stockCount') {
+        numValue = Math.max(0, Math.floor(numValue)); // Ensure non-negative integer
+        
+        // Update inStock based on stockCount - if stock is 0, mark as not in stock
+        const newStockCount = numValue;
+        setFormData(prev => ({ 
+          ...prev, 
+          [name]: newStockCount,
+          inStock: newStockCount > 0 ? true : prev.inStock // Only auto-set to false if stock is 0
+        }));
+        return; // Early return since we've handled both fields
       } else if (name === 'price' || name === 'originalPrice') {
         numValue = Math.max(0, numValue); // Ensure non-negative prices
       }
@@ -94,6 +116,16 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
       setFormData(prev => ({ ...prev, [name]: numValue }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const isValidUrl = (string: string) => {
+    if (!string.trim()) return true; // Allow empty URLs
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
     }
   };
 
@@ -222,6 +254,14 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
       discount = Math.round(((formData.originalPrice - formData.price) / formData.originalPrice) * 100);
     }
 
+    // Filter out invalid URLs and empty strings, but keep at least one empty string for the form
+    const validImages = (formData.images || ['']).filter(img => {
+      const trimmed = img?.trim();
+      return trimmed && isValidUrl(trimmed);
+    });
+    const finalImages = validImages.length > 0 ? validImages : [];
+    const mainImage = formData.image && isValidUrl(formData.image) ? formData.image : (finalImages[0] || '');
+
     const newProduct: Product = {
       id: product?.id || Date.now().toString(),
       name: formData.name || '',
@@ -229,11 +269,11 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
       price: formData.price || 0,
       originalPrice: formData.originalPrice,
       discount,
-      category: formData.category || activeCategories[0]?.name || 'Skincare',
+      category: formData.category || defaultCategoryName,
       subcategory: formData.subcategory || '',
       brand: formData.brand || '',
-      image: formData.image || formData.images?.[0] || '',
-      images: (formData.images || ['']).filter(img => img.trim().length > 0),
+      image: mainImage,
+      images: finalImages,
       inStock: formData.inStock ?? true,
       stockCount: formData.stockCount || 0,
       rating: formData.rating || 0,
@@ -245,6 +285,13 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
 
     await onSave(newProduct);
   };
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setImageUploadError(null);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -301,13 +348,16 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
                 </label>
                 <select
                   name="category"
-                  value={formData.category || activeCategories[0]?.name || 'Skincare'}
+                  value={formData.category || defaultCategoryName}
                   onChange={handleInputChange}
                   required
                   className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 >
+                  {activeCategories.length === 0 && (
+                    <option value="">Loading categories...</option>
+                  )}
                   {activeCategories.map(cat => (
-                    <option key={cat._id} value={cat.name}>
+                    <option key={cat._id || cat.id || cat.slug} value={cat.name}>
                       {cat.name}
                     </option>
                   ))}
@@ -461,15 +511,26 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
             {/* Manual URL Input */}
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700 mb-2">Or enter image URLs manually:</div>
-              {(formData.images || ['']).map((image, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <input
-                    type="url"
-                    value={image}
-                    onChange={(e) => handleImageChange(index, e.target.value)}
-                    placeholder="Image URL"
-                    className="admin-input admin-field-bg flex-1 border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  />
+              {(formData.images || ['']).map((image, index) => {
+                const isInvalidUrl = image && !isValidUrl(image);
+                return (
+                <div key={`image-input-${index}-${image || 'empty'}`} className="flex items-center space-x-2">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={image}
+                      onChange={(e) => handleImageChange(index, e.target.value)}
+                      placeholder="Image URL (optional)"
+                      className={`admin-input admin-field-bg w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors ${
+                        isInvalidUrl 
+                          ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
+                          : 'border-gray-300'
+                      }`}
+                    />
+                    {isInvalidUrl && (
+                      <p className="text-xs text-red-600 mt-1">Please enter a valid URL or leave empty</p>
+                    )}
+                  </div>
                   {(formData.images || []).length > 1 && (
                     <button
                       type="button"
@@ -481,7 +542,8 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
                     </button>
                   )}
                 </div>
-              ))}
+                );
+              })}
               <button
                 type="button"
                 onClick={addImageField}
@@ -497,14 +559,14 @@ export default function ProductModal({ isOpen, onClose, onSave, product, isSubmi
                 <div className="text-sm font-medium text-gray-700 mb-2">Preview:</div>
                 <div className="grid grid-cols-3 gap-2">
                   {formData.images.filter(img => img.trim()).map((image, index) => (
-                    <div key={index} className="relative group">
+                    <div key={`image-preview-${index}-${image || 'empty'}`} className="relative group">
                       <img
-                        src={image}
+                        src={image || '/images/placeholder-product.jpg'}
                         alt={`Product ${index + 1}`}
                         className="w-full h-20 object-cover rounded-md border border-gray-200"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.src = '/placeholder-product.png';
+                          target.src = '/images/placeholder-product.jpg';
                         }}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-md flex items-center justify-center">

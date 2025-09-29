@@ -1,109 +1,31 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const { protect, authorize } = require('../middleware/auth');
-const { uploadSingle, uploadMultiple, handleUploadError } = require('../middleware/upload');
-const Product = require('../models/Product');
+const { query: dbQuery } = require('../config/mysql-database');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const router = express.Router();
 
-// All routes are protected
-router.use(protect);
-
-// Meta routes (must come before parameterized routes)
-// @desc    Get product categories
-// @route   GET /api/products/meta/categories
-// @access  Private
-router.get('/meta/categories', async (req, res, next) => {
-  try {
-    // Get dynamic categories from Category collection
-    const Category = require('../models/Category');
-    const categories = await Category.find({ isActive: true }).sort({ sortOrder: 1, name: 1 });
-    
-    // Get product count for each category
-    const categoryStats = await Product.aggregate([
-      {
-        $match: { isActive: true }
-      },
-      {
-        $group: {
-          _id: '$category',
-          count: { $sum: 1 },
-          totalStock: { $sum: '$stock' },
-          avgPrice: { $avg: '$price' }
-        }
-      }
-    ]);
-
-    const categoriesWithStats = categories.map(category => {
-      const stats = categoryStats.find(stat => stat._id === category.name) || { count: 0, totalStock: 0, avgPrice: 0 };
-      return {
-        _id: category._id,
-        name: category.name,
-        slug: category.slug,
-        description: category.description,
-        isActive: category.isActive,
-        productCount: stats.count,
-        totalStock: stats.totalStock,
-        averagePrice: stats.avgPrice ? parseFloat(stats.avgPrice.toFixed(2)) : 0
-      };
-    });
-
-    res.json({
-      success: true,
-      data: categoriesWithStats
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Get low stock products
-// @route   GET /api/products/alerts/low-stock
-// @access  Private
-router.get('/alerts/low-stock', [
-  query('threshold').optional().isInt({ min: 1 }).withMessage('Threshold must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const threshold = parseInt(req.query.threshold) || 10;
-    const limit = parseInt(req.query.limit) || 20;
-
-    const lowStockProducts = await Product.find({
-      isActive: true,
-      stock: { $lte: threshold, $gt: 0 }
-    })
-    .sort({ stock: 1 })
-    .limit(limit)
-    .select('name sku stock category price');
-
-    res.json({
-      success: true,
-      data: lowStockProducts,
-      threshold
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+// Helper function to get product images
+const getProductImages = async (productId) => {
+  const images = await dbQuery(
+    'SELECT url, alt, sortOrder FROM product_images WHERE productId = ? ORDER BY sortOrder ASC',
+    [productId]
+  );
+  return images.map(img => img.url);
+};
 
 // @desc    Get all products for admin (including inactive)
 // @route   GET /api/products/admin/all
 // @access  Private (admin and manager only)
-router.get('/admin/all', authorize('manager', 'admin'), [
+router.get('/admin/all', protect, authorize('manager', 'admin'), [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
-  query('category').optional().isString().withMessage('Category must be a string'),
   query('status').optional().isIn(['active', 'inactive']).withMessage('Status must be active or inactive'),
-  query('search').optional().isString().withMessage('Search must be a string')
+  query('search').optional().isString().withMessage('Search must be a string'),
+  query('category').optional().isString().withMessage('Category must be a string')
 ], async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -117,42 +39,95 @@ router.get('/admin/all', authorize('manager', 'admin'), [
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    // Build filter object (don't filter by isActive for admin)
-    const filter = {};
-    
-    if (req.query.category) {
-      filter.category = req.query.category;
-    }
+    // Build WHERE clause
+    let whereClause = 'WHERE 1=1';
+    const params = [];
     
     if (req.query.status === 'active') {
-      filter.isActive = true;
+      whereClause += ' AND isActive = ?';
+      params.push(1); // Use 1 instead of true for MySQL
     } else if (req.query.status === 'inactive') {
-      filter.isActive = false;
+      whereClause += ' AND isActive = ?';
+      params.push(0); // Use 0 instead of false for MySQL
+    }
+    
+    if (req.query.category) {
+      // Handle both category name and slug
+      const categoryParam = req.query.category;
+      
+      // Map common slugs to category names
+      const slugToNameMap = {
+        'makeup': 'Makeup',
+        'skincare': 'Skincare', 
+        'hair-care': 'Hair Care',
+        'fragrance': 'Fragrance',
+        'personal-care': 'Personal Care',
+        'mens-grooming': "Men's Grooming",
+        'baby-care': 'Baby Care',
+        'wellness': 'Wellness'
+      };
+      
+      const categoryName = slugToNameMap[categoryParam.toLowerCase()] || categoryParam;
+      whereClause += ' AND category = ?';
+      params.push(categoryName);
     }
     
     if (req.query.search) {
-      filter.$or = [
-        { name: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } },
-        { sku: { $regex: req.query.search, $options: 'i' } }
-      ];
+      whereClause += ' AND (name LIKE ? OR description LIKE ? OR sku LIKE ?)';
+      const searchTerm = `%${req.query.search}%`;
+      params.push(searchTerm, searchTerm, searchTerm);
     }
 
     // Get products
-    const products = await Product.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .select('-__v');
+    const sql = `
+      SELECT 
+        id,
+        name,
+        description,
+        category,
+        price,
+        costPrice,
+        stock,
+        sku,
+        isActive,
+        tags,
+        weight,
+        dimensions,
+        totalSold,
+        averageRating,
+        reviewCount,
+        createdAt,
+        updatedAt
+      FROM products 
+      ${whereClause}
+      ORDER BY createdAt DESC
+      LIMIT ? OFFSET ?
+    `;
 
-    const totalProducts = await Product.countDocuments(filter);
+    const products = await dbQuery(sql, [...params, limit, offset]);
+
+    // Get images for each product
+    const productsWithImages = await Promise.all(
+      products.map(async (product) => {
+        const images = await getProductImages(product.id);
+        return {
+          ...product,
+          images
+        };
+      })
+    );
+
+    // Get total count for pagination
+    const countSql = `SELECT COUNT(*) as total FROM products ${whereClause}`;
+    const [countResult] = await dbQuery(countSql, params);
+    const totalProducts = countResult.total;
     const totalPages = Math.ceil(totalProducts / limit);
 
     res.json({
       success: true,
-      data: products,
+      data: productsWithImages,
       pagination: {
         currentPage: page,
         totalPages,
@@ -162,21 +137,187 @@ router.get('/admin/all', authorize('manager', 'admin'), [
       }
     });
   } catch (error) {
+    console.error('Error fetching admin products:', error);
     next(error);
   }
 });
 
-// @desc    Get all products with pagination, filtering, and search
+// @desc    Get low stock products
+// @route   GET /api/products/alerts/low-stock
+// @access  Private
+router.get('/alerts/low-stock', protect, async (req, res, next) => {
+  try {
+    const threshold = parseInt(req.query.threshold) || 10;
+    const limit = parseInt(req.query.limit) || 20;
+
+    const products = await dbQuery(`
+      SELECT 
+        id,
+        name,
+        sku,
+        stock,
+        category,
+        isActive
+      FROM products 
+      WHERE stock <= ? AND isActive = 1
+      ORDER BY stock ASC
+      LIMIT ?
+    `, [threshold, limit]);
+
+    res.json({
+      success: true,
+      data: products
+    });
+  } catch (error) {
+    console.error('Error fetching low stock products:', error);
+    next(error);
+  }
+});
+
+// @desc    Get product categories
+// @route   GET /api/products/meta/categories
+// @access  Private
+router.get('/meta/categories', protect, async (req, res, next) => {
+  try {
+    const categories = await dbQuery(`
+      SELECT DISTINCT category as name, COUNT(*) as productCount
+      FROM products 
+      WHERE isActive = 1
+      GROUP BY category
+      ORDER BY category ASC
+    `);
+
+    res.json({
+      success: true,
+      data: categories
+    });
+  } catch (error) {
+    console.error('Error fetching product categories:', error);
+    next(error);
+  }
+});
+
+// @desc    Create new product
+// @route   POST /api/products
+// @access  Private (admin and manager only)
+router.post('/', protect, authorize('manager', 'admin'), [
+  body('name').isString().isLength({ min: 1, max: 255 }).withMessage('Name must be 1-255 characters'),
+  body('description').isString().withMessage('Description must be a string'),
+  body('category').isString().isLength({ min: 1, max: 100 }).withMessage('Category must be 1-100 characters'),
+  body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+  body('costPrice').optional().isFloat({ min: 0 }).withMessage('Cost price must be a positive number'),
+  body('stock').isInt({ min: 0 }).withMessage('Stock must be a non-negative integer'),
+  body('sku').isString().isLength({ min: 1, max: 50 }).withMessage('SKU must be 1-50 characters'),
+  body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
+  body('tags').optional().custom((value) => {
+    if (typeof value === 'string' || Array.isArray(value)) {
+      return true;
+    }
+    throw new Error('Tags must be a string or array');
+  }),
+  body('weight').optional().isFloat({ min: 0 }).withMessage('Weight must be a positive number'),
+  body('dimensions').optional().isString().withMessage('Dimensions must be a string'),
+  body('averageRating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
+  body('reviewCount').optional().isInt({ min: 0 }).withMessage('Review count must be a non-negative integer'),
+  body('images').optional().isArray().withMessage('Images must be an array')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const {
+      name, description, category, price, costPrice = 0, stock, sku,
+      isActive = true, tags = [], weight = 0, dimensions = '', images = [],
+      averageRating = 0, reviewCount = 0
+    } = req.body;
+
+    // Process tags - convert to JSON string for storage
+    let tagsJson = '';
+    if (Array.isArray(tags)) {
+      tagsJson = JSON.stringify(tags.filter(tag => tag && tag.trim().length > 0));
+    } else if (typeof tags === 'string' && tags.trim()) {
+      tagsJson = JSON.stringify([tags.trim()]);
+    } else {
+      tagsJson = JSON.stringify([]);
+    }
+
+    // Insert product
+    const insertResult = await dbQuery(`
+      INSERT INTO products (
+        name, description, category, price, costPrice, stock, sku,
+        isActive, tags, weight, dimensions, averageRating, reviewCount, createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+    `, [name, description, category, price, costPrice, stock, sku, isActive, tagsJson, weight, dimensions, averageRating, reviewCount]);
+
+    const productId = insertResult.insertId;
+
+    // Insert images if provided
+    if (images.length > 0) {
+      const imageInserts = images.map((url, index) => [
+        productId, url, `${name} - Image ${index + 1}`, index + 1
+      ]);
+      
+      // Use proper bulk insert syntax for mysql2
+      const placeholders = imageInserts.map(() => '(?, ?, ?, ?)').join(', ');
+      const flatValues = imageInserts.flat();
+      
+      await dbQuery(`
+        INSERT INTO product_images (productId, url, alt, sortOrder)
+        VALUES ${placeholders}
+      `, flatValues);
+    }
+
+    // Fetch and return created product
+    const [createdProduct] = await dbQuery(`
+      SELECT 
+        id, name, description, category, price, costPrice, stock, sku,
+        isActive, tags, weight, dimensions, totalSold, averageRating,
+        reviewCount, createdAt, updatedAt
+      FROM products 
+      WHERE id = ?
+    `, [productId]);
+
+    // Get product images
+    const productImages = await getProductImages(productId);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Product created successfully',
+      data: {
+        ...createdProduct,
+        images: productImages
+      }
+    });
+  } catch (error) {
+    console.error('Error creating product:', error);
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({
+        success: false,
+        message: 'A product with this SKU already exists'
+      });
+    }
+    next(error);
+  }
+});
+
+// @desc    Get all products (public endpoint for homepage)
 // @route   GET /api/products
 // @access  Private
-router.get('/', [
+router.get('/', protect, [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('category').optional().isString().withMessage('Category must be a string'),
-  query('minPrice').optional().isNumeric().withMessage('Min price must be a number'),
-  query('maxPrice').optional().isNumeric().withMessage('Max price must be a number'),
-  query('inStock').optional().isBoolean().withMessage('In stock must be boolean'),
-  query('sortBy').optional().isIn(['name', 'price', 'totalSold', 'createdAt']).withMessage('Invalid sort field'),
+  query('search').optional().isString().withMessage('Search must be a string'),
+  query('minPrice').optional().isFloat({ min: 0 }).withMessage('Min price must be a positive number'),
+  query('maxPrice').optional().isFloat({ min: 0 }).withMessage('Max price must be a positive number'),
+  query('inStock').optional().isBoolean().withMessage('inStock must be boolean'),
+  query('sortBy').optional().isIn(['name', 'price', 'createdAt', 'totalSold', 'averageRating']).withMessage('Invalid sort field'),
   query('sortOrder').optional().isIn(['asc', 'desc']).withMessage('Sort order must be asc or desc')
 ], async (req, res, next) => {
   try {
@@ -190,50 +331,112 @@ router.get('/', [
     }
 
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
 
-    // Build filter object
-    const filter = { isActive: true };
+    // Build WHERE clause (only active products for public)
+    let whereClause = 'WHERE isActive = ?';
+    const params = [1]; // Use 1 instead of true for MySQL
     
     if (req.query.category) {
-      filter.category = req.query.category;
-    }
-    
-    if (req.query.minPrice || req.query.maxPrice) {
-      filter.price = {};
-      if (req.query.minPrice) filter.price.$gte = parseFloat(req.query.minPrice);
-      if (req.query.maxPrice) filter.price.$lte = parseFloat(req.query.maxPrice);
-    }
-    
-    if (req.query.inStock === 'true') {
-      filter.stock = { $gt: 0 };
-    } else if (req.query.inStock === 'false') {
-      filter.stock = { $eq: 0 };
+      // Handle both category name and slug
+      const categoryParam = req.query.category;
+      
+      // Map common slugs to category names
+      const slugToNameMap = {
+        'makeup': 'Makeup',
+        'skincare': 'Skincare', 
+        'hair-care': 'Hair Care',
+        'fragrance': 'Fragrance',
+        'personal-care': 'Personal Care',
+        'mens-grooming': "Men's Grooming",
+        'baby-care': 'Baby Care',
+        'wellness': 'Wellness'
+      };
+      
+      const categoryName = slugToNameMap[categoryParam.toLowerCase()] || categoryParam;
+      whereClause += ' AND category = ?';
+      params.push(categoryName);
     }
     
     if (req.query.search) {
-      filter.$text = { $search: req.query.search };
+      whereClause += ' AND (name LIKE ? OR description LIKE ?)';
+      const searchTerm = `%${req.query.search}%`;
+      params.push(searchTerm, searchTerm);
+    }
+    
+    if (req.query.minPrice) {
+      whereClause += ' AND price >= ?';
+      params.push(parseFloat(req.query.minPrice));
+    }
+    
+    if (req.query.maxPrice) {
+      whereClause += ' AND price <= ?';
+      params.push(parseFloat(req.query.maxPrice));
+    }
+    
+    if (req.query.inStock === 'true') {
+      whereClause += ' AND stock > 0';
     }
 
-    // Build sort object
-    const sortBy = req.query.sortBy || 'createdAt';
-    const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
-    const sort = { [sortBy]: sortOrder };
+    // Build ORDER BY clause
+    let orderBy = 'ORDER BY createdAt DESC';
+    if (req.query.sortBy) {
+      const sortOrder = req.query.sortOrder || 'desc';
+      orderBy = `ORDER BY ${req.query.sortBy} ${sortOrder.toUpperCase()}`;
+    }
 
     // Get products
-    const products = await Product.find(filter)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .select('-__v');
+    const sql = `
+      SELECT 
+        id,
+        name,
+        description,
+        category,
+        price,
+        costPrice,
+        stock,
+        sku,
+        isActive,
+        tags,
+        weight,
+        dimensions,
+        totalSold,
+        averageRating,
+        reviewCount,
+        createdAt,
+        updatedAt
+      FROM products 
+      ${whereClause}
+      ${orderBy}
+      LIMIT ? OFFSET ?
+    `;
 
-    const totalProducts = await Product.countDocuments(filter);
+    const finalParams = [...params, limit, offset];
+    console.log('🔍 SQL Query:', sql);
+    console.log('🔍 Parameters:', finalParams);
+    const products = await dbQuery(sql, finalParams);
+
+    // Get images for each product
+    const productsWithImages = await Promise.all(
+      products.map(async (product) => {
+        const images = await getProductImages(product.id);
+        return {
+          ...product,
+          images
+        };
+      })
+    );
+
+    // Get total count for pagination
+    const countSql = `SELECT COUNT(*) as total FROM products ${whereClause}`;
+    const [countResult] = await dbQuery(countSql, params); // params don't include limit/offset
+    const totalProducts = countResult.total;
     const totalPages = Math.ceil(totalProducts / limit);
 
     res.json({
       success: true,
-      data: products,
+      data: productsWithImages,
       pagination: {
         currentPage: page,
         totalPages,
@@ -243,451 +446,33 @@ router.get('/', [
       }
     });
   } catch (error) {
-    next(error);
-  }
-});
-
-// BULK OPERATIONS (must come before parameterized routes)
-
-// @desc    Bulk update product status
-// @route   PATCH /api/products/bulk/status
-// @access  Private (manager and admin only)
-router.patch('/bulk/status', authorize('manager', 'admin'), [
-  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required'),
-  body('isActive').isBoolean().withMessage('isActive must be boolean')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { productIds, isActive } = req.body;
-
-    const result = await Product.updateMany(
-      { _id: { $in: productIds } },
-      { isActive }
-    );
-
-    res.json({
-      success: true,
-      message: `${result.modifiedCount} products ${isActive ? 'activated' : 'deactivated'} successfully`,
-      data: {
-        matchedCount: result.matchedCount,
-        modifiedCount: result.modifiedCount
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Bulk delete products (soft delete)
-// @route   DELETE /api/products/bulk
-// @access  Private (admin only)
-router.delete('/bulk', authorize('admin'), [
-  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { productIds } = req.body;
-
-    const result = await Product.updateMany(
-      { _id: { $in: productIds } },
-      { isActive: false }
-    );
-
-    res.json({
-      success: true,
-      message: `${result.modifiedCount} products deleted successfully`,
-      data: {
-        matchedCount: result.matchedCount,
-        modifiedCount: result.modifiedCount
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Bulk update product inventory
-// @route   PATCH /api/products/bulk/inventory
-// @access  Private (manager and admin only)
-router.patch('/bulk/inventory', authorize('manager', 'admin'), [
-  body('updates').isArray({ min: 1 }).withMessage('Updates array is required'),
-  body('updates.*.productId').isMongoId().withMessage('Valid product ID is required'),
-  body('updates.*.stock').isInt({ min: 0 }).withMessage('Stock must be a non-negative integer')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { updates } = req.body;
-    let successCount = 0;
-    let failureCount = 0;
-    const results = [];
-
-    for (const update of updates) {
-      try {
-        const product = await Product.findByIdAndUpdate(
-          update.productId,
-          { stock: update.stock },
-          { new: true, runValidators: true }
-        );
-
-        if (product) {
-          successCount++;
-          results.push({
-            productId: update.productId,
-            success: true,
-            name: product.name,
-            newStock: product.stock
-          });
-        } else {
-          failureCount++;
-          results.push({
-            productId: update.productId,
-            success: false,
-            error: 'Product not found'
-          });
-        }
-      } catch (error) {
-        failureCount++;
-        results.push({
-          productId: update.productId,
-          success: false,
-          error: error.message
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      message: `Bulk inventory update completed: ${successCount} successful, ${failureCount} failed`,
-      data: {
-        successCount,
-        failureCount,
-        results
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Bulk change product category
-// @route   PATCH /api/products/bulk/category
-// @access  Private (manager and admin only)
-router.patch('/bulk/category', authorize('manager', 'admin'), [
-  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required'),
-  body('category').trim().notEmpty().withMessage('Category is required')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { productIds, category } = req.body;
-
-    // Check if category exists and is active
-    const Category = require('../models/Category');
-    const categoryExists = await Category.findOne({ name: category, isActive: true });
-    if (!categoryExists) {
-      // Get list of available categories for helpful error message
-      const availableCategories = await Category.find({ isActive: true }, 'name').lean();
-      const categoryNames = availableCategories.map(cat => cat.name).join(', ');
-      
-      return res.status(400).json({
-        success: false,
-        message: `Invalid category "${category}". Category does not exist or is inactive. Available categories: ${categoryNames}`
-      });
-    }
-
-    const result = await Product.updateMany(
-      { _id: { $in: productIds } },
-      { category }
-    );
-
-    res.json({
-      success: true,
-      message: `${result.modifiedCount} products moved to ${category} category successfully`,
-      data: {
-        matchedCount: result.matchedCount,
-        modifiedCount: result.modifiedCount,
-        category
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Bulk update product prices
-// @route   PATCH /api/products/bulk/pricing
-// @access  Private (manager and admin only)
-router.patch('/bulk/pricing', authorize('manager', 'admin'), [
-  body('productIds').isArray({ min: 1 }).withMessage('Product IDs array is required'),
-  body('priceChange').isObject().withMessage('Price change configuration is required'),
-  body('priceChange.type').isIn(['percentage', 'fixed']).withMessage('Price change type must be percentage or fixed'),
-  body('priceChange.value').isNumeric().withMessage('Price change value must be numeric')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { productIds, priceChange } = req.body;
-    let successCount = 0;
-    let failureCount = 0;
-    const results = [];
-
-    const products = await Product.find({ _id: { $in: productIds } });
-
-    for (const product of products) {
-      try {
-        let newPrice;
-        let newCostPrice;
-
-        if (priceChange.type === 'percentage') {
-          const multiplier = 1 + (parseFloat(priceChange.value) / 100);
-          newPrice = Math.round(product.price * multiplier * 100) / 100;
-          newCostPrice = Math.round(product.costPrice * multiplier * 100) / 100;
-        } else {
-          newPrice = product.price + parseFloat(priceChange.value);
-          newCostPrice = product.costPrice + parseFloat(priceChange.value);
-        }
-
-        // Ensure prices don't go below 0
-        newPrice = Math.max(0, newPrice);
-        newCostPrice = Math.max(0, newCostPrice);
-
-        await Product.findByIdAndUpdate(
-          product._id,
-          { price: newPrice, costPrice: newCostPrice },
-          { runValidators: true }
-        );
-
-        successCount++;
-        results.push({
-          productId: product._id,
-          success: true,
-          name: product.name,
-          oldPrice: product.price,
-          newPrice,
-          oldCostPrice: product.costPrice,
-          newCostPrice
-        });
-      } catch (error) {
-        failureCount++;
-        results.push({
-          productId: product._id,
-          success: false,
-          error: error.message
-        });
-      }
-    }
-
-    res.json({
-      success: true,
-      message: `Bulk pricing update completed: ${successCount} successful, ${failureCount} failed`,
-      data: {
-        successCount,
-        failureCount,
-        results,
-        priceChange
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// UPLOAD ROUTES (must come before parameterized routes)
-
-// @desc    Upload single product image
-// @route   POST /api/products/upload/image
-// @access  Private (manager and admin only)
-router.post('/upload/image', authorize('manager', 'admin'), (req, res, next) => {
-  uploadSingle(req, res, (err) => {
-    if (err) {
-      return handleUploadError(err, req, res, next);
-    }
-    
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'No image file provided'
-      });
-    }
-    
-    res.json({
-      success: true,
-      message: 'Image uploaded successfully',
-      data: {
-        url: req.file.path,
-        publicId: req.file.filename,
-        originalName: req.file.originalname
-      }
-    });
-  });
-});
-
-// @desc    Upload multiple product images
-// @route   POST /api/products/upload/images
-// @access  Private (manager and admin only)
-router.post('/upload/images', authorize('manager', 'admin'), (req, res, next) => {
-  uploadMultiple(req, res, (err) => {
-    if (err) {
-      return handleUploadError(err, req, res, next);
-    }
-    
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No image files provided'
-      });
-    }
-    
-    const uploadedImages = req.files.map(file => ({
-      url: file.path,
-      publicId: file.filename,
-      originalName: file.originalname
-    }));
-    
-    res.json({
-      success: true,
-      message: `${req.files.length} images uploaded successfully`,
-      data: uploadedImages
-    });
-  });
-});
-
-// PARAMETERIZED ROUTES (must come after specific routes)
-
-// @desc    Get single product
-// @route   GET /api/products/:id
-// @access  Private
-router.get('/:id', async (req, res, next) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: product
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Create new product
-// @route   POST /api/products
-// @access  Private (manager and admin only)
-router.post('/', authorize('manager', 'admin'), [
-  body('name').trim().notEmpty().withMessage('Product name is required'),
-  body('description').trim().notEmpty().withMessage('Product description is required'),
-  body('category').trim().notEmpty().withMessage('Product category is required'),
-  body('price').isNumeric().isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-  body('costPrice').isNumeric().isFloat({ min: 0 }).withMessage('Cost price must be a positive number'),
-  body('stock').isInt({ min: 0 }).withMessage('Stock must be a non-negative integer'),
-  body('sku').trim().notEmpty().withMessage('SKU is required'),
-  body('weight').optional().isNumeric().withMessage('Weight must be a number'),
-  body('tags').optional().isArray().withMessage('Tags must be an array'),
-  body('images').optional().isArray().withMessage('Images must be an array')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    // Check if category exists and is active
-    const Category = require('../models/Category');
-    const category = await Category.findOne({ name: req.body.category, isActive: true });
-    if (!category) {
-      // Get list of available categories for helpful error message
-      const availableCategories = await Category.find({ isActive: true }, 'name').lean();
-      const categoryNames = availableCategories.map(cat => cat.name).join(', ');
-      
-      return res.status(400).json({
-        success: false,
-        message: `Invalid category "${req.body.category}". Category does not exist or is inactive. Available categories: ${categoryNames}`
-      });
-    }
-
-    // Check if SKU already exists
-    const existingProduct = await Product.findOne({ sku: req.body.sku });
-    if (existingProduct) {
-      return res.status(400).json({
-        success: false,
-        message: 'Product with this SKU already exists'
-      });
-    }
-
-    const product = await Product.create(req.body);
-
-    res.status(201).json({
-      success: true,
-      message: 'Product created successfully',
-      data: product
-    });
-  } catch (error) {
+    console.error('Error fetching products:', error);
     next(error);
   }
 });
 
 // @desc    Update product
 // @route   PUT /api/products/:id
-// @access  Private (manager and admin only)
-router.put('/:id', authorize('manager', 'admin'), [
-  body('name').optional().trim().notEmpty().withMessage('Product name cannot be empty'),
-  body('description').optional().trim().notEmpty().withMessage('Product description cannot be empty'),
-  body('category').optional().trim().notEmpty().withMessage('Category cannot be empty'),
-  body('price').optional().isNumeric().isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-  body('costPrice').optional().isNumeric().isFloat({ min: 0 }).withMessage('Cost price must be a positive number'),
+// @access  Private (admin and manager only)
+router.put('/:id', protect, authorize('manager', 'admin'), [
+  body('name').optional().isString().isLength({ min: 1, max: 255 }).withMessage('Name must be 1-255 characters'),
+  body('description').optional().isString().withMessage('Description must be a string'),
+  body('category').optional().isString().isLength({ min: 1, max: 100 }).withMessage('Category must be 1-100 characters'),
+  body('price').optional().isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+  body('costPrice').optional().isFloat({ min: 0 }).withMessage('Cost price must be a positive number'),
   body('stock').optional().isInt({ min: 0 }).withMessage('Stock must be a non-negative integer'),
-  body('sku').optional().trim().notEmpty().withMessage('SKU cannot be empty'),
-  body('weight').optional().isNumeric().withMessage('Weight must be a number'),
-  body('tags').optional().isArray().withMessage('Tags must be an array'),
+  body('sku').optional().isString().isLength({ min: 1, max: 50 }).withMessage('SKU must be 1-50 characters'),
+  body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
+  body('tags').optional().custom((value) => {
+    if (typeof value === 'string' || Array.isArray(value)) {
+      return true;
+    }
+    throw new Error('Tags must be a string or array');
+  }),
+  body('weight').optional().isFloat({ min: 0 }).withMessage('Weight must be a positive number'),
+  body('dimensions').optional().isString().withMessage('Dimensions must be a string'),
+  body('averageRating').optional().isFloat({ min: 0, max: 5 }).withMessage('Rating must be between 0 and 5'),
+  body('reviewCount').optional().isInt({ min: 0 }).withMessage('Review count must be a non-negative integer'),
   body('images').optional().isArray().withMessage('Images must be an array')
 ], async (req, res, next) => {
   try {
@@ -700,41 +485,169 @@ router.put('/:id', authorize('manager', 'admin'), [
       });
     }
 
-    // Check if category exists and is active (if category is being updated)
-    if (req.body.category) {
-      const Category = require('../models/Category');
-      const category = await Category.findOne({ name: req.body.category, isActive: true });
-      if (!category) {
-        // Get list of available categories for helpful error message
-        const availableCategories = await Category.find({ isActive: true }, 'name').lean();
-        const categoryNames = availableCategories.map(cat => cat.name).join(', ');
-        
-        return res.status(400).json({
-          success: false,
-          message: `Invalid category "${req.body.category}". Category does not exist or is inactive. Available categories: ${categoryNames}`
-        });
-      }
-    }
-
-    // Check if SKU already exists (excluding current product)
-    if (req.body.sku) {
-      const existingProduct = await Product.findOne({ 
-        sku: req.body.sku,
-        _id: { $ne: req.params.id }
-      });
-      if (existingProduct) {
-        return res.status(400).json({
-          success: false,
-          message: 'Product with this SKU already exists'
-        });
-      }
-    }
-
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
+    const productId = req.params.id;
+    
+    // Check if product exists
+    const [existingProduct] = await dbQuery(
+      'SELECT id FROM products WHERE id = ?',
+      [productId]
     );
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    // Build update query dynamically based on provided fields
+    const updateFields = [];
+    const updateValues = [];
+    
+    const allowedFields = [
+      'name', 'description', 'category', 'price', 'costPrice', 
+      'stock', 'sku', 'isActive', 'tags', 'weight', 'dimensions',
+      'averageRating', 'reviewCount'
+    ];
+    
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updateFields.push(`${field} = ?`);
+        
+        // Handle tags specially - convert to JSON string
+        if (field === 'tags') {
+          const tags = req.body[field];
+          let tagsJson = '';
+          if (Array.isArray(tags)) {
+            tagsJson = JSON.stringify(tags.filter(tag => tag && tag.trim().length > 0));
+          } else if (typeof tags === 'string' && tags.trim()) {
+            tagsJson = JSON.stringify([tags.trim()]);
+          } else {
+            tagsJson = JSON.stringify([]);
+          }
+          updateValues.push(tagsJson);
+        } else {
+          updateValues.push(req.body[field]);
+        }
+      }
+    });
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid fields provided for update'
+      });
+    }
+
+    // Add updatedAt timestamp
+    updateFields.push('updatedAt = NOW()');
+    updateValues.push(productId);
+
+    const updateSql = `
+      UPDATE products 
+      SET ${updateFields.join(', ')}
+      WHERE id = ?
+    `;
+
+    await dbQuery(updateSql, updateValues);
+
+    // Handle image updates if provided
+    if (req.body.images && Array.isArray(req.body.images)) {
+      // Delete existing images
+      await dbQuery('DELETE FROM product_images WHERE productId = ?', [productId]);
+      
+      // Insert new images if any provided
+      const validImages = req.body.images.filter(url => url && typeof url === 'string' && url.trim().length > 0);
+      if (validImages.length > 0) {
+        const imageInserts = validImages.map((url, index) => [
+          productId, url.trim(), `${req.body.name || 'Product'} - Image ${index + 1}`, index + 1
+        ]);
+        
+        // Use proper bulk insert syntax for mysql2
+        const placeholders = imageInserts.map(() => '(?, ?, ?, ?)').join(', ');
+        const flatValues = imageInserts.flat();
+        
+        await dbQuery(`
+          INSERT INTO product_images (productId, url, alt, sortOrder)
+          VALUES ${placeholders}
+        `, flatValues);
+      }
+    }
+
+    // Fetch and return updated product
+    const [updatedProduct] = await dbQuery(`
+      SELECT 
+        id,
+        name,
+        description,
+        category,
+        price,
+        costPrice,
+        stock,
+        sku,
+        isActive,
+        tags,
+        weight,
+        dimensions,
+        totalSold,
+        averageRating,
+        reviewCount,
+        createdAt,
+        updatedAt
+      FROM products 
+      WHERE id = ?
+    `, [productId]);
+
+    // Get product images
+    const images = await getProductImages(updatedProduct.id);
+    
+    res.json({
+      success: true,
+      message: 'Product updated successfully',
+      data: {
+        ...updatedProduct,
+        images
+      }
+    });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({
+        success: false,
+        message: 'A product with this SKU already exists'
+      });
+    }
+    next(error);
+  }
+});
+
+// @desc    Get single product
+// @route   GET /api/products/:id
+// @access  Private
+router.get('/:id', protect, async (req, res, next) => {
+  try {
+    const [product] = await dbQuery(`
+      SELECT 
+        id,
+        name,
+        description,
+        category,
+        price,
+        costPrice,
+        stock,
+        sku,
+        isActive,
+        tags,
+        weight,
+        dimensions,
+        totalSold,
+        averageRating,
+        reviewCount,
+        createdAt,
+        updatedAt
+      FROM products 
+      WHERE id = ?
+    `, [req.params.id]);
 
     if (!product) {
       return res.status(404).json({
@@ -743,20 +656,62 @@ router.put('/:id', authorize('manager', 'admin'), [
       });
     }
 
+    // Get product images
+    const images = await getProductImages(product.id);
+    
     res.json({
       success: true,
-      message: 'Product updated successfully',
-      data: product
+      data: {
+        ...product,
+        images
+      }
     });
   } catch (error) {
+    console.error('Error fetching product:', error);
+    next(error);
+  }
+});
+
+// @desc    Delete product
+// @route   DELETE /api/products/:id
+// @access  Private (admin only)
+router.delete('/:id', protect, authorize('admin'), async (req, res, next) => {
+  try {
+    const productId = req.params.id;
+    
+    // Check if product exists
+    const [existingProduct] = await dbQuery(
+      'SELECT id, name FROM products WHERE id = ?',
+      [productId]
+    );
+
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    // Delete product images first
+    await dbQuery('DELETE FROM product_images WHERE productId = ?', [productId]);
+    
+    // Delete the product
+    await dbQuery('DELETE FROM products WHERE id = ?', [productId]);
+    
+    res.json({
+      success: true,
+      message: `Product "${existingProduct.name}" deleted successfully`
+    });
+  } catch (error) {
+    console.error('Error deleting product:', error);
     next(error);
   }
 });
 
 // @desc    Update product stock
 // @route   PATCH /api/products/:id/stock
-// @access  Private (staff and above)
-router.patch('/:id/stock', authorize('staff', 'manager', 'admin'), [
+// @access  Private (admin and manager only)
+router.patch('/:id/stock', protect, authorize('manager', 'admin'), [
   body('stock').isInt({ min: 0 }).withMessage('Stock must be a non-negative integer')
 ], async (req, res, next) => {
   try {
@@ -769,90 +724,335 @@ router.patch('/:id/stock', authorize('staff', 'manager', 'admin'), [
       });
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { stock: req.body.stock },
-      { new: true, runValidators: true }
-    );
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Product stock updated successfully',
-      data: product
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @desc    Toggle product active status
-// @route   PATCH /api/products/:id/toggle-status
-// @access  Private (manager and admin only)
-router.patch('/:id/toggle-status', authorize('manager', 'admin'), async (req, res, next) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      });
-    }
-
-    product.isActive = !product.isActive;
-    await product.save();
-
-    res.json({
-      success: true,
-      message: `Product ${product.isActive ? 'activated' : 'deactivated'} successfully`,
-      data: product
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-
-
-// @desc    Delete product (soft delete by setting isActive to false)
-// @route   DELETE /api/products/:id
-// @access  Private (admin only)
-router.delete('/:id', authorize('admin'), async (req, res, next) => {
-  try {
-    console.log('Delete request for product ID:', req.params.id);
+    const productId = req.params.id;
+    const { stock } = req.body;
     
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { isActive: false },
-      { new: true, runValidators: false } // Don't run validators for delete operation
+    // Check if product exists
+    const [existingProduct] = await dbQuery(
+      'SELECT id, name FROM products WHERE id = ?',
+      [productId]
     );
 
-    if (!product) {
-      console.log('Product not found:', req.params.id);
+    if (!existingProduct) {
       return res.status(404).json({
         success: false,
         message: 'Product not found'
       });
     }
 
-    console.log('Product deleted successfully:', product.name);
+    // Update stock
+    await dbQuery(
+      'UPDATE products SET stock = ?, updatedAt = NOW() WHERE id = ?',
+      [stock, productId]
+    );
+    
     res.json({
       success: true,
-      message: 'Product deleted successfully'
+      message: `Stock updated to ${stock} for "${existingProduct.name}"`
     });
   } catch (error) {
-    console.error('Delete error:', error.message);
-    console.error('Error details:', error);
+    console.error('Error updating product stock:', error);
     next(error);
   }
 });
 
+// @desc    Bulk update product inventory
+// @route   PATCH /api/products/bulk/inventory
+// @access  Private (admin and manager only)
+router.patch('/bulk/inventory', protect, authorize('manager', 'admin'), [
+  body('updates').isArray({ min: 1 }).withMessage('updates must be a non-empty array'),
+  body('updates.*.productId').isString().withMessage('productId must be a string'),
+  body('updates.*.stock').isInt({ min: 0 }).withMessage('stock must be a non-negative integer')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { updates } = req.body;
+    
+    // Prepare bulk update query
+    const cases = updates.map(() => 'WHEN id = ? THEN ?').join(' ');
+    const productIds = updates.map(u => u.productId);
+    const values = updates.flatMap(u => [u.productId, u.stock]);
+    
+    const placeholders = productIds.map(() => '?').join(',');
+    const result = await dbQuery(`
+      UPDATE products 
+      SET stock = CASE ${cases} END,
+          updatedAt = NOW()
+      WHERE id IN (${placeholders})
+    `, [...values, ...productIds]);
+    
+    res.json({
+      success: true,
+      message: `${result.affectedRows} products inventory updated successfully`
+    });
+  } catch (error) {
+    console.error('Error bulk updating inventory:', error);
+    next(error);
+  }
+});
+
+// @desc    Bulk update product status (activate/deactivate)
+// @route   PATCH /api/products/bulk/status
+// @access  Private (admin and manager only)
+router.patch('/bulk/status', protect, authorize('manager', 'admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('productIds must be a non-empty array'),
+  body('isActive').isBoolean().withMessage('isActive must be a boolean')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds, isActive } = req.body;
+    
+    // Update products
+    const placeholders = productIds.map(() => '?').join(',');
+    const result = await dbQuery(
+      `UPDATE products SET isActive = ?, updatedAt = NOW() WHERE id IN (${placeholders})`,
+      [isActive, ...productIds]
+    );
+    
+    res.json({
+      success: true,
+      message: `${result.affectedRows} products ${isActive ? 'activated' : 'deactivated'} successfully`
+    });
+  } catch (error) {
+    console.error('Error bulk updating product status:', error);
+    next(error);
+  }
+});
+
+// @desc    Bulk delete products
+// @route   DELETE /api/products/bulk
+// @access  Private (admin only)
+router.delete('/bulk', protect, authorize('admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('productIds must be a non-empty array')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds } = req.body;
+    
+    // Delete product images first
+    const placeholders = productIds.map(() => '?').join(',');
+    await dbQuery(`DELETE FROM product_images WHERE productId IN (${placeholders})`, productIds);
+    
+    // Delete products
+    const result = await dbQuery(
+      `DELETE FROM products WHERE id IN (${placeholders})`,
+      productIds
+    );
+    
+    res.json({
+      success: true,
+      message: `${result.affectedRows} products deleted successfully`
+    });
+  } catch (error) {
+    console.error('Error bulk deleting products:', error);
+    next(error);
+  }
+});
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '../..', 'public', 'images', 'uploads');
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    // Generate unique filename with timestamp
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, `product-${uniqueSuffix}${ext}`);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Check file type
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Please upload only image files'), false);
+    }
+  }
+});
+
+// @desc    Upload single product image
+// @route   POST /api/products/upload/image
+// @access  Private (admin and manager only)
+router.post('/upload/image', protect, authorize('manager', 'admin'), upload.single('image'), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file provided'
+      });
+    }
+
+    const imageUrl = `/images/uploads/${req.file.filename}`;
+    
+    res.json({
+      success: true,
+      data: {
+        url: imageUrl,
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size
+      },
+      message: 'Image uploaded successfully'
+    });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    next(error);
+  }
+});
+
+// @desc    Upload multiple product images
+// @route   POST /api/products/upload/images
+// @access  Private (admin and manager only)
+router.post('/upload/images', protect, authorize('manager', 'admin'), upload.array('images', 10), async (req, res, next) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image files provided'
+      });
+    }
+
+    const uploadedImages = req.files.map(file => ({
+      url: `/images/uploads/${file.filename}`,
+      filename: file.filename,
+      originalName: file.originalname,
+      size: file.size
+    }));
+    
+    res.json({
+      success: true,
+      data: uploadedImages,
+      message: `${uploadedImages.length} images uploaded successfully`
+    });
+  } catch (error) {
+    console.error('Error uploading images:', error);
+    next(error);
+  }
+});
+
+// @desc    Bulk change product category
+// @route   PATCH /api/products/bulk/category
+// @access  Private (admin and manager only)
+router.patch('/bulk/category', protect, authorize('manager', 'admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('productIds must be a non-empty array'),
+  body('category').isString().isLength({ min: 1, max: 100 }).withMessage('Category must be 1-100 characters')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds, category } = req.body;
+    
+    // Update products category
+    const placeholders = productIds.map(() => '?').join(',');
+    const result = await dbQuery(
+      `UPDATE products SET category = ?, updatedAt = NOW() WHERE id IN (${placeholders})`,
+      [category, ...productIds]
+    );
+    
+    res.json({
+      success: true,
+      message: `${result.affectedRows} products updated to category "${category}" successfully`
+    });
+  } catch (error) {
+    console.error('Error bulk updating product category:', error);
+    next(error);
+  }
+});
+
+// @desc    Bulk update product pricing
+// @route   PATCH /api/products/bulk/pricing
+// @access  Private (admin and manager only)
+router.patch('/bulk/pricing', protect, authorize('manager', 'admin'), [
+  body('productIds').isArray({ min: 1 }).withMessage('productIds must be a non-empty array'),
+  body('priceChange.type').isIn(['percentage', 'fixed']).withMessage('Price change type must be percentage or fixed'),
+  body('priceChange.value').isFloat().withMessage('Price change value must be a number')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const { productIds, priceChange } = req.body;
+    const { type, value } = priceChange;
+    
+    let updateExpression;
+    let params;
+    
+    if (type === 'percentage') {
+      // Increase/decrease by percentage
+      const multiplier = 1 + (value / 100);
+      updateExpression = 'price = ROUND(price * ?, 2)';
+      params = [multiplier, ...productIds];
+    } else {
+      // Fixed amount increase/decrease
+      updateExpression = 'price = GREATEST(0, price + ?)';
+      params = [value, ...productIds];
+    }
+    
+    const placeholders = productIds.map(() => '?').join(',');
+    const result = await dbQuery(
+      `UPDATE products SET ${updateExpression}, updatedAt = NOW() WHERE id IN (${placeholders})`,
+      params
+    );
+    
+    res.json({
+      success: true,
+      message: `${result.affectedRows} products pricing updated successfully`
+    });
+  } catch (error) {
+    console.error('Error bulk updating product pricing:', error);
+    next(error);
+  }
+});
 
 module.exports = router;

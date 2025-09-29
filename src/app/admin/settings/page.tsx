@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { 
   CogIcon,
@@ -15,6 +15,10 @@ import {
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('general');
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [settings, setSettings] = useState({
     general: {
       siteName: 'Kaaya Beauty',
@@ -114,10 +118,128 @@ export default function SettingsPage() {
     }));
   };
 
-  const handleSaveSettings = () => {
-    // In a real app, this would save to the backend
-    alert('Settings saved successfully!');
+  // Helper function to safely get values and prevent controlled/uncontrolled component issues
+  const getSafeValue = (value: any, defaultValue: string | number | boolean = '') => {
+    if (value === undefined || value === null) {
+      return defaultValue;
+    }
+    return value;
   };
+
+  // Helper function to safely get nested values
+  const getSafeNestedValue = (obj: any, path: string[], defaultValue: any = '') => {
+    let current = obj;
+    for (const key of path) {
+      if (current === undefined || current === null || typeof current !== 'object') {
+        return defaultValue;
+      }
+      current = current[key];
+    }
+    return current !== undefined && current !== null ? current : defaultValue;
+  };
+
+  // Load settings from API
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('http://localhost:5001/api/settings', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load settings');
+      }
+
+      const data = await response.json();
+      if (data.success && data.settings) {
+        // Deep merge loaded settings with defaults to ensure all properties exist
+        setSettings(prevSettings => {
+          const mergedSettings = { ...prevSettings };
+          
+          // Deep merge each section while preserving nested structure
+          Object.keys(data.settings).forEach(section => {
+            if (mergedSettings[section as keyof typeof mergedSettings]) {
+              const currentSection = mergedSettings[section as keyof typeof mergedSettings];
+              const newSection = data.settings[section];
+              
+              // For nested objects, merge recursively
+              const mergedSection: any = { ...currentSection };
+              Object.keys(newSection).forEach(key => {
+                if (typeof newSection[key] === 'object' && newSection[key] !== null && !Array.isArray(newSection[key])) {
+                  mergedSection[key] = {
+                    ...mergedSection[key],
+                    ...newSection[key]
+                  };
+                } else {
+                  mergedSection[key] = newSection[key];
+                }
+              });
+              
+              mergedSettings[section as keyof typeof mergedSettings] = mergedSection;
+            }
+          });
+          
+          return mergedSettings;
+        });
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      setError('Failed to load settings. Using default values.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save settings to API
+  const handleSaveSettings = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+      
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('http://localhost:5001/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ settings }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setSuccess('Settings saved successfully!');
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        throw new Error(data.message || 'Failed to save settings');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setError(error instanceof Error ? error.message : 'Failed to save settings');
+      // Clear error message after 5 seconds
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Load settings on component mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
 
   return (
     <AdminLayout title="Settings">
@@ -130,11 +252,29 @@ export default function SettingsPage() {
           </div>
           <button
             onClick={handleSaveSettings}
-            className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors"
+            disabled={saving || loading}
+            className={`px-4 py-2 rounded-md transition-colors ${
+              saving || loading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-pink-600 hover:bg-pink-700'
+            } text-white`}
           >
-            Save Changes
+            {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
+
+        {/* Success/Error Messages */}
+        {success && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            {success}
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Settings Navigation */}
@@ -159,6 +299,14 @@ export default function SettingsPage() {
 
           {/* Settings Content */}
           <div className="flex-1">
+            {loading ? (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
+                  <span className="ml-2 text-gray-600">Loading settings...</span>
+                </div>
+              </div>
+            ) : (
             <div className="bg-white rounded-lg shadow-sm">
               {/* General Settings */}
               {activeTab === 'general' && (
@@ -172,7 +320,7 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="text"
-                          value={settings.general.siteName}
+                          value={getSafeValue(settings.general?.siteName, 'Kaaya Beauty')}
                           onChange={(e) => handleInputChange('general', 'siteName', e.target.value)}
                           className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         />
@@ -183,7 +331,7 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="email"
-                          value={settings.general.contactEmail}
+                          value={getSafeValue(settings.general?.contactEmail, 'support@kaaya.com')}
                           onChange={(e) => handleInputChange('general', 'contactEmail', e.target.value)}
                           className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         />
@@ -195,7 +343,7 @@ export default function SettingsPage() {
                         Site Description
                       </label>
                       <textarea
-                        value={settings.general.siteDescription}
+                        value={getSafeValue(settings.general?.siteDescription, 'Your ultimate destination for beauty and cosmetics')}
                         onChange={(e) => handleInputChange('general', 'siteDescription', e.target.value)}
                         rows={3}
                         className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
@@ -209,7 +357,7 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="tel"
-                          value={settings.general.contactPhone}
+                          value={getSafeValue(settings.general?.contactPhone, '+91 9876543210')}
                           onChange={(e) => handleInputChange('general', 'contactPhone', e.target.value)}
                           className="admin-input admin-field-bg w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent font-medium"
                         />
@@ -279,7 +427,7 @@ export default function SettingsPage() {
                           </div>
                           <input
                             type="checkbox"
-                            checked={settings.notifications.emailNotifications}
+                          checked={getSafeNestedValue(settings, ['notifications', 'emailNotifications'], false)}
                             onChange={(e) => handleInputChange('notifications', 'emailNotifications', e.target.checked)}
                             className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                           />
@@ -291,7 +439,7 @@ export default function SettingsPage() {
                           </div>
                           <input
                             type="checkbox"
-                            checked={settings.notifications.smsNotifications}
+                          checked={getSafeNestedValue(settings, ['notifications', 'smsNotifications'], false)}
                             onChange={(e) => handleInputChange('notifications', 'smsNotifications', e.target.checked)}
                             className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                           />
@@ -370,7 +518,7 @@ export default function SettingsPage() {
                         <h4 className="text-md font-medium text-gray-900">Razorpay</h4>
                         <input
                           type="checkbox"
-                          checked={settings.payment.razorpay.enabled}
+                          checked={getSafeNestedValue(settings, ['payment', 'razorpay', 'enabled'], false)}
                           onChange={(e) => handleNestedInputChange('payment', 'razorpay', 'enabled', e.target.checked)}
                           className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                         />
@@ -381,7 +529,7 @@ export default function SettingsPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-2">Key ID</label>
                             <input
                               type="text"
-                              value={settings.payment.razorpay.keyId}
+                              value={getSafeNestedValue(settings, ['payment', 'razorpay', 'keyId'], '')}
                               onChange={(e) => handleNestedInputChange('payment', 'razorpay', 'keyId', e.target.value)}
                               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                             />
@@ -390,7 +538,7 @@ export default function SettingsPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-2">Key Secret</label>
                             <input
                               type="password"
-                              value={settings.payment.razorpay.keySecret}
+                              value={getSafeNestedValue(settings, ['payment', 'razorpay', 'keySecret'], '')}
                               onChange={(e) => handleNestedInputChange('payment', 'razorpay', 'keySecret', e.target.value)}
                               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                             />
@@ -405,7 +553,7 @@ export default function SettingsPage() {
                         <h4 className="text-md font-medium text-gray-900">Cash on Delivery</h4>
                         <input
                           type="checkbox"
-                          checked={settings.payment.cod.enabled}
+                          checked={getSafeNestedValue(settings, ['payment', 'cod', 'enabled'], false)}
                           onChange={(e) => handleNestedInputChange('payment', 'cod', 'enabled', e.target.checked)}
                           className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                         />
@@ -416,7 +564,7 @@ export default function SettingsPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Amount (₹)</label>
                         <input
                           type="number"
-                          value={settings.payment.cod.minAmount?.toString() || '0'}
+                          value={getSafeNestedValue(settings, ['payment', 'cod', 'minAmount'], 0).toString()}
                           onChange={(e) => handleNestedInputChange('payment', 'cod', 'minAmount', parseInt(e.target.value) || 0)}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                         />
@@ -425,7 +573,7 @@ export default function SettingsPage() {
                             <label className="block text-sm font-medium text-gray-700 mb-2">Maximum Amount (₹)</label>
                             <input
                               type="number"
-                              value={settings.payment.cod.maxAmount?.toString() || '5000'}
+                              value={getSafeNestedValue(settings, ['payment', 'cod', 'maxAmount'], 5000).toString()}
                               onChange={(e) => handleNestedInputChange('payment', 'cod', 'maxAmount', parseInt(e.target.value) || 5000)}
                               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                             />
@@ -448,7 +596,7 @@ export default function SettingsPage() {
                       </label>
                       <input
                         type="number"
-                        value={settings.shipping.freeShippingThreshold?.toString() || '999'}
+                        value={getSafeNestedValue(settings, ['shipping', 'freeShippingThreshold'], 999).toString()}
                         onChange={(e) => handleInputChange('shipping', 'freeShippingThreshold', parseInt(e.target.value) || 999)}
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                       />
@@ -462,7 +610,7 @@ export default function SettingsPage() {
                           <span className="font-medium text-black">Standard Shipping</span>
                           <input
                             type="checkbox"
-                            checked={settings.shipping.standardShipping.enabled}
+                          checked={getSafeNestedValue(settings, ['shipping', 'standardShipping', 'enabled'], false)}
                             onChange={(e) => handleNestedInputChange('shipping', 'standardShipping', 'enabled', e.target.checked)}
                             className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                           />
@@ -473,7 +621,7 @@ export default function SettingsPage() {
                               <label className="block text-sm font-medium text-gray-700 mb-2">Rate (₹)</label>
                               <input
                                 type="number"
-                                value={settings.shipping.standardShipping.rate?.toString() || '99'}
+                                value={getSafeNestedValue(settings, ['shipping', 'standardShipping', 'rate'], 99).toString()}
                                 onChange={(e) => handleNestedInputChange('shipping', 'standardShipping', 'rate', parseInt(e.target.value) || 99)}
                                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                               />
@@ -482,7 +630,7 @@ export default function SettingsPage() {
                               <label className="block text-sm font-medium text-gray-700 mb-2">Estimated Days</label>
                               <input
                                 type="text"
-                                value={settings.shipping.standardShipping.estimatedDays}
+                                value={getSafeNestedValue(settings, ['shipping', 'standardShipping', 'estimatedDays'], '3-7')}
                                 onChange={(e) => handleNestedInputChange('shipping', 'standardShipping', 'estimatedDays', e.target.value)}
                                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                               />
@@ -496,7 +644,7 @@ export default function SettingsPage() {
                           <span className="font-medium text-black">Express Shipping</span>
                           <input
                             type="checkbox"
-                            checked={settings.shipping.expressShipping.enabled}
+                          checked={getSafeNestedValue(settings, ['shipping', 'expressShipping', 'enabled'], false)}
                             onChange={(e) => handleNestedInputChange('shipping', 'expressShipping', 'enabled', e.target.checked)}
                             className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                           />
@@ -507,7 +655,7 @@ export default function SettingsPage() {
                               <label className="block text-sm font-medium text-gray-700 mb-2">Rate (₹)</label>
                               <input
                                 type="number"
-                                value={settings.shipping.expressShipping.rate?.toString() || '199'}
+                                value={getSafeNestedValue(settings, ['shipping', 'expressShipping', 'rate'], 199).toString()}
                                 onChange={(e) => handleNestedInputChange('shipping', 'expressShipping', 'rate', parseInt(e.target.value) || 199)}
                                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                               />
@@ -516,7 +664,7 @@ export default function SettingsPage() {
                               <label className="block text-sm font-medium text-gray-700 mb-2">Estimated Days</label>
                               <input
                                 type="text"
-                                value={settings.shipping.expressShipping.estimatedDays}
+                                value={getSafeNestedValue(settings, ['shipping', 'expressShipping', 'estimatedDays'], '1-2')}
                                 onChange={(e) => handleNestedInputChange('shipping', 'expressShipping', 'estimatedDays', e.target.value)}
                                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                               />
@@ -567,7 +715,7 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="number"
-                          value={settings.security.sessionTimeout?.toString() || '30'}
+                          value={getSafeNestedValue(settings, ['security', 'sessionTimeout'], 30).toString()}
                           onChange={(e) => handleInputChange('security', 'sessionTimeout', parseInt(e.target.value) || 30)}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                         />
@@ -578,7 +726,7 @@ export default function SettingsPage() {
                         </label>
                         <input
                           type="number"
-                          value={settings.security.loginAttempts?.toString() || '5'}
+                          value={getSafeNestedValue(settings, ['security', 'loginAttempts'], 5).toString()}
                           onChange={(e) => handleInputChange('security', 'loginAttempts', parseInt(e.target.value) || 5)}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                         />
@@ -591,7 +739,7 @@ export default function SettingsPage() {
                       </label>
                       <input
                         type="number"
-                        value={settings.security.passwordExpiry?.toString() || '90'}
+                        value={getSafeNestedValue(settings, ['security', 'passwordExpiry'], 90).toString()}
                         onChange={(e) => handleInputChange('security', 'passwordExpiry', parseInt(e.target.value) || 90)}
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-transparent text-blue-600 font-medium"
                       />
@@ -600,6 +748,7 @@ export default function SettingsPage() {
                 </div>
               )}
             </div>
+            )}
           </div>
         </div>
       </div>

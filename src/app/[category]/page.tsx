@@ -3,7 +3,8 @@
 import { useState, useMemo, use, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { useCategories } from '@/hooks/useCategories';
-import { useProducts } from '@/hooks/useProducts';
+import { apiService } from '@/lib/api';
+import { mapBackendToFrontend } from '@/lib/dataMapper';
 import ProductCard from '@/components/ui/ProductCard';
 import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
@@ -17,7 +18,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const { category } = use(params);
   
   const { categories } = useCategories();
-  const { products, loading: productsLoading, error: productsError } = useProducts();
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
   
   const [sortBy, setSortBy] = useState<string>('featured');
   const [priceRange, setPriceRange] = useState<string>('');
@@ -26,18 +29,49 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   // Find the category by slug from API
   const currentCategory = categories.find(cat => cat.slug === category);
   
+  // Fetch products for this category
+  useEffect(() => {
+    const fetchCategoryProducts = async () => {
+      if (!currentCategory) return;
+      
+      try {
+        setProductsLoading(true);
+        setProductsError(null);
+        
+        // Use category slug for API call (backend will map it to name)
+        const response = await apiService.getProducts({ 
+          category: category, // Pass the slug
+          limit: 100 
+        });
+        
+        if (response.success && response.data) {
+          const mappedProducts = response.data.map(mapBackendToFrontend);
+          setProducts(mappedProducts);
+        } else {
+          throw new Error(response.message || 'Failed to fetch products');
+        }
+      } catch (err) {
+        console.error('Failed to fetch category products:', err);
+        setProductsError(err instanceof Error ? err.message : 'Failed to fetch products');
+        setProducts([]);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+    
+    fetchCategoryProducts();
+  }, [category, currentCategory]);
+  
   // If category doesn't exist, show 404
   if (!currentCategory && categories.length > 0) {
     notFound();
   }
 
   const filteredAndSortedProducts = useMemo(() => {
-    if (!currentCategory) return [];
+    if (!currentCategory || !products) return [];
     
-    // Use only API products (fully dynamic)
-    let filtered = products.filter(product => 
-      product.category.toLowerCase() === currentCategory.name.toLowerCase()
-    );
+    // Products are already filtered by category from API
+    let filtered = [...products];
 
     // Filter by price range
     if (priceRange) {

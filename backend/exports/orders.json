@@ -1,0 +1,266 @@
+[
+  {
+    "invoiceNumber": "12240",
+    "customer": "68d77b125da1b812da48b5be",
+    "customerName": "ahmed yassine",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5c8",
+        "productName": "Lakme Absolute Perfect Radiance Skin Lightening Facewash",
+        "quantity": 2,
+        "price": 175,
+        "total": 350,
+        "_id": "68d77b125da1b812da48b68b"
+      },
+      {
+        "product": "68d77b125da1b812da48b5d0",
+        "productName": "La Roche-Posay Anthelios Sunscreen SPF 50",
+        "quantity": 1,
+        "price": 1250,
+        "total": 1250,
+        "_id": "68d77b125da1b812da48b68c"
+      }
+    ],
+    "subtotal": 1600,
+    "tax": 128,
+    "shipping": 0,
+    "discount": 0,
+    "total": 1728,
+    "paymentMethod": "cash",
+    "paymentStatus": "pending",
+    "status": "pending",
+    "orderDate": "2025-09-23T10:00:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b68a"
+  },
+  {
+    "invoiceNumber": "12241",
+    "customer": "68d77b125da1b812da48b5bf",
+    "customerName": "Sierra Brooks",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5ca",
+        "productName": "The Ordinary Niacinamide 10% + Zinc 1%",
+        "quantity": 1,
+        "price": 700,
+        "total": 700,
+        "_id": "68d77b125da1b812da48b68e"
+      },
+      {
+        "product": "68d77b125da1b812da48b5d4",
+        "productName": "MAC Lipstick - Ruby Woo",
+        "quantity": 2,
+        "price": 1950,
+        "total": 3900,
+        "_id": "68d77b125da1b812da48b68f"
+      }
+    ],
+    "subtotal": 4600,
+    "tax": 368,
+    "shipping": 0,
+    "discount": 0,
+    "total": 4968,
+    "paymentMethod": "cash",
+    "paymentStatus": "pending",
+    "status": "pending",
+    "orderDate": "2025-09-23T09:59:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b68d"
+  },
+  {
+    "invoiceNumber": "12242",
+    "customer": "68d77b125da1b812da48b5bf",
+    "customerName": "Sierra Brooks",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5cc",
+        "productName": "Neutrogena Ultra Gentle Daily Cleanser",
+        "quantity": 1,
+        "price": 395,
+        "total": 395,
+        "_id": "68d77b125da1b812da48b691"
+      },
+      {
+        "product": "68d77b125da1b812da48b5d2",
+        "productName": "Maybelline New York Fit Me Matte Foundation",
+        "quantity": 3,
+        "price": 599,
+        "total": 1797,
+        "_id": "68d77b125da1b812da48b692"
+      }
+    ],
+    "subtotal": 2192,
+    "tax": 175.36,
+    "shipping": 0,
+    "discount": 0,
+    "total": 2367.36,
+    "paymentMethod": "cash",
+    "paymentStatus": "paid",
+    "status": "delivered",
+    "orderDate": "2025-09-23T02:11:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b690"
+  },
+  {
+    "invoiceNumber": "12243",
+    "customer": "68d77b125da1b812da48b5c0",
+    "customerName": "Ibukunoluwa Adeyoju",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5d6",
+        "productName": "Urban Decay Naked3 Eyeshadow Palette",
+        "quantity": 1,
+        "price": 3200,
+        "total": 3200,
+        "_id": "68d77b125da1b812da48b694"
+      }
+    ],
+    "subtotal": 3200,
+    "tax": 256,
+    "shipping": 0,
+    "discount": 0,
+    "total": 3456,
+    "paymentMethod": "card",
+    "paymentStatus": "pending",
+    "status": "pending",
+    "orderDate": "2025-09-22T18:29:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b693"
+  },
+  {
+    "invoiceNumber": "12244",
+    "customer": "68d77b125da1b812da48b5c1",
+    "customerName": "00 000",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5ce",
+        "productName": "Cetaphil Daily Facial Cleanser",
+        "quantity": 2,
+        "price": 550,
+        "total": 1100,
+        "_id": "68d77b125da1b812da48b696"
+      },
+      {
+        "product": "68d77b125da1b812da48b5d0",
+        "productName": "La Roche-Posay Anthelios Sunscreen SPF 50",
+        "quantity": 4,
+        "price": 1250,
+        "total": 5000,
+        "_id": "68d77b125da1b812da48b697"
+      }
+    ],
+    "subtotal": 6100,
+    "tax": 488,
+    "shipping": 0,
+    "discount": 0,
+    "total": 6588,
+    "paymentMethod": "cash",
+    "paymentStatus": "pending",
+    "status": "processing",
+    "orderDate": "2025-09-22T14:14:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b695"
+  },
+  {
+    "invoiceNumber": "12245",
+    "customer": "68d77b125da1b812da48b5c1",
+    "customerName": "00 000",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5c8",
+        "productName": "Lakme Absolute Perfect Radiance Skin Lightening Facewash",
+        "quantity": 1,
+        "price": 175,
+        "total": 175,
+        "_id": "68d77b125da1b812da48b699"
+      }
+    ],
+    "subtotal": 175,
+    "tax": 14,
+    "shipping": 0,
+    "discount": 0,
+    "total": 189,
+    "paymentMethod": "cash",
+    "paymentStatus": "pending",
+    "status": "processing",
+    "orderDate": "2025-09-22T14:14:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b698"
+  },
+  {
+    "invoiceNumber": "12246",
+    "customer": "68d77b125da1b812da48b5c2",
+    "customerName": "jsijl njknmas",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5cc",
+        "productName": "Neutrogena Ultra Gentle Daily Cleanser",
+        "quantity": 5,
+        "price": 395,
+        "total": 1975,
+        "_id": "68d77b125da1b812da48b69b"
+      },
+      {
+        "product": "68d77b125da1b812da48b5ca",
+        "productName": "The Ordinary Niacinamide 10% + Zinc 1%",
+        "quantity": 8,
+        "price": 700,
+        "total": 5600,
+        "_id": "68d77b125da1b812da48b69c"
+      }
+    ],
+    "subtotal": 7575,
+    "tax": 606,
+    "shipping": 0,
+    "discount": 0,
+    "total": 8181,
+    "paymentMethod": "cash",
+    "paymentStatus": "pending",
+    "status": "pending",
+    "orderDate": "2025-09-22T14:14:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b69a"
+  },
+  {
+    "invoiceNumber": "12247",
+    "customer": "68d77b125da1b812da48b5bf",
+    "customerName": "Sierra Brooks",
+    "items": [
+      {
+        "product": "68d77b125da1b812da48b5d4",
+        "productName": "MAC Lipstick - Ruby Woo",
+        "quantity": 1,
+        "price": 1950,
+        "total": 1950,
+        "_id": "68d77b125da1b812da48b69e"
+      }
+    ],
+    "subtotal": 1950,
+    "tax": 156,
+    "shipping": 0,
+    "discount": 0,
+    "total": 2106,
+    "paymentMethod": "cash",
+    "paymentStatus": "paid",
+    "status": "delivered",
+    "orderDate": "2025-09-20T03:29:00.000Z",
+    "createdAt": "2025-09-27T05:50:10.573Z",
+    "updatedAt": "2025-09-27T05:50:10.573Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b69d"
+  }
+]

@@ -2,7 +2,6 @@
 
 import AdminLayout from '../../../components/admin/AdminLayout';
 import MenuManager from '../../../components/admin/MenuManager';
-import SyncTest from '../../../components/debug/SyncTest';
 
 export default function MenuManagementPage() {
   const handleAddItem = () => {
@@ -14,9 +13,6 @@ export default function MenuManagementPage() {
   return (
     <AdminLayout title="Menu Management">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Debug Component - Remove in production */}
-        <SyncTest />
-        
         <MenuManager onAddItem={handleAddItem} />
       </div>
     </AdminLayout>

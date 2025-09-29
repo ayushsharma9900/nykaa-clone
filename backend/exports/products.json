@@ -1,0 +1,2662 @@
+[
+  {
+    "name": "Urban Decay Naked3 Eyeshadow Palette",
+    "description": "12 rose-hued neutral eyeshadows in matte and shimmer finishes.",
+    "category": "Makeup",
+    "price": 3200,
+    "costPrice": 2240,
+    "stock": 15,
+    "sku": "URB001",
+    "isActive": true,
+    "tags": [
+      "eyeshadow",
+      "palette",
+      "neutral"
+    ],
+    "weight": 0,
+    "totalSold": 31,
+    "averageRating": 4.9,
+    "reviewCount": 289,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&h=500&fit=crop&auto=format",
+        "alt": "Urban Decay Naked3 Eyeshadow Palette image 1",
+        "_id": "img_68d77b125da1b812da48b5d6_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=500&h=500&fit=crop&auto=format",
+        "alt": "Urban Decay Naked3 Eyeshadow Palette image 2",
+        "_id": "img_68d77b125da1b812da48b5d6_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5d6"
+  },
+  {
+    "name": "Rare Beauty Liquid Blush",
+    "description": "Weightless liquid blush for a natural flush.",
+    "category": "Makeup",
+    "price": 1800,
+    "costPrice": 1260,
+    "stock": 35,
+    "sku": "RAR001",
+    "isActive": true,
+    "tags": [
+      "blush",
+      "liquid",
+      "natural"
+    ],
+    "weight": 0,
+    "totalSold": 112,
+    "averageRating": 4.6,
+    "reviewCount": 145,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=500&h=500&fit=crop&auto=format",
+        "alt": "Rare Beauty Liquid Blush image 1",
+        "_id": "img_68d77b125da1b812da48b5d7_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&h=500&fit=crop&auto=format",
+        "alt": "Rare Beauty Liquid Blush image 2",
+        "_id": "img_68d77b125da1b812da48b5d7_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5d7"
+  },
+  {
+    "name": "Too Faced Better Than Sex Mascara",
+    "description": "Volumizing mascara for dramatic lashes.",
+    "category": "Makeup",
+    "price": 2100,
+    "costPrice": 1470,
+    "stock": 47,
+    "sku": "TOO001",
+    "isActive": true,
+    "tags": [
+      "mascara",
+      "volumizing",
+      "dramatic"
+    ],
+    "weight": 0,
+    "totalSold": 58,
+    "averageRating": 4.6,
+    "reviewCount": 324,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1631214540181-cdb35d4b3e5b?w=500&h=500&fit=crop&auto=format",
+        "alt": "Too Faced Better Than Sex Mascara image 1",
+        "_id": "img_68d77b125da1b812da48b5d8_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=500&h=500&fit=crop&auto=format",
+        "alt": "Too Faced Better Than Sex Mascara image 2",
+        "_id": "img_68d77b125da1b812da48b5d8_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5d8"
+  },
+  {
+    "name": "Olaplex No. 3 Hair Perfector",
+    "description": "At-home treatment to repair damaged hair.",
+    "category": "Hair Care",
+    "price": 2800,
+    "costPrice": 1960,
+    "stock": 22,
+    "sku": "OLA001",
+    "isActive": true,
+    "tags": [
+      "hair treatment",
+      "repair",
+      "damaged hair"
+    ],
+    "weight": 0,
+    "totalSold": 43,
+    "averageRating": 4.9,
+    "reviewCount": 456,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&h=500&fit=crop&auto=format",
+        "alt": "Olaplex No. 3 Hair Perfector image 1",
+        "_id": "img_68d77b125da1b812da48b5d9_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop&auto=format",
+        "alt": "Olaplex No. 3 Hair Perfector image 2",
+        "_id": "img_68d77b125da1b812da48b5d9_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5d9"
+  },
+  {
+    "name": "Pantene Pro-V Daily Moisture Renewal Shampoo",
+    "description": "Nourishing shampoo with Pro-Vitamin B5 for daily moisture",
+    "category": "Hair Care",
+    "price": 11.99,
+    "costPrice": 7.25,
+    "stock": 200,
+    "sku": "PT001",
+    "isActive": true,
+    "tags": [
+      "pantene",
+      "shampoo",
+      "moisture",
+      "pro-vitamin"
+    ],
+    "weight": 0,
+    "totalSold": 112,
+    "averageRating": 4.2,
+    "reviewCount": 34,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&h=500&fit=crop&auto=format",
+        "alt": "Pantene Pro-V Daily Moisture Renewal Shampoo image 1",
+        "_id": "img_68d77b125da1b812da48b5da_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop&auto=format",
+        "alt": "Pantene Pro-V Daily Moisture Renewal Shampoo image 2",
+        "_id": "img_68d77b125da1b812da48b5da_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5da"
+  },
+  {
+    "name": "Pantene Gold Series Sulfate-Free Shampoo",
+    "description": "Gentle sulfate-free shampoo for textured hair",
+    "category": "Hair Care",
+    "price": 15.99,
+    "costPrice": 9.5,
+    "stock": 90,
+    "sku": "PT002",
+    "isActive": true,
+    "tags": [
+      "pantene",
+      "sulfate-free",
+      "textured-hair"
+    ],
+    "weight": 0,
+    "totalSold": 58,
+    "averageRating": 4.4,
+    "reviewCount": 21,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&h=500&fit=crop&auto=format",
+        "alt": "Pantene Gold Series Sulfate-Free Shampoo image 1",
+        "_id": "img_68d77b125da1b812da48b5db_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop&auto=format",
+        "alt": "Pantene Gold Series Sulfate-Free Shampoo image 2",
+        "_id": "img_68d77b125da1b812da48b5db_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5db"
+  },
+  {
+    "name": "Dove Deeply Nourishing Body Wash",
+    "description": "Moisturizing body wash with 1/4 moisturizing cream.",
+    "category": "Personal Care",
+    "price": 285,
+    "costPrice": 200,
+    "stock": 78,
+    "sku": "DOV001",
+    "isActive": true,
+    "tags": [
+      "body wash",
+      "moisturizing",
+      "nourishing"
+    ],
+    "weight": 0,
+    "totalSold": 31,
+    "averageRating": 4.3,
+    "reviewCount": 234,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dove Deeply Nourishing Body Wash image 1",
+        "_id": "img_68d77b125da1b812da48b5de_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dove Deeply Nourishing Body Wash image 2",
+        "_id": "img_68d77b125da1b812da48b5de_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5de"
+  },
+  {
+    "name": "Calvin Klein Euphoria Eau de Parfum",
+    "description": "Captivating floral fragrance for modern women.",
+    "category": "Personal Care",
+    "price": 4200,
+    "costPrice": 2940,
+    "stock": 28,
+    "sku": "CK001",
+    "isActive": true,
+    "tags": [
+      "floral",
+      "modern",
+      "captivating"
+    ],
+    "weight": 0,
+    "totalSold": 112,
+    "averageRating": 4.6,
+    "reviewCount": 178,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format",
+        "alt": "Calvin Klein Euphoria Eau de Parfum image 1",
+        "_id": "img_68d77b125da1b812da48b5df_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59d32?w=500&h=500&fit=crop&auto=format",
+        "alt": "Calvin Klein Euphoria Eau de Parfum image 2",
+        "_id": "img_68d77b125da1b812da48b5df_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5df"
+  },
+  {
+    "name": "Chanel Coco Mademoiselle Eau de Parfum",
+    "description": "Elegant and sensual fragrance with oriental notes.",
+    "category": "Personal Care",
+    "price": 8500,
+    "costPrice": 5950,
+    "stock": 15,
+    "sku": "CHA001",
+    "isActive": true,
+    "tags": [
+      "perfume",
+      "luxury",
+      "oriental"
+    ],
+    "weight": 0,
+    "totalSold": 58,
+    "averageRating": 4.9,
+    "reviewCount": 567,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format",
+        "alt": "Chanel Coco Mademoiselle Eau de Parfum image 1",
+        "_id": "img_68d77b125da1b812da48b5e0_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59d32?w=500&h=500&fit=crop&auto=format",
+        "alt": "Chanel Coco Mademoiselle Eau de Parfum image 2",
+        "_id": "img_68d77b125da1b812da48b5e0_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e0"
+  },
+  {
+    "name": "Charlotte Tilbury Magic Cream",
+    "description": "Luxury moisturizer for radiant, youthful-looking skin.",
+    "category": "Skincare",
+    "price": 4500,
+    "costPrice": 3150,
+    "stock": 20,
+    "sku": "CT001",
+    "isActive": true,
+    "tags": [
+      "moisturizer",
+      "luxury",
+      "anti-aging"
+    ],
+    "weight": 0,
+    "totalSold": 43,
+    "averageRating": 4.8,
+    "reviewCount": 156,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Charlotte Tilbury Magic Cream image 1",
+        "_id": "img_68d77b125da1b812da48b5e1_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556228843-f6532330642f?w=500&h=500&fit=crop&auto=format",
+        "alt": "Charlotte Tilbury Magic Cream image 2",
+        "_id": "img_68d77b125da1b812da48b5e1_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e1"
+  },
+  {
+    "name": "Paula's Choice 2% BHA Liquid Exfoliant",
+    "description": "Gentle salicylic acid exfoliant for clearer skin.",
+    "category": "Skincare",
+    "price": 2800,
+    "costPrice": 1960,
+    "stock": 33,
+    "sku": "PC001",
+    "isActive": true,
+    "tags": [
+      "exfoliant",
+      "bha",
+      "salicylic acid"
+    ],
+    "weight": 0,
+    "totalSold": 31,
+    "averageRating": 4.9,
+    "reviewCount": 267,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=500&h=500&fit=crop&auto=format",
+        "alt": "Paula's Choice 2% BHA Liquid Exfoliant image 1",
+        "_id": "img_68d77b125da1b812da48b5e2_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format",
+        "alt": "Paula's Choice 2% BHA Liquid Exfoliant image 2",
+        "_id": "img_68d77b125da1b812da48b5e2_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e2"
+  },
+  {
+    "name": "CeraVe Hydrating Facial Cleanser",
+    "description": "Non-foaming cleanser for normal to dry skin with ceramides.",
+    "category": "Skincare",
+    "price": 650,
+    "costPrice": 455,
+    "stock": 55,
+    "sku": "CER001",
+    "isActive": true,
+    "tags": [
+      "cleanser",
+      "hydrating",
+      "ceramides"
+    ],
+    "weight": 0,
+    "totalSold": 78,
+    "averageRating": 4.4,
+    "reviewCount": 178,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "CeraVe Hydrating Facial Cleanser image 1",
+        "_id": "img_68d77b125da1b812da48b5e3_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909205-f2d9a4bf9df7?w=500&h=500&fit=crop&auto=format",
+        "alt": "CeraVe Hydrating Facial Cleanser image 2",
+        "_id": "img_68d77b125da1b812da48b5e3_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e3"
+  },
+  {
+    "name": "Drunk Elephant C-Firma Day Serum",
+    "description": "Vitamin C day serum for firmer, brighter skin.",
+    "category": "Skincare",
+    "price": 6800,
+    "costPrice": 4760,
+    "stock": 18,
+    "sku": "DE001",
+    "isActive": true,
+    "tags": [
+      "vitamin c",
+      "serum",
+      "brightening"
+    ],
+    "weight": 0,
+    "totalSold": 42,
+    "averageRating": 4.8,
+    "reviewCount": 142,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=500&h=500&fit=crop&auto=format",
+        "alt": "Drunk Elephant C-Firma Day Serum image 1",
+        "_id": "img_68d77b125da1b812da48b5e4_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format",
+        "alt": "Drunk Elephant C-Firma Day Serum image 2",
+        "_id": "img_68d77b125da1b812da48b5e4_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e4"
+  },
+  {
+    "name": "Olay Regenerist Micro-Sculpting Cream",
+    "description": "Anti-aging moisturizer with amino-peptides and hyaluronic acid.",
+    "category": "Skincare",
+    "price": 1299,
+    "costPrice": 909,
+    "stock": 67,
+    "sku": "OLY001",
+    "isActive": true,
+    "tags": [
+      "anti-aging",
+      "moisturizer",
+      "peptides"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.3,
+    "reviewCount": 234,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Olay Regenerist Micro-Sculpting Cream image 1",
+        "_id": "img_68d77b125da1b812da48b5e5_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556228843-f6532330642f?w=500&h=500&fit=crop&auto=format",
+        "alt": "Olay Regenerist Micro-Sculpting Cream image 2",
+        "_id": "img_68d77b125da1b812da48b5e5_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e5"
+  },
+  {
+    "name": "Garnier Micellar Water",
+    "description": "All-in-1 cleanser and makeup remover for sensitive skin.",
+    "category": "Skincare",
+    "price": 399,
+    "costPrice": 279,
+    "stock": 120,
+    "sku": "GAR001",
+    "isActive": true,
+    "tags": [
+      "micellar water",
+      "makeup remover",
+      "sensitive skin"
+    ],
+    "weight": 0,
+    "totalSold": 156,
+    "averageRating": 4.1,
+    "reviewCount": 289,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=500&h=500&fit=crop&auto=format",
+        "alt": "Garnier Micellar Water image 1",
+        "_id": "img_68d77b125da1b812da48b5e6_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format",
+        "alt": "Garnier Micellar Water image 2",
+        "_id": "img_68d77b125da1b812da48b5e6_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e6"
+  },
+  {
+    "name": "Nivea Creme",
+    "description": "Classic moisturizing cream for face, hands and body.",
+    "category": "Skincare",
+    "price": 299,
+    "costPrice": 209,
+    "stock": 89,
+    "sku": "NIV001",
+    "isActive": true,
+    "tags": [
+      "moisturizer",
+      "classic",
+      "multi-use"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4.2,
+    "reviewCount": 567,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Nivea Creme image 1",
+        "_id": "img_68d77b125da1b812da48b5e7_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556228843-f6532330642f?w=500&h=500&fit=crop&auto=format",
+        "alt": "Nivea Creme image 2",
+        "_id": "img_68d77b125da1b812da48b5e7_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e7"
+  },
+  {
+    "name": "NARS Radiant Creamy Concealer",
+    "description": "Multi-use concealer with medium to full buildable coverage.",
+    "category": "Makeup",
+    "price": 2200,
+    "costPrice": 1540,
+    "stock": 29,
+    "sku": "NAR001",
+    "isActive": true,
+    "tags": [
+      "concealer",
+      "radiant",
+      "buildable"
+    ],
+    "weight": 0,
+    "totalSold": 67,
+    "averageRating": 4.5,
+    "reviewCount": 215,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format",
+        "alt": "NARS Radiant Creamy Concealer image 1",
+        "_id": "img_68d77b125da1b812da48b5e8_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&h=500&fit=crop&auto=format",
+        "alt": "NARS Radiant Creamy Concealer image 2",
+        "_id": "img_68d77b125da1b812da48b5e8_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e8"
+  },
+  {
+    "name": "Tarte Shape Tape Concealer",
+    "description": "Full coverage concealer that lasts up to 16 hours.",
+    "category": "Makeup",
+    "price": 2400,
+    "costPrice": 1680,
+    "stock": 42,
+    "sku": "TAR001",
+    "isActive": true,
+    "tags": [
+      "concealer",
+      "full coverage",
+      "long wear"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.7,
+    "reviewCount": 298,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format",
+        "alt": "Tarte Shape Tape Concealer image 1",
+        "_id": "img_68d77b125da1b812da48b5e9_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&h=500&fit=crop&auto=format",
+        "alt": "Tarte Shape Tape Concealer image 2",
+        "_id": "img_68d77b125da1b812da48b5e9_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5e9"
+  },
+  {
+    "name": "Benefit Brow Precisely My Brow Pencil",
+    "description": "Ultra-fine tip brow pencil for precise definition.",
+    "category": "Makeup",
+    "price": 2200,
+    "costPrice": 1540,
+    "stock": 28,
+    "sku": "BEN001",
+    "isActive": true,
+    "tags": [
+      "brow pencil",
+      "precise",
+      "definition"
+    ],
+    "weight": 0,
+    "totalSold": 45,
+    "averageRating": 4.5,
+    "reviewCount": 187,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format",
+        "alt": "Benefit Brow Precisely My Brow Pencil image 1",
+        "_id": "img_68d77b125da1b812da48b5ea_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&h=500&fit=crop&auto=format",
+        "alt": "Benefit Brow Precisely My Brow Pencil image 2",
+        "_id": "img_68d77b125da1b812da48b5ea_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ea"
+  },
+  {
+    "name": "Fenty Beauty Gloss Bomb Universal Lip Luminizer",
+    "description": "Explosive shine that feels as good as it looks.",
+    "category": "Makeup",
+    "price": 1600,
+    "costPrice": 1120,
+    "stock": 38,
+    "sku": "FEN001",
+    "isActive": true,
+    "tags": [
+      "lip gloss",
+      "shine",
+      "universal"
+    ],
+    "weight": 0,
+    "totalSold": 78,
+    "averageRating": 4.6,
+    "reviewCount": 203,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&h=500&fit=crop&auto=format",
+        "alt": "Fenty Beauty Gloss Bomb Universal Lip Luminizer image 1",
+        "_id": "img_68d77b125da1b812da48b5eb_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format",
+        "alt": "Fenty Beauty Gloss Bomb Universal Lip Luminizer image 2",
+        "_id": "img_68d77b125da1b812da48b5eb_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5eb"
+  },
+  {
+    "name": "Glossier Cloud Paint",
+    "description": "Gel-cream blush for a dewy, natural flush.",
+    "category": "Makeup",
+    "price": 1400,
+    "costPrice": 980,
+    "stock": 31,
+    "sku": "GLO001",
+    "isActive": true,
+    "tags": [
+      "blush",
+      "gel-cream",
+      "dewy"
+    ],
+    "weight": 0,
+    "totalSold": 56,
+    "averageRating": 4.7,
+    "reviewCount": 189,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=500&h=500&fit=crop&auto=format",
+        "alt": "Glossier Cloud Paint image 1",
+        "_id": "img_68d77b125da1b812da48b5ec_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&h=500&fit=crop&auto=format",
+        "alt": "Glossier Cloud Paint image 2",
+        "_id": "img_68d77b125da1b812da48b5ec_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ec"
+  },
+  {
+    "name": "L'Oreal Paris True Match Foundation",
+    "description": "Matches skin tone and undertone with buildable coverage.",
+    "category": "Makeup",
+    "price": 799,
+    "costPrice": 559,
+    "stock": 67,
+    "sku": "LOR001",
+    "isActive": true,
+    "tags": [
+      "foundation",
+      "true match",
+      "buildable"
+    ],
+    "weight": 0,
+    "totalSold": 123,
+    "averageRating": 4.3,
+    "reviewCount": 345,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format",
+        "alt": "L'Oreal Paris True Match Foundation image 1",
+        "_id": "img_68d77b125da1b812da48b5ed_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&h=500&fit=crop&auto=format",
+        "alt": "L'Oreal Paris True Match Foundation image 2",
+        "_id": "img_68d77b125da1b812da48b5ed_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ed"
+  },
+  {
+    "name": "NYX Professional Makeup Butter Gloss",
+    "description": "Buttery soft lip gloss with intense color payoff.",
+    "category": "Makeup",
+    "price": 450,
+    "costPrice": 315,
+    "stock": 89,
+    "sku": "NYX001",
+    "isActive": true,
+    "tags": [
+      "lip gloss",
+      "buttery",
+      "intense color"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4.4,
+    "reviewCount": 156,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&h=500&fit=crop&auto=format",
+        "alt": "NYX Professional Makeup Butter Gloss image 1",
+        "_id": "img_68d77b125da1b812da48b5ee_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format",
+        "alt": "NYX Professional Makeup Butter Gloss image 2",
+        "_id": "img_68d77b125da1b812da48b5ee_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ee"
+  },
+  {
+    "name": "L'Oreal Professionnel Serie Expert Vitamino Color Shampoo",
+    "description": "Color-protecting shampoo for color-treated hair.",
+    "category": "Hair Care",
+    "price": 1299,
+    "costPrice": 909,
+    "stock": 45,
+    "sku": "LPR001",
+    "isActive": true,
+    "tags": [
+      "color protection",
+      "shampoo",
+      "professional"
+    ],
+    "weight": 0,
+    "totalSold": 67,
+    "averageRating": 4.2,
+    "reviewCount": 89,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&h=500&fit=crop&auto=format",
+        "alt": "L'Oreal Professionnel Serie Expert Vitamino Color Shampoo image 1",
+        "_id": "img_68d77b125da1b812da48b5ef_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop&auto=format",
+        "alt": "L'Oreal Professionnel Serie Expert Vitamino Color Shampoo image 2",
+        "_id": "img_68d77b125da1b812da48b5ef_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ef"
+  },
+  {
+    "name": "Matrix Biolage Hydrasource Conditioner",
+    "description": "Moisturizing conditioner for dry hair with aloe extract.",
+    "category": "Personal Care",
+    "price": 1199,
+    "costPrice": 839,
+    "stock": 56,
+    "sku": "MAT001",
+    "isActive": true,
+    "tags": [
+      "moisturizing",
+      "conditioner",
+      "aloe"
+    ],
+    "weight": 0,
+    "totalSold": 78,
+    "averageRating": 4.3,
+    "reviewCount": 123,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Matrix Biolage Hydrasource Conditioner image 1",
+        "_id": "img_68d77b125da1b812da48b5f0_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Matrix Biolage Hydrasource Conditioner image 2",
+        "_id": "img_68d77b125da1b812da48b5f0_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f0"
+  },
+  {
+    "name": "Schwarzkopf Professional BC Bonacure Repair Rescue Shampoo",
+    "description": "Reconstructing shampoo for damaged and over-processed hair.",
+    "category": "Hair Care",
+    "price": 1399,
+    "costPrice": 979,
+    "stock": 34,
+    "sku": "SCH001",
+    "isActive": true,
+    "tags": [
+      "repair",
+      "damaged hair",
+      "professional"
+    ],
+    "weight": 0,
+    "totalSold": 45,
+    "averageRating": 4.4,
+    "reviewCount": 67,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&h=500&fit=crop&auto=format",
+        "alt": "Schwarzkopf Professional BC Bonacure Repair Rescue Shampoo image 1",
+        "_id": "img_68d77b125da1b812da48b5f1_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop&auto=format",
+        "alt": "Schwarzkopf Professional BC Bonacure Repair Rescue Shampoo image 2",
+        "_id": "img_68d77b125da1b812da48b5f1_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f1"
+  },
+  {
+    "name": "WOW Skin Science Red Onion Hair Oil",
+    "description": "Hair growth oil with red onion extract and essential oils.",
+    "category": "Hair Care",
+    "price": 599,
+    "costPrice": 419,
+    "stock": 78,
+    "sku": "WOW001",
+    "isActive": true,
+    "tags": [
+      "hair oil",
+      "red onion",
+      "hair growth"
+    ],
+    "weight": 0,
+    "totalSold": 156,
+    "averageRating": 4.1,
+    "reviewCount": 289,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format",
+        "alt": "WOW Skin Science Red Onion Hair Oil image 1",
+        "_id": "img_68d77b125da1b812da48b5f2_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "WOW Skin Science Red Onion Hair Oil image 2",
+        "_id": "img_68d77b125da1b812da48b5f2_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f2"
+  },
+  {
+    "name": "Mamaearth Onion Hair Mask",
+    "description": "Deep conditioning hair mask with onion oil and organic bamboo vinegar.",
+    "category": "Personal Care",
+    "price": 399,
+    "costPrice": 279,
+    "stock": 67,
+    "sku": "MAM001",
+    "isActive": true,
+    "tags": [
+      "hair mask",
+      "onion",
+      "deep conditioning"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.2,
+    "reviewCount": 167,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Mamaearth Onion Hair Mask image 1",
+        "_id": "img_68d77b125da1b812da48b5f3_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Mamaearth Onion Hair Mask image 2",
+        "_id": "img_68d77b125da1b812da48b5f3_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f3"
+  },
+  {
+    "name": "Tresemme Keratin Smooth Shampoo",
+    "description": "Smoothing shampoo with keratin for frizz control.",
+    "category": "Hair Care",
+    "price": 349,
+    "costPrice": 244,
+    "stock": 89,
+    "sku": "TRE001",
+    "isActive": true,
+    "tags": [
+      "keratin",
+      "smooth",
+      "frizz control"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4,
+    "reviewCount": 345,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=500&h=500&fit=crop&auto=format",
+        "alt": "Tresemme Keratin Smooth Shampoo image 1",
+        "_id": "img_68d77b125da1b812da48b5f4_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop&auto=format",
+        "alt": "Tresemme Keratin Smooth Shampoo image 2",
+        "_id": "img_68d77b125da1b812da48b5f4_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f4"
+  },
+  {
+    "name": "Herbal Essences Bio Renew Argan Oil Conditioner",
+    "description": "Nourishing conditioner with argan oil for dry hair.",
+    "category": "Personal Care",
+    "price": 299,
+    "costPrice": 209,
+    "stock": 78,
+    "sku": "HER001",
+    "isActive": true,
+    "tags": [
+      "argan oil",
+      "conditioner",
+      "nourishing"
+    ],
+    "weight": 0,
+    "totalSold": 123,
+    "averageRating": 4.1,
+    "reviewCount": 234,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Herbal Essences Bio Renew Argan Oil Conditioner image 1",
+        "_id": "img_68d77b125da1b812da48b5f5_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Herbal Essences Bio Renew Argan Oil Conditioner image 2",
+        "_id": "img_68d77b125da1b812da48b5f5_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f5"
+  },
+  {
+    "name": "Dark & Lovely Moisture Plus Conditioner",
+    "description": "Rich conditioning formula for dry, damaged hair",
+    "category": "Personal Care",
+    "price": 9.99,
+    "costPrice": 5.75,
+    "stock": 110,
+    "sku": "DL001",
+    "isActive": true,
+    "tags": [
+      "dark-lovely",
+      "conditioner",
+      "moisture",
+      "damaged-hair"
+    ],
+    "weight": 0,
+    "totalSold": 76,
+    "averageRating": 4,
+    "reviewCount": 19,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dark & Lovely Moisture Plus Conditioner image 1",
+        "_id": "img_68d77b125da1b812da48b5dc_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dark & Lovely Moisture Plus Conditioner image 2",
+        "_id": "img_68d77b125da1b812da48b5dc_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5dc"
+  },
+  {
+    "name": "Dark & Lovely Healthy Gloss 5-in-1 Conditioner",
+    "description": "Multi-benefit conditioner with 5 hair care benefits in one",
+    "category": "Personal Care",
+    "price": 12.49,
+    "costPrice": 7.25,
+    "stock": 85,
+    "sku": "DL002",
+    "isActive": true,
+    "tags": [
+      "dark-lovely",
+      "conditioner",
+      "5-in-1",
+      "gloss"
+    ],
+    "weight": 0,
+    "totalSold": 52,
+    "averageRating": 4.1,
+    "reviewCount": 14,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dark & Lovely Healthy Gloss 5-in-1 Conditioner image 1",
+        "_id": "img_68d77b125da1b812da48b5dd_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dark & Lovely Healthy Gloss 5-in-1 Conditioner image 2",
+        "_id": "img_68d77b125da1b812da48b5dd_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5dd"
+  },
+  {
+    "name": "Hugo Boss Bottled Eau de Toilette",
+    "description": "Sophisticated masculine fragrance with apple and cinnamon.",
+    "category": "Personal Care",
+    "price": 3200,
+    "costPrice": 2240,
+    "stock": 26,
+    "sku": "HUG001",
+    "isActive": true,
+    "tags": [
+      "masculine",
+      "apple",
+      "sophisticated"
+    ],
+    "weight": 0,
+    "totalSold": 67,
+    "averageRating": 4.4,
+    "reviewCount": 189,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format",
+        "alt": "Hugo Boss Bottled Eau de Toilette image 1",
+        "_id": "img_68d77b125da1b812da48b5f8_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59d32?w=500&h=500&fit=crop&auto=format",
+        "alt": "Hugo Boss Bottled Eau de Toilette image 2",
+        "_id": "img_68d77b125da1b812da48b5f8_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f8"
+  },
+  {
+    "name": "Gucci Bloom Eau de Parfum",
+    "description": "Contemporary floral fragrance with tuberose and jasmine.",
+    "category": "Personal Care",
+    "price": 7200,
+    "costPrice": 5040,
+    "stock": 15,
+    "sku": "GUC001",
+    "isActive": true,
+    "tags": [
+      "floral",
+      "tuberose",
+      "contemporary"
+    ],
+    "weight": 0,
+    "totalSold": 23,
+    "averageRating": 4.9,
+    "reviewCount": 87,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format",
+        "alt": "Gucci Bloom Eau de Parfum image 1",
+        "_id": "img_68d77b125da1b812da48b5f9_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59d32?w=500&h=500&fit=crop&auto=format",
+        "alt": "Gucci Bloom Eau de Parfum image 2",
+        "_id": "img_68d77b125da1b812da48b5f9_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f9"
+  },
+  {
+    "name": "Tom Ford Black Orchid Eau de Parfum",
+    "description": "Luxurious oriental fragrance with black orchid and dark chocolate.",
+    "category": "Personal Care",
+    "price": 12500,
+    "costPrice": 8750,
+    "stock": 8,
+    "sku": "TOM001",
+    "isActive": true,
+    "tags": [
+      "luxury",
+      "oriental",
+      "black orchid"
+    ],
+    "weight": 0,
+    "totalSold": 12,
+    "averageRating": 5,
+    "reviewCount": 34,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format",
+        "alt": "Tom Ford Black Orchid Eau de Parfum image 1",
+        "_id": "img_68d77b125da1b812da48b5fa_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59d32?w=500&h=500&fit=crop&auto=format",
+        "alt": "Tom Ford Black Orchid Eau de Parfum image 2",
+        "_id": "img_68d77b125da1b812da48b5fa_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5fa"
+  },
+  {
+    "name": "Himalaya Neem Face Wash",
+    "description": "Purifying face wash with neem and turmeric for acne-prone skin.",
+    "category": "Skincare",
+    "price": 150,
+    "costPrice": 105,
+    "stock": 156,
+    "sku": "HIM001",
+    "isActive": true,
+    "tags": [
+      "neem",
+      "purifying",
+      "acne"
+    ],
+    "weight": 0,
+    "totalSold": 345,
+    "averageRating": 4.2,
+    "reviewCount": 567,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Himalaya Neem Face Wash image 1",
+        "_id": "img_68d77b125da1b812da48b5fb_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909205-f2d9a4bf9df7?w=500&h=500&fit=crop&auto=format",
+        "alt": "Himalaya Neem Face Wash image 2",
+        "_id": "img_68d77b125da1b812da48b5fb_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5fb"
+  },
+  {
+    "name": "Pears Transparent Soap",
+    "description": "Gentle transparent soap with glycerin and natural oils.",
+    "category": "Personal Care",
+    "price": 45,
+    "costPrice": 32,
+    "stock": 234,
+    "sku": "PEA001",
+    "isActive": true,
+    "tags": [
+      "transparent",
+      "gentle",
+      "glycerin"
+    ],
+    "weight": 0,
+    "totalSold": 567,
+    "averageRating": 4,
+    "reviewCount": 789,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Pears Transparent Soap image 1",
+        "_id": "img_68d77b125da1b812da48b5fc_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Pears Transparent Soap image 2",
+        "_id": "img_68d77b125da1b812da48b5fc_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5fc"
+  },
+  {
+    "name": "Dettol Original Antiseptic Liquid",
+    "description": "Multi-use antiseptic liquid for wound care and household cleaning.",
+    "category": "Personal Care",
+    "price": 189,
+    "costPrice": 132,
+    "stock": 123,
+    "sku": "DET001",
+    "isActive": true,
+    "tags": [
+      "antiseptic",
+      "multi-use",
+      "protection"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4.3,
+    "reviewCount": 456,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dettol Original Antiseptic Liquid image 1",
+        "_id": "img_68d77b125da1b812da48b5fd_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dettol Original Antiseptic Liquid image 2",
+        "_id": "img_68d77b125da1b812da48b5fd_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5fd"
+  },
+  {
+    "name": "Lifebuoy Total 10 Hand Sanitizer",
+    "description": "Advanced protection hand sanitizer with silver formula.",
+    "category": "Personal Care",
+    "price": 89,
+    "costPrice": 62,
+    "stock": 189,
+    "sku": "LIF001",
+    "isActive": true,
+    "tags": [
+      "hand sanitizer",
+      "protection",
+      "silver formula"
+    ],
+    "weight": 0,
+    "totalSold": 456,
+    "averageRating": 4.1,
+    "reviewCount": 234,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Lifebuoy Total 10 Hand Sanitizer image 1",
+        "_id": "img_68d77b125da1b812da48b5fe_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Lifebuoy Total 10 Hand Sanitizer image 2",
+        "_id": "img_68d77b125da1b812da48b5fe_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5fe"
+  },
+  {
+    "name": "Palmolive Naturals Milk & Honey Shower Gel",
+    "description": "Moisturizing shower gel with milk proteins and honey extracts.",
+    "category": "Personal Care",
+    "price": 195,
+    "costPrice": 137,
+    "stock": 89,
+    "sku": "PAL001",
+    "isActive": true,
+    "tags": [
+      "shower gel",
+      "milk",
+      "honey"
+    ],
+    "weight": 0,
+    "totalSold": 156,
+    "averageRating": 4.2,
+    "reviewCount": 189,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Palmolive Naturals Milk & Honey Shower Gel image 1",
+        "_id": "img_68d77b125da1b812da48b5ff_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556228578-dd6e4b1f4ed5?w=500&h=500&fit=crop&auto=format",
+        "alt": "Palmolive Naturals Milk & Honey Shower Gel image 2",
+        "_id": "img_68d77b125da1b812da48b5ff_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ff"
+  },
+  {
+    "name": "Colgate Total Advanced Health Toothpaste",
+    "description": "Complete oral care toothpaste with 12-hour protection.",
+    "category": "Personal Care",
+    "price": 85,
+    "costPrice": 60,
+    "stock": 234,
+    "sku": "COL001",
+    "isActive": true,
+    "tags": [
+      "toothpaste",
+      "complete care",
+      "12-hour protection"
+    ],
+    "weight": 0,
+    "totalSold": 567,
+    "averageRating": 4.3,
+    "reviewCount": 789,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500&h=500&fit=crop&auto=format",
+        "alt": "Colgate Total Advanced Health Toothpaste image 1",
+        "_id": "img_68d77b125da1b812da48b600_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=500&h=500&fit=crop&auto=format",
+        "alt": "Colgate Total Advanced Health Toothpaste image 2",
+        "_id": "img_68d77b125da1b812da48b600_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b600"
+  },
+  {
+    "name": "Sensodyne Rapid Relief Toothpaste",
+    "description": "Fast relief toothpaste for sensitive teeth with stannous fluoride.",
+    "category": "Personal Care",
+    "price": 125,
+    "costPrice": 88,
+    "stock": 156,
+    "sku": "SEN001",
+    "isActive": true,
+    "tags": [
+      "sensitive teeth",
+      "rapid relief",
+      "fluoride"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4.4,
+    "reviewCount": 345,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500&h=500&fit=crop&auto=format",
+        "alt": "Sensodyne Rapid Relief Toothpaste image 1",
+        "_id": "img_68d77b125da1b812da48b601_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=500&h=500&fit=crop&auto=format",
+        "alt": "Sensodyne Rapid Relief Toothpaste image 2",
+        "_id": "img_68d77b125da1b812da48b601_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b601"
+  },
+  {
+    "name": "Listerine Cool Skincare Mouthwash",
+    "description": "Antiseptic mouthwash that kills 99.9% of germs.",
+    "category": "Personal Care",
+    "price": 199,
+    "costPrice": 139,
+    "stock": 89,
+    "sku": "LIS001",
+    "isActive": true,
+    "tags": [
+      "mouthwash",
+      "antiseptic",
+      "cool Skincare"
+    ],
+    "weight": 0,
+    "totalSold": 156,
+    "averageRating": 4.2,
+    "reviewCount": 234,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=500&h=500&fit=crop&auto=format",
+        "alt": "Listerine Cool Skincare Mouthwash image 1",
+        "_id": "img_68d77b125da1b812da48b602_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500&h=500&fit=crop&auto=format",
+        "alt": "Listerine Cool Skincare Mouthwash image 2",
+        "_id": "img_68d77b125da1b812da48b602_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b602"
+  },
+  {
+    "name": "Axe Dark Temptation Deodorant Spray",
+    "description": "Long-lasting deodorant spray with dark chocolate fragrance.",
+    "category": "Personal Care",
+    "price": 299,
+    "costPrice": 209,
+    "stock": 67,
+    "sku": "AXE001",
+    "isActive": true,
+    "tags": [
+      "deodorant",
+      "long-lasting",
+      "chocolate"
+    ],
+    "weight": 0,
+    "totalSold": 189,
+    "averageRating": 4.1,
+    "reviewCount": 234,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=500&h=500&fit=crop&auto=format",
+        "alt": "Axe Dark Temptation Deodorant Spray image 1",
+        "_id": "img_68d77b125da1b812da48b603_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format",
+        "alt": "Axe Dark Temptation Deodorant Spray image 2",
+        "_id": "img_68d77b125da1b812da48b603_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.459Z",
+    "updatedAt": "2025-09-27T05:50:10.459Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b603"
+  },
+  {
+    "name": "Lakme Absolute Perfect Radiance Skin Lightening Facewash",
+    "description": "A gentle facewash that brightens and lightens skin tone with regular use.",
+    "category": "Skincare",
+    "price": 175,
+    "costPrice": 145,
+    "stock": 50,
+    "sku": "LAK001",
+    "images": [
+      {
+        "url": "/images/lakme-facewash.jpg",
+        "alt": "Lakme Facewash",
+        "_id": "68d77b125da1b812da48b5c9"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "face wash",
+      "brightening",
+      "skincare"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.2,
+    "reviewCount": 128,
+    "createdAt": "2025-09-27T05:50:10.481Z",
+    "updatedAt": "2025-09-27T05:50:10.481Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5c8"
+  },
+  {
+    "name": "The Ordinary Niacinamide 10% + Zinc 1%",
+    "description": "A high-strength vitamin and mineral blemish formula.",
+    "category": "Skincare",
+    "price": 700,
+    "costPrice": 480,
+    "stock": 30,
+    "sku": "ORD001",
+    "images": [
+      {
+        "url": "/images/ordinary-niacinamide.jpg",
+        "alt": "The Ordinary Niacinamide",
+        "_id": "68d77b125da1b812da48b5cb"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "serum",
+      "niacinamide",
+      "acne treatment"
+    ],
+    "weight": 0,
+    "totalSold": 67,
+    "averageRating": 4.7,
+    "reviewCount": 189,
+    "createdAt": "2025-09-27T05:50:10.481Z",
+    "updatedAt": "2025-09-27T05:50:10.481Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ca"
+  },
+  {
+    "name": "Neutrogena Ultra Gentle Daily Cleanser",
+    "description": "Gentle daily cleanser suitable for sensitive skin.",
+    "category": "Skincare",
+    "price": 395,
+    "costPrice": 275,
+    "stock": 40,
+    "sku": "NEU001",
+    "images": [
+      {
+        "url": "/images/neutrogena-cleanser.jpg",
+        "alt": "Neutrogena Cleanser",
+        "_id": "68d77b125da1b812da48b5cd"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "cleanser",
+      "gentle",
+      "sensitive skin"
+    ],
+    "weight": 0,
+    "totalSold": 43,
+    "averageRating": 4.3,
+    "reviewCount": 167,
+    "createdAt": "2025-09-27T05:50:10.481Z",
+    "updatedAt": "2025-09-27T05:50:10.481Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5cc"
+  },
+  {
+    "name": "Cetaphil Daily Facial Cleanser",
+    "description": "Gentle cleanser for normal to oily skin.",
+    "category": "Skincare",
+    "price": 550,
+    "costPrice": 385,
+    "stock": 60,
+    "sku": "CET001",
+    "images": [
+      {
+        "url": "/images/cetaphil-cleanser.jpg",
+        "alt": "Cetaphil Cleanser",
+        "_id": "68d77b125da1b812da48b5cf"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "cleanser",
+      "daily",
+      "oily skin"
+    ],
+    "weight": 0,
+    "totalSold": 31,
+    "averageRating": 4.4,
+    "reviewCount": 198,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5ce"
+  },
+  {
+    "name": "La Roche-Posay Anthelios Sunscreen SPF 50",
+    "description": "Broad spectrum protection with antioxidants.",
+    "category": "Skincare",
+    "price": 1250,
+    "costPrice": 875,
+    "stock": 45,
+    "sku": "LRP001",
+    "images": [
+      {
+        "url": "/images/laroche-sunscreen.jpg",
+        "alt": "La Roche Posay Sunscreen",
+        "_id": "68d77b125da1b812da48b5d1"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "sunscreen",
+      "spf 50",
+      "protection"
+    ],
+    "weight": 0,
+    "totalSold": 112,
+    "averageRating": 4.7,
+    "reviewCount": 234,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5d0"
+  },
+  {
+    "name": "Maybelline New York Fit Me Matte Foundation",
+    "description": "Full coverage matte foundation that lasts up to 12 hours.",
+    "category": "Makeup",
+    "price": 599,
+    "costPrice": 419,
+    "stock": 75,
+    "sku": "MAY001",
+    "images": [
+      {
+        "url": "/images/maybelline-foundation.jpg",
+        "alt": "Maybelline Foundation",
+        "_id": "68d77b125da1b812da48b5d3"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "foundation",
+      "matte",
+      "full coverage"
+    ],
+    "weight": 0,
+    "totalSold": 58,
+    "averageRating": 4.5,
+    "reviewCount": 256,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5d2"
+  },
+  {
+    "name": "MAC Lipstick - Ruby Woo",
+    "description": "Iconic matte red lipstick with intense color payoff.",
+    "category": "Makeup",
+    "price": 1950,
+    "costPrice": 1365,
+    "stock": 25,
+    "sku": "MAC001",
+    "images": [
+      {
+        "url": "/images/mac-ruby-woo.jpg",
+        "alt": "MAC Ruby Woo Lipstick",
+        "_id": "68d77b125da1b812da48b5d5"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "lipstick",
+      "matte",
+      "red"
+    ],
+    "weight": 0,
+    "totalSold": 43,
+    "averageRating": 4.8,
+    "reviewCount": 342,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5d4"
+  },
+  {
+    "name": "Rexona Women Maximum Protection Antiperspirant",
+    "description": "96-hour protection antiperspirant deodorant for women.",
+    "category": "Personal Care",
+    "price": 349,
+    "costPrice": 244,
+    "stock": 45,
+    "sku": "REX001",
+    "images": [
+      {
+        "url": "/images/rexona-antiperspirant.jpg",
+        "alt": "Rexona Antiperspirant",
+        "_id": "68d77b125da1b812da48b605"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "antiperspirant",
+      "96-hour protection",
+      "women"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.3,
+    "reviewCount": 156,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b604"
+  },
+  {
+    "name": "Gillette Fusion5 Razor",
+    "description": "Advanced 5-blade razor for a close and comfortable shave.",
+    "category": "Men's Grooming",
+    "price": 599,
+    "costPrice": 419,
+    "stock": 45,
+    "sku": "GIL001",
+    "images": [
+      {
+        "url": "/images/gillette-fusion5.jpg",
+        "alt": "Gillette Fusion5 Razor",
+        "_id": "68d77b125da1b812da48b607"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "razor",
+      "5-blade",
+      "men",
+      "shaving"
+    ],
+    "weight": 0,
+    "totalSold": 123,
+    "averageRating": 4.5,
+    "reviewCount": 234,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b606"
+  },
+  {
+    "name": "The Man Company Charcoal Face Wash",
+    "description": "Deep cleansing charcoal face wash for men.",
+    "category": "Men's Grooming",
+    "price": 299,
+    "costPrice": 209,
+    "stock": 67,
+    "sku": "TMC001",
+    "images": [
+      {
+        "url": "/images/man-company-charcoal.jpg",
+        "alt": "The Man Company Charcoal Face Wash",
+        "_id": "68d77b125da1b812da48b609"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "charcoal",
+      "face wash",
+      "men",
+      "cleansing"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.2,
+    "reviewCount": 156,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b608"
+  },
+  {
+    "name": "Beardo Beard Growth Oil",
+    "description": "Natural beard growth oil with essential nutrients.",
+    "category": "Men's Grooming",
+    "price": 449,
+    "costPrice": 314,
+    "stock": 34,
+    "sku": "BRD001",
+    "images": [
+      {
+        "url": "/images/beardo-beard-oil.jpg",
+        "alt": "Beardo Beard Growth Oil",
+        "_id": "68d77b125da1b812da48b60b"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "beard oil",
+      "growth",
+      "men",
+      "natural"
+    ],
+    "weight": 0,
+    "totalSold": 67,
+    "averageRating": 4.3,
+    "reviewCount": 189,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b60a"
+  },
+  {
+    "name": "Johnson's Baby Shampoo",
+    "description": "Gentle, no more tears formula for baby's delicate hair.",
+    "category": "Baby Care",
+    "price": 189,
+    "costPrice": 132,
+    "stock": 89,
+    "sku": "JOH001",
+    "images": [
+      {
+        "url": "/images/johnsons-baby-shampoo.jpg",
+        "alt": "Johnson Baby Shampoo",
+        "_id": "68d77b125da1b812da48b60d"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "baby",
+      "shampoo",
+      "gentle",
+      "no tears"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4.6,
+    "reviewCount": 345,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b60c"
+  },
+  {
+    "name": "Himalaya Baby Lotion",
+    "description": "Nourishing baby lotion with natural ingredients.",
+    "category": "Baby Care",
+    "price": 145,
+    "costPrice": 102,
+    "stock": 78,
+    "sku": "HIM002",
+    "images": [
+      {
+        "url": "/images/himalaya-baby-lotion.jpg",
+        "alt": "Himalaya Baby Lotion",
+        "_id": "68d77b125da1b812da48b60f"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "baby",
+      "lotion",
+      "natural",
+      "nourishing"
+    ],
+    "weight": 0,
+    "totalSold": 156,
+    "averageRating": 4.4,
+    "reviewCount": 234,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b60e"
+  },
+  {
+    "name": "Pampers Baby Dry Diapers",
+    "description": "All-night protection with 3 Extra Absorb Channels.",
+    "category": "Baby Care",
+    "price": 999,
+    "costPrice": 699,
+    "stock": 45,
+    "sku": "PAM001",
+    "images": [
+      {
+        "url": "/images/pampers-baby-dry.jpg",
+        "alt": "Pampers Baby Dry Diapers",
+        "_id": "68d77b125da1b812da48b611"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "diapers",
+      "baby",
+      "protection",
+      "dry"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.3,
+    "reviewCount": 167,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b610"
+  },
+  {
+    "name": "HealthKart Multivitamin",
+    "description": "Complete multivitamin with 24 essential nutrients.",
+    "category": "Wellness",
+    "price": 799,
+    "costPrice": 559,
+    "stock": 56,
+    "sku": "HK001",
+    "images": [
+      {
+        "url": "/images/healthkart-multivitamin.jpg",
+        "alt": "HealthKart Multivitamin",
+        "_id": "68d77b125da1b812da48b613"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "multivitamin",
+      "wellness",
+      "nutrients",
+      "health"
+    ],
+    "weight": 0,
+    "totalSold": 78,
+    "averageRating": 4.1,
+    "reviewCount": 234,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b612"
+  },
+  {
+    "name": "Dabur Chyawanprash",
+    "description": "Ayurvedic immunity booster with 40+ herbs and spices.",
+    "category": "Wellness",
+    "price": 299,
+    "costPrice": 209,
+    "stock": 89,
+    "sku": "DAB001",
+    "images": [
+      {
+        "url": "/images/dabur-chyawanprash.jpg",
+        "alt": "Dabur Chyawanprash",
+        "_id": "68d77b125da1b812da48b615"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "ayurvedic",
+      "immunity",
+      "herbs",
+      "traditional"
+    ],
+    "weight": 0,
+    "totalSold": 156,
+    "averageRating": 4.4,
+    "reviewCount": 345,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b614"
+  },
+  {
+    "name": "Neurobion Forte Tablets",
+    "description": "Vitamin B complex supplement for nerve health.",
+    "category": "Wellness",
+    "price": 45,
+    "costPrice": 32,
+    "stock": 234,
+    "sku": "NEU002",
+    "images": [
+      {
+        "url": "/images/neurobion-forte.jpg",
+        "alt": "Neurobion Forte Tablets",
+        "_id": "68d77b125da1b812da48b617"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "vitamin b",
+      "supplement",
+      "nerve health",
+      "tablets"
+    ],
+    "weight": 0,
+    "totalSold": 567,
+    "averageRating": 4.2,
+    "reviewCount": 189,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b616"
+  },
+  {
+    "name": "Bombay Shaving Company Perfume",
+    "description": "Fresh and woody fragrance for the modern man.",
+    "category": "Fragrance",
+    "price": 899,
+    "costPrice": 629,
+    "stock": 34,
+    "sku": "BSC001",
+    "images": [
+      {
+        "url": "/images/bombay-shaving-perfume.jpg",
+        "alt": "Bombay Shaving Company Perfume",
+        "_id": "68d77b125da1b812da48b619"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "perfume",
+      "woody",
+      "fresh",
+      "men"
+    ],
+    "weight": 0,
+    "totalSold": 67,
+    "averageRating": 4,
+    "reviewCount": 123,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b618"
+  },
+  {
+    "name": "Engage Cologne Spray",
+    "description": "Long-lasting cologne spray with captivating fragrance.",
+    "category": "Fragrance",
+    "price": 299,
+    "costPrice": 209,
+    "stock": 78,
+    "sku": "ENG001",
+    "images": [
+      {
+        "url": "/images/engage-cologne.jpg",
+        "alt": "Engage Cologne Spray",
+        "_id": "68d77b125da1b812da48b61b"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "cologne",
+      "spray",
+      "long-lasting",
+      "captivating"
+    ],
+    "weight": 0,
+    "totalSold": 189,
+    "averageRating": 3.9,
+    "reviewCount": 234,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b61a"
+  },
+  {
+    "name": "Dior Sauvage Eau de Toilette",
+    "description": "Fresh and woody fragrance with bergamot and pepper notes.",
+    "category": "Personal Care",
+    "price": 6500,
+    "costPrice": 4550,
+    "stock": 22,
+    "sku": "DIO001",
+    "isActive": true,
+    "tags": [
+      "woody",
+      "fresh",
+      "bergamot"
+    ],
+    "weight": 0,
+    "totalSold": 45,
+    "averageRating": 4.8,
+    "reviewCount": 234,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dior Sauvage Eau de Toilette image 1",
+        "_id": "img_68d77b125da1b812da48b5f6_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59d32?w=500&h=500&fit=crop&auto=format",
+        "alt": "Dior Sauvage Eau de Toilette image 2",
+        "_id": "img_68d77b125da1b812da48b5f6_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f6"
+  },
+  {
+    "name": "Versace Bright Crystal Eau de Toilette",
+    "description": "Floral fruity fragrance with pomegranate and peony.",
+    "category": "Personal Care",
+    "price": 4800,
+    "costPrice": 3360,
+    "stock": 18,
+    "sku": "VER001",
+    "isActive": true,
+    "tags": [
+      "floral",
+      "fruity",
+      "pomegranate"
+    ],
+    "weight": 0,
+    "totalSold": 34,
+    "averageRating": 4.6,
+    "reviewCount": 156,
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format",
+        "alt": "Versace Bright Crystal Eau de Toilette image 1",
+        "_id": "img_68d77b125da1b812da48b5f7_0"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588405748880-12d1d2a59d32?w=500&h=500&fit=crop&auto=format",
+        "alt": "Versace Bright Crystal Eau de Toilette image 2",
+        "_id": "img_68d77b125da1b812da48b5f7_1"
+      }
+    ],
+    "createdAt": "2025-09-27T05:50:10.458Z",
+    "updatedAt": "2025-09-27T05:50:10.458Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b5f7"
+  },
+  {
+    "name": "Forest Essentials Facial Cleanser",
+    "description": "Ayurvedic facial cleanser with sandalwood and saffron.",
+    "category": "Skincare",
+    "price": 1250,
+    "costPrice": 875,
+    "stock": 30,
+    "sku": "FE001",
+    "images": [
+      {
+        "url": "/images/forest-essentials-cleanser.jpg",
+        "alt": "Forest Essentials Facial Cleanser",
+        "_id": "68d77b125da1b812da48b621"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "ayurvedic",
+      "sandalwood",
+      "saffron",
+      "luxury"
+    ],
+    "weight": 0,
+    "totalSold": 67,
+    "averageRating": 4.7,
+    "reviewCount": 145,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b620"
+  },
+  {
+    "name": "Minimalist Hyaluronic Acid Serum",
+    "description": "2% Hyaluronic Acid serum for intense hydration and plumping.",
+    "category": "Skincare",
+    "price": 599,
+    "costPrice": 419,
+    "stock": 78,
+    "sku": "MIN001",
+    "images": [
+      {
+        "url": "/images/minimalist-ha-serum.jpg",
+        "alt": "Minimalist Hyaluronic Acid Serum",
+        "_id": "68d77b125da1b812da48b623"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "hyaluronic acid",
+      "hydration",
+      "plumping",
+      "serum"
+    ],
+    "weight": 0,
+    "totalSold": 189,
+    "averageRating": 4.6,
+    "reviewCount": 234,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b622"
+  },
+  {
+    "name": "Huda Beauty Liquid Matte Lipstick",
+    "description": "Long-wearing liquid lipstick with intense color payoff.",
+    "category": "Makeup",
+    "price": 1650,
+    "costPrice": 1155,
+    "stock": 34,
+    "sku": "HB001",
+    "images": [
+      {
+        "url": "/images/huda-liquid-lipstick.jpg",
+        "alt": "Huda Beauty Liquid Matte Lipstick",
+        "_id": "68d77b125da1b812da48b625"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "liquid lipstick",
+      "matte",
+      "long-wearing",
+      "huda beauty"
+    ],
+    "weight": 0,
+    "totalSold": 89,
+    "averageRating": 4.7,
+    "reviewCount": 178,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b624"
+  },
+  {
+    "name": "Colorbar Perfect Match Concealer",
+    "description": "Full coverage concealer that matches Indian skin tones perfectly.",
+    "category": "Makeup",
+    "price": 699,
+    "costPrice": 489,
+    "stock": 56,
+    "sku": "CB001",
+    "images": [
+      {
+        "url": "/images/colorbar-concealer.jpg",
+        "alt": "Colorbar Perfect Match Concealer",
+        "_id": "68d77b125da1b812da48b627"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "concealer",
+      "indian skin tones",
+      "full coverage",
+      "colorbar"
+    ],
+    "weight": 0,
+    "totalSold": 134,
+    "averageRating": 4.3,
+    "reviewCount": 267,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b626"
+  },
+  {
+    "name": "Lakme Eyeconic Kajal",
+    "description": "Intense black kajal with 22-hour stay power.",
+    "category": "Makeup",
+    "price": 275,
+    "costPrice": 193,
+    "stock": 123,
+    "sku": "LAK002",
+    "images": [
+      {
+        "url": "/images/lakme-kajal.jpg",
+        "alt": "Lakme Eyeconic Kajal",
+        "_id": "68d77b125da1b812da48b629"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "kajal",
+      "black",
+      "22-hour",
+      "lakme"
+    ],
+    "weight": 0,
+    "totalSold": 445,
+    "averageRating": 4.2,
+    "reviewCount": 567,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b628"
+  },
+  {
+    "name": "Moroccanoil Treatment",
+    "description": "Original hair treatment with argan oil for all hair types.",
+    "category": "Hair Care",
+    "price": 3200,
+    "costPrice": 2240,
+    "stock": 25,
+    "sku": "MOR001",
+    "images": [
+      {
+        "url": "/images/moroccanoil-treatment.jpg",
+        "alt": "Moroccanoil Treatment",
+        "_id": "68d77b125da1b812da48b62b"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "argan oil",
+      "hair treatment",
+      "moroccan",
+      "luxury"
+    ],
+    "weight": 0,
+    "totalSold": 78,
+    "averageRating": 4.8,
+    "reviewCount": 189,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b62a"
+  },
+  {
+    "name": "Khadi Natural Hair Oil",
+    "description": "Ayurvedic hair oil with 18 herbs for hair growth and nourishment.",
+    "category": "Hair Care",
+    "price": 349,
+    "costPrice": 244,
+    "stock": 89,
+    "sku": "KH001",
+    "images": [
+      {
+        "url": "/images/khadi-hair-oil.jpg",
+        "alt": "Khadi Natural Hair Oil",
+        "_id": "68d77b125da1b812da48b62d"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "ayurvedic",
+      "18 herbs",
+      "hair growth",
+      "natural"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4.1,
+    "reviewCount": 345,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b62c"
+  },
+  {
+    "name": "Ustraa Beard Growth Oil",
+    "description": "Premium beard growth oil with 8 natural oils.",
+    "category": "Men's Grooming",
+    "price": 549,
+    "costPrice": 384,
+    "stock": 67,
+    "sku": "UST001",
+    "images": [
+      {
+        "url": "/images/ustraa-beard-oil.jpg",
+        "alt": "Ustraa Beard Growth Oil",
+        "_id": "68d77b125da1b812da48b62f"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "beard growth",
+      "8 oils",
+      "premium",
+      "men"
+    ],
+    "weight": 0,
+    "totalSold": 156,
+    "averageRating": 4.4,
+    "reviewCount": 234,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b62e"
+  },
+  {
+    "name": "Park Avenue Deodorant Spray",
+    "description": "Long-lasting deodorant spray with sophisticated fragrance.",
+    "category": "Men's Grooming",
+    "price": 199,
+    "costPrice": 139,
+    "stock": 123,
+    "sku": "PA001",
+    "images": [
+      {
+        "url": "/images/park-avenue-deo.jpg",
+        "alt": "Park Avenue Deodorant Spray",
+        "_id": "68d77b125da1b812da48b631"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "deodorant",
+      "long-lasting",
+      "sophisticated",
+      "men"
+    ],
+    "weight": 0,
+    "totalSold": 345,
+    "averageRating": 4,
+    "reviewCount": 456,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b630"
+  },
+  {
+    "name": "Mamaearth Baby Lotion",
+    "description": "Natural baby lotion with oats, milk and calendula.",
+    "category": "Baby Care",
+    "price": 299,
+    "costPrice": 209,
+    "stock": 89,
+    "sku": "ME002",
+    "images": [
+      {
+        "url": "/images/mamaearth-baby-lotion.jpg",
+        "alt": "Mamaearth Baby Lotion",
+        "_id": "68d77b125da1b812da48b633"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "baby lotion",
+      "oats",
+      "milk",
+      "calendula",
+      "natural"
+    ],
+    "weight": 0,
+    "totalSold": 189,
+    "averageRating": 4.5,
+    "reviewCount": 267,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b632"
+  },
+  {
+    "name": "Sebamed Baby Cleansing Bar",
+    "description": "Extra mild cleansing bar with pH 5.5 for baby's delicate skin.",
+    "category": "Baby Care",
+    "price": 195,
+    "costPrice": 137,
+    "stock": 67,
+    "sku": "SB001",
+    "images": [
+      {
+        "url": "/images/sebamed-baby-bar.jpg",
+        "alt": "Sebamed Baby Cleansing Bar",
+        "_id": "68d77b125da1b812da48b635"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "cleansing bar",
+      "pH 5.5",
+      "mild",
+      "baby"
+    ],
+    "weight": 0,
+    "totalSold": 123,
+    "averageRating": 4.4,
+    "reviewCount": 178,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b634"
+  },
+  {
+    "name": "Himalaya Ashwagandha Tablets",
+    "description": "Pure ashwagandha tablets for stress relief and energy boost.",
+    "category": "Wellness",
+    "price": 399,
+    "costPrice": 279,
+    "stock": 156,
+    "sku": "HIM003",
+    "images": [
+      {
+        "url": "/images/himalaya-ashwagandha.jpg",
+        "alt": "Himalaya Ashwagandha Tablets",
+        "_id": "68d77b125da1b812da48b637"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "ashwagandha",
+      "stress relief",
+      "energy",
+      "ayurvedic"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 4.3,
+    "reviewCount": 345,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b636"
+  },
+  {
+    "name": "Patanjali Honey",
+    "description": "Pure and natural honey for health and wellness.",
+    "category": "Wellness",
+    "price": 189,
+    "costPrice": 132,
+    "stock": 234,
+    "sku": "PAT001",
+    "images": [
+      {
+        "url": "/images/patanjali-honey.jpg",
+        "alt": "Patanjali Honey",
+        "_id": "68d77b125da1b812da48b639"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "honey",
+      "pure",
+      "natural",
+      "patanjali"
+    ],
+    "weight": 0,
+    "totalSold": 567,
+    "averageRating": 4.1,
+    "reviewCount": 678,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b638"
+  },
+  {
+    "name": "Wild Stone Body Perfume",
+    "description": "Refreshing body perfume with long-lasting fragrance.",
+    "category": "Fragrance",
+    "price": 199,
+    "costPrice": 139,
+    "stock": 89,
+    "sku": "WS001",
+    "images": [
+      {
+        "url": "/images/wildstone-perfume.jpg",
+        "alt": "Wild Stone Body Perfume",
+        "_id": "68d77b125da1b812da48b61d"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "body perfume",
+      "refreshing",
+      "long-lasting",
+      "affordable"
+    ],
+    "weight": 0,
+    "totalSold": 234,
+    "averageRating": 3.8,
+    "reviewCount": 167,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b61c"
+  },
+  {
+    "name": "Bio-Oil Skincare Oil",
+    "description": "Multi-use skincare oil for scars, stretch marks, and uneven skin tone.",
+    "category": "Skincare",
+    "price": 899,
+    "costPrice": 629,
+    "stock": 45,
+    "sku": "BIO001",
+    "images": [
+      {
+        "url": "/images/bio-oil.jpg",
+        "alt": "Bio-Oil Skincare Oil",
+        "_id": "68d77b125da1b812da48b61f"
+      }
+    ],
+    "isActive": true,
+    "tags": [
+      "bio-oil",
+      "scars",
+      "stretch marks",
+      "skincare oil"
+    ],
+    "weight": 0,
+    "totalSold": 123,
+    "averageRating": 4.5,
+    "reviewCount": 298,
+    "createdAt": "2025-09-27T05:50:10.482Z",
+    "updatedAt": "2025-09-27T05:50:10.482Z",
+    "__v": 0,
+    "id": "68d77b125da1b812da48b61e"
+  }
+]

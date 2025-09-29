@@ -1,8 +1,8 @@
 import { Product } from '@/types';
 
-// Backend product interface based on the API routes
+// Backend product interface based on the MySQL API routes
 interface BackendProduct {
-  _id: string;
+  id: string; // MySQL uses 'id', not '_id'
   name: string;
   description: string;
   category: string;
@@ -11,20 +11,20 @@ interface BackendProduct {
   stock: number;
   sku: string;
   weight?: number;
-  tags?: string[];
+  tags?: string[] | string; // Can be JSON string from MySQL
   isActive: boolean;
   totalSold?: number;
   averageRating?: number;
   reviewCount?: number;
+  images?: string[]; // Array of image URLs from MySQL
   createdAt: string;
   updatedAt?: string;
-  __v?: number;
 }
 
 // Frontend to Backend mapping
 export function mapFrontendToBackend(frontendProduct: Product): Partial<BackendProduct> {
-  // Ensure price is a valid number
-  const price = Number(frontendProduct.price) || 0;
+  // Ensure price is a valid number and greater than 0
+  const price = Math.max(0, Number(frontendProduct.price) || 0);
   
   // Calculate costPrice - always required by backend
   let costPrice: number;
@@ -35,48 +35,65 @@ export function mapFrontendToBackend(frontendProduct: Product): Partial<BackendP
     costPrice = Math.round(price * 0.7 * 100) / 100; // Round to 2 decimal places
   }
 
+  // Validate required fields
+  if (!frontendProduct.name?.trim()) {
+    throw new Error('Product name is required');
+  }
+  
+  if (price <= 0) {
+    throw new Error('Product price must be greater than 0');
+  }
+  
+  if (!frontendProduct.category?.trim()) {
+    throw new Error('Product category is required');
+  }
+
   // For updates, only send the fields that are actually being updated
   const backendData: Partial<BackendProduct> = {
-    name: frontendProduct.name?.trim() || '',
+    name: frontendProduct.name.trim(),
     description: frontendProduct.description?.trim() || '',
     price: price,
     costPrice: costPrice,
     stock: Math.max(0, Math.floor(Number(frontendProduct.stockCount) || 0)), // Ensure non-negative integer
-    isActive: frontendProduct.inStock !== false,
+    // isActive should reflect both inStock status and stock availability
+    isActive: Boolean(frontendProduct.inStock) && (Number(frontendProduct.stockCount) || 0) >= 0,
   };
 
   // Always include category - use fallback if mapping fails
-  if (frontendProduct.category) {
-    const mappedCategory = mapFrontendCategoryToBackend(frontendProduct.category);
-    backendData.category = mappedCategory || frontendProduct.category;
-  }
+  const mappedCategory = mapFrontendCategoryToBackend(frontendProduct.category.trim());
+  backendData.category = mappedCategory || frontendProduct.category.trim();
   
-  if (frontendProduct.tags && frontendProduct.tags.length > 0) {
-    backendData.tags = frontendProduct.tags;
+  // Handle tags properly - ensure it's always an array of strings
+  if (frontendProduct.tags && Array.isArray(frontendProduct.tags) && frontendProduct.tags.length > 0) {
+    backendData.tags = frontendProduct.tags.filter(tag => tag.trim().length > 0);
+  } else {
+    backendData.tags = [];
+  }
+
+  // Include images if provided
+  if (frontendProduct.images && Array.isArray(frontendProduct.images)) {
+    const validImages = frontendProduct.images.filter(img => img && img.trim().length > 0);
+    if (validImages.length > 0) {
+      backendData.images = validImages;
+    }
   }
 
   // Include rating and review count if provided
-  if (frontendProduct.rating !== undefined) {
-    backendData.averageRating = Number(frontendProduct.rating);
+  if (frontendProduct.rating !== undefined && frontendProduct.rating >= 0) {
+    backendData.averageRating = Math.min(5, Math.max(0, Number(frontendProduct.rating)));
   }
   
-  if (frontendProduct.reviewCount !== undefined) {
-    backendData.reviewCount = Number(frontendProduct.reviewCount);
+  if (frontendProduct.reviewCount !== undefined && frontendProduct.reviewCount >= 0) {
+    backendData.reviewCount = Math.max(0, Math.floor(Number(frontendProduct.reviewCount)));
   }
 
   // Handle SKU generation more carefully
   if (!frontendProduct.id) {
     // For new products, generate a unique SKU with timestamp
     backendData.sku = generateSKU(frontendProduct.name, frontendProduct.brand || 'UNKNOWN');
-  } else {
-    // For existing products, only regenerate SKU if it doesn't already have one
-    // This prevents duplicate SKU issues on updates
-    const existingProduct = frontendProduct as any;
-    if (!existingProduct.sku) {
-      backendData.sku = generateSKU(frontendProduct.name, frontendProduct.brand || 'UNKNOWN', frontendProduct.id);
-    }
-    // If updating an existing product, don't change the SKU unless explicitly provided
   }
+  // For existing products (updates), don't include SKU in the update data
+  // Let the backend keep the existing SKU to avoid conflicts
 
   // Debug logging to help troubleshoot validation issues
   console.log('Data mapper - Frontend product:', {
@@ -85,7 +102,8 @@ export function mapFrontendToBackend(frontendProduct: Product): Partial<BackendP
     price: frontendProduct.price,
     originalPrice: frontendProduct.originalPrice,
     stockCount: frontendProduct.stockCount,
-    category: frontendProduct.category
+    category: frontendProduct.category,
+    isUpdate: Boolean(frontendProduct.id)
   });
   
   console.log('Data mapper - Backend data to send:', backendData);
@@ -95,8 +113,27 @@ export function mapFrontendToBackend(frontendProduct: Product): Partial<BackendP
 
 // Backend to Frontend mapping
 export function mapBackendToFrontend(backendProduct: BackendProduct): Product {
+  // Handle tags - MySQL might return as JSON string
+  let tags: string[] = [];
+  if (backendProduct.tags) {
+    if (typeof backendProduct.tags === 'string') {
+      try {
+        tags = JSON.parse(backendProduct.tags);
+      } catch (e) {
+        tags = [backendProduct.tags]; // Fallback to single tag
+      }
+    } else {
+      tags = backendProduct.tags;
+    }
+  }
+
+  // Use images from backend if available, otherwise generate placeholder
+  const images = backendProduct.images && backendProduct.images.length > 0 
+    ? backendProduct.images 
+    : [generatePlaceholderImage(backendProduct.category)];
+  
   return {
-    id: backendProduct._id,
+    id: backendProduct.id, // Fixed: use 'id' not '_id'
     name: backendProduct.name,
     description: backendProduct.description,
     price: backendProduct.price,
@@ -107,13 +144,13 @@ export function mapBackendToFrontend(backendProduct: BackendProduct): Product {
     category: mapBackendCategoryToFrontend(backendProduct.category),
     subcategory: '', // Backend doesn't have subcategory
     brand: extractBrandFromName(backendProduct.name) || 'Unknown',
-    image: generatePlaceholderImage(backendProduct.category),
-    images: [generatePlaceholderImage(backendProduct.category)],
+    image: images[0], // Use first image as main image
+    images: images, // Use actual images from backend
     inStock: backendProduct.isActive && backendProduct.stock > 0,
     stockCount: backendProduct.stock,
     rating: backendProduct.averageRating || 0, // Use actual stored rating
     reviewCount: backendProduct.reviewCount || 0, // Use actual stored review count
-    tags: backendProduct.tags || [],
+    tags: tags,
     createdAt: new Date(backendProduct.createdAt),
     updatedAt: backendProduct.updatedAt ? new Date(backendProduct.updatedAt) : new Date(backendProduct.createdAt),
   };
@@ -214,13 +251,17 @@ function extractBrandFromName(name: string): string | null {
 
 function generatePlaceholderImage(category: string): string {
   const imageMap: Record<string, string> = {
-    'Head Shoulders Shampoo': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-    'Mint': 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
-    'Pantene hair-care': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
-    'Dark & Lovely Conditioner': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+    'Makeup': 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format',
+    'Skincare': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format',
+    'Hair Care': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format',
+    'Fragrance': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format',
+    'Personal Care': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
+    "Men's Grooming": 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
+    'Baby Care': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
+    'Wellness': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format'
   };
   
-  return imageMap[category] || 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400';
+  return imageMap[category] || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format';
 }
 
 // Default export for easier imports

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { query } = require('../config/mysql-database');
 
 // Protect routes
 const protect = async (req, res, next) => {
@@ -7,7 +7,7 @@ const protect = async (req, res, next) => {
   if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
     // Create a mock admin user for development
     req.user = {
-      _id: 'dev-admin-user',
+      id: 'dev-admin-user',
       name: 'Development Admin',
       email: 'admin@dev.com',
       role: 'admin',
@@ -34,7 +34,8 @@ const protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Get user from token
-    req.user = await User.findById(decoded.id);
+    const [user] = await query('SELECT * FROM users WHERE id = ?', [decoded.id]);
+    req.user = user;
 
     if (!req.user) {
       return res.status(401).json({

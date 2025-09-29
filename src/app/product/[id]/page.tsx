@@ -131,11 +131,15 @@ export default function ProductPage({ params }: ProductPageProps) {
             {/* Main Image */}
             <div className="aspect-square relative overflow-hidden rounded-lg bg-white">
               <Image
-                src={product.images[selectedImage] || product.image}
+                src={product.images[selectedImage] || product.image || '/images/placeholder-product.jpg'}
                 alt={product.name}
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/images/placeholder-product.jpg';
+                }}
               />
             </div>
 
@@ -151,11 +155,15 @@ export default function ProductPage({ params }: ProductPageProps) {
                     }`}
                   >
                     <Image
-                      src={image}
+                      src={image || '/images/placeholder-product.jpg'}
                       alt={`${product.name} ${index + 1}`}
                       width={80}
                       height={80}
                       className="object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/images/placeholder-product.jpg';
+                      }}
                     />
                   </button>
                 ))}

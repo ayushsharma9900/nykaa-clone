@@ -40,6 +40,7 @@ export default function DynamicCategoriesGrid({
   gridCols = "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
 }: DynamicCategoriesGridProps) {
   const [showAll, setShowAll] = useState(false);
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({});
   
   // Filter only active categories and sort by sortOrder
   const activeCategories = categories
@@ -119,19 +120,20 @@ export default function DynamicCategoriesGrid({
       <div className={`grid ${gridCols} gap-6`}>
         {displayCategories.map((category, index) => (
           <Link
-            key={category._id || category.id}
+            key={category._id || category.id || category.slug || `category-${index}`}
             href={`/${category.slug}`}
             className="group text-center transform transition-all duration-300 hover:scale-105"
           >
             <div className="relative">
               <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-full w-20 h-20 mx-auto mb-3 flex items-center justify-center group-hover:from-pink-100 group-hover:to-purple-100 transition-all duration-300 shadow-sm group-hover:shadow-lg">
-                {category.image ? (
+                {category.image && !imageErrors[category.id] ? (
                   <Image
                     src={category.image}
                     alt={category.name}
                     width={44}
                     height={44}
                     className="rounded-full object-cover"
+                    onError={() => setImageErrors(prev => ({ ...prev, [category.id]: true }))}
                   />
                 ) : (
                   <span className="text-3xl text-pink-600 group-hover:text-pink-700 transition-colors">

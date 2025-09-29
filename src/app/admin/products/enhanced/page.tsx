@@ -72,7 +72,9 @@ export default function EnhancedProductsPage() {
         ...filters
       };
       
+      console.log('Fetching products with params:', params);
       const response = await apiService.getAllProductsForAdmin(params);
+      console.log('Fetch products response:', response);
       
       if (response.success && response.data) {
         const mappedProducts = (response.data as BackendProduct[]).map(mapBackendToFrontend);
@@ -93,7 +95,24 @@ export default function EnhancedProductsPage() {
       }
     } catch (err) {
       console.error('Failed to fetch products:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch products');
+      
+      let errorMessage = 'Failed to fetch products. Please try again.';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // Handle specific network errors
+        if (errorMessage.includes('Backend server is not running')) {
+          errorMessage = 'Backend server is not available. Please check if the server is running.';
+        } else if (errorMessage.includes('timeout')) {
+          errorMessage = 'Request timed out. Please check your connection and try again.';
+        } else if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
+          errorMessage = 'Authentication failed. Please log in again.';
+        } else if (errorMessage.includes('403') || errorMessage.includes('forbidden')) {
+          errorMessage = 'Access denied. You do not have permission to view products.';
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -161,16 +180,23 @@ export default function EnhancedProductsPage() {
       label: 'Price',
       sortable: true,
       align: 'right' as const,
-      render: (value: number, item: Product) => (
-        <div className="text-right">
-          <div className="text-sm font-medium text-gray-900">₹{value.toLocaleString('en-IN')}</div>
-          {item.originalPrice && (
-            <div className="text-xs text-gray-400 line-through">
-              ₹{item.originalPrice.toLocaleString('en-IN')}
-            </div>
-          )}
-        </div>
-      )
+      render: (value: number, item: Product) => {
+        // Defensive coding: ensure value is a number
+        const numericValue = typeof value === 'number' ? value : parseFloat(value as any) || 0;
+        const originalPrice = item.originalPrice && typeof item.originalPrice === 'number' ? 
+          item.originalPrice : parseFloat(item.originalPrice as any) || 0;
+        
+        return (
+          <div className="text-right">
+            <div className="text-sm font-medium text-gray-900">₹{numericValue.toLocaleString('en-IN')}</div>
+            {originalPrice > 0 && (
+              <div className="text-xs text-gray-400 line-through">
+                ₹{originalPrice.toLocaleString('en-IN')}
+              </div>
+            )}
+          </div>
+        );
+      }
     },
     {
       key: 'stockCount',
@@ -217,15 +243,19 @@ export default function EnhancedProductsPage() {
       label: 'Rating',
       sortable: true,
       align: 'center' as const,
-      render: (value: number, item: Product) => (
-        <div className="text-center">
-          <div className="flex items-center justify-center">
-            <span className="text-yellow-400">★</span>
-            <span className="ml-1 text-sm font-medium">{value.toFixed(1)}</span>
+      render: (value: number, item: Product) => {
+        // Defensive coding: ensure value is a number
+        const numericValue = typeof value === 'number' ? value : parseFloat(value as any) || 0;
+        return (
+          <div className="text-center">
+            <div className="flex items-center justify-center">
+              <span className="text-yellow-400">★</span>
+              <span className="ml-1 text-sm font-medium">{numericValue.toFixed(1)}</span>
+            </div>
+            <div className="text-xs text-gray-400">({item.reviewCount || 0})</div>
           </div>
-          <div className="text-xs text-gray-400">({item.reviewCount || 0})</div>
-        </div>
-      )
+        );
+      }
     }
   ], []);
 
@@ -454,22 +484,55 @@ export default function EnhancedProductsPage() {
   const handleSaveProduct = useCallback(async (product: Product) => {
     try {
       setIsSubmitting(true);
+      setError(null);
+      
       const backendProduct = mapFrontendToBackend(product);
+      console.log('Saving product with data:', backendProduct);
       
       if (product.id && products.find(p => p.id === product.id)) {
         // Update existing product
-        await apiService.updateProduct(product.id, backendProduct);
+        const response = await apiService.updateProduct(product.id, backendProduct);
+        console.log('Update response:', response);
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to update product');
+        }
       } else {
         // Create new product
-        await apiService.createProduct(backendProduct);
+        const response = await apiService.createProduct(backendProduct);
+        console.log('Create response:', response);
+        if (!response.success) {
+          throw new Error(response.message || 'Failed to create product');
+        }
       }
       
       await fetchProducts(pagination.current, pagination.pageSize);
       setShowProductModal(false);
       setSelectedProduct(null);
+      
+      // Show success message
+      const action = product.id ? 'updated' : 'created';
+      alert(`Product successfully ${action}!`);
     } catch (err) {
       console.error('Failed to save product:', err);
-      alert('Failed to save product. Please try again.');
+      
+      let errorMessage = 'Failed to save product. Please try again.';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // Handle specific validation errors
+        if (errorMessage.includes('Validation errors')) {
+          errorMessage = 'Please check all required fields and try again.';
+        } else if (errorMessage.includes('SKU already exists')) {
+          errorMessage = 'A product with this SKU already exists. Please use a different name or brand.';
+        } else if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
+          errorMessage = 'Authentication failed. Please log in again.';
+        } else if (errorMessage.includes('403') || errorMessage.includes('forbidden')) {
+          errorMessage = 'Access denied. You do not have permission to perform this action.';
+        }
+      }
+      
+      setError(errorMessage);
+      alert(errorMessage);
       throw err; // Re-throw to keep modal open
     } finally {
       setIsSubmitting(false);

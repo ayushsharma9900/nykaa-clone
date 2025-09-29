@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 require('dotenv').config();
 
-const connectDB = require('./config/database');
+const { connectDB } = require('./config/mysql-database');
 const errorHandler = require('./middleware/errorHandler');
 
 // Route imports
@@ -15,6 +16,7 @@ const productRoutes = require('./routes/products');
 const customerRoutes = require('./routes/customers');
 const categoryRoutes = require('./routes/categories');
 const menuManagementRoutes = require('./routes/menuManagement');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -37,6 +39,9 @@ app.use(cors({
   credentials: true
 }));
 
+// Serve static files from public directory
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
+
 // Body parser middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -49,27 +54,36 @@ app.use('/api/products', productRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/menu-management', menuManagementRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  const mongoose = require('mongoose');
-  const dbStatus = mongoose.connection.readyState;
-  const dbStatusMap = {
-    0: 'disconnected',
-    1: 'connected',
-    2: 'connecting',
-    3: 'disconnecting'
-  };
-  
-  res.status(200).json({
-    status: 'OK',
-    message: 'Dashtar Backend API is running',
-    database: {
-      status: dbStatusMap[dbStatus],
-      readyState: dbStatus
-    },
-    timestamp: new Date().toISOString()
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    const { pool } = require('./config/mysql-database');
+    const connection = await pool.getConnection();
+    connection.release();
+    
+    res.status(200).json({
+      status: 'OK',
+      message: 'Nykaa Clone Backend API is running',
+      database: {
+        status: 'connected',
+        type: 'MySQL'
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(200).json({
+      status: 'OK',
+      message: 'Nykaa Clone Backend API is running',
+      database: {
+        status: 'disconnected',
+        type: 'MySQL',
+        error: error.message
+      },
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Error handling middleware
@@ -103,13 +117,13 @@ async function gracefulShutdown(signal) {
     
     try {
       // Close database connection
-      const mongoose = require('mongoose');
-      await mongoose.connection.close();
-      console.log('MongoDB connection closed.');
+      const { closePool } = require('./config/mysql-database');
+      await closePool();
+      console.log('MySQL connection pool closed.');
       console.log('Server shutdown complete.');
       process.exit(0);
     } catch (error) {
-      console.error('Error closing MongoDB connection:', error);
+      console.error('Error closing MySQL connection:', error);
       process.exit(1);
     }
   });

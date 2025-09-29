@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useRef, ReactNode } from 'react';
 import { Product } from '@/types';
 
 export interface CartItem {
@@ -127,6 +127,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const isInitialLoad = useRef(true);
 
   // Load cart from localStorage on mount (with migration from legacy key)
   useEffect(() => {
@@ -149,12 +150,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error loading cart from localStorage:', error);
     }
+    
+    // Mark initial load as complete
+    isInitialLoad.current = false;
   }, []);
 
-  // Save cart to localStorage whenever it changes (new key)
+  // Save cart to localStorage whenever it changes (but not on initial load)
   useEffect(() => {
-    const NEW_KEY = 'kaayalife-cart';
-    localStorage.setItem(NEW_KEY, JSON.stringify(state));
+    if (!isInitialLoad.current) {
+      const NEW_KEY = 'kaayalife-cart';
+      localStorage.setItem(NEW_KEY, JSON.stringify(state));
+    }
   }, [state]);
 
   const addToCart = (product: Product, quantity: number = 1) => {

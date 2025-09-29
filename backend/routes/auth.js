@@ -1,74 +1,16 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const User = require('../models/User');
-const { protect } = require('../middleware/auth');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { query: dbQuery } = require('../config/mysql-database');
 
 const router = express.Router();
-
-// Generate JWT Token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
-  });
-};
-
-// @desc    Register user
-// @route   POST /api/auth/register
-// @access  Public (but you might want to restrict this in production)
-router.post('/register', [
-  body('name').trim().notEmpty().withMessage('Name is required'),
-  body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('role').optional().isIn(['admin', 'staff', 'manager']).withMessage('Invalid role')
-], async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation errors',
-        errors: errors.array()
-      });
-    }
-
-    const { name, email, password, role } = req.body;
-
-    // Check if user exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists with this email'
-      });
-    }
-
-    // Create user
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role: role || 'staff'
-    });
-
-    const token = generateToken(user._id);
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      token,
-      user
-    });
-  } catch (error) {
-    next(error);
-  }
-});
 
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
 router.post('/login', [
-  body('email').isEmail().normalizeEmail().withMessage('Valid email is required'),
+  body('email').isEmail().withMessage('Please enter a valid email'),
   body('password').notEmpty().withMessage('Password is required')
 ], async (req, res, next) => {
   try {
@@ -83,9 +25,10 @@ router.post('/login', [
 
     const { email, password } = req.body;
 
-    // Check for user
-    const user = await User.findOne({ email }).select('+password');
-    
+    // Check if user exists
+    const users = await dbQuery('SELECT * FROM users WHERE email = ?', [email]);
+    const user = users[0];
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -93,59 +36,72 @@ router.post('/login', [
       });
     }
 
-    // Check if password matches
-    const isMatch = await user.comparePassword(password);
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) {
+    if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
-    // Check if user is active
-    if (!user.isActive) {
-      return res.status(401).json({
-        success: false,
-        message: 'Your account has been deactivated. Please contact administrator.'
-      });
-    }
-
     // Update last login
-    user.lastLogin = new Date();
-    await user.save();
+    await dbQuery('UPDATE users SET lastLogin = NOW() WHERE id = ?', [user.id]);
 
-    const token = generateToken(user._id);
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        id: user.id,
+        email: user.email,
+        role: user.role 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
 
-    res.status(200).json({
+    res.json({
       success: true,
       message: 'Login successful',
-      token,
-      user
+      data: {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          isActive: user.isActive,
+          avatar: user.avatar
+        },
+        token
+      }
     });
   } catch (error) {
+    console.error('Login error:', error);
     next(error);
   }
 });
 
-// @desc    Get current user
+// @desc    Get current user info
 // @route   GET /api/auth/me
 // @access  Private
-router.get('/me', protect, async (req, res) => {
-  res.status(200).json({
-    success: true,
-    user: req.user
-  });
-});
-
-// @desc    Logout user
-// @route   POST /api/auth/logout
-// @access  Private
-router.post('/logout', protect, (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Logged out successfully'
-  });
+router.get('/me', async (req, res, next) => {
+  try {
+    // For now, return a mock user until we implement proper auth middleware
+    res.json({
+      success: true,
+      data: {
+        id: '1',
+        name: 'Admin User',
+        email: 'admin@kayaalife.com',
+        role: 'admin',
+        isActive: true,
+        avatar: null
+      }
+    });
+  } catch (error) {
+    console.error('Get current user error:', error);
+    next(error);
+  }
 });
 
 module.exports = router;
