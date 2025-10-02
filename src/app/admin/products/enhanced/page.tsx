@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdvancedDataTable, { Column, BulkAction } from '@/components/admin/AdvancedDataTable';
 import { usePagination } from '@/hooks/usePagination';
@@ -17,7 +17,8 @@ import {
   EyeIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 
 interface BackendProduct {
@@ -43,6 +44,7 @@ function EnhancedProductsContent() {
   console.log('🚀 ENHANCED PRODUCTS PAGE LOADING');
   
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Array<{ _id: string; name: string; isActive: boolean }>>([]);
   const [loading, setLoading] = useState(true);
@@ -589,13 +591,22 @@ function EnhancedProductsContent() {
             <h1 className="text-2xl font-bold text-gray-900">Products</h1>
             <p className="text-gray-600 mt-1">Manage your product inventory with advanced controls</p>
           </div>
-          <button 
-            onClick={handleAddProduct}
-            className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors flex items-center space-x-2"
-          >
-            <PlusIcon className="h-5 w-5" />
-            <span>Add Product</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            <button 
+              onClick={() => router.push('/admin/import')}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            >
+              <ArrowDownTrayIcon className="h-5 w-5" />
+              <span>Import Products</span>
+            </button>
+            <button 
+              onClick={handleAddProduct}
+              className="bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors flex items-center space-x-2"
+            >
+              <PlusIcon className="h-5 w-5" />
+              <span>Add Product</span>
+            </button>
+          </div>
         </div>
 
         {/* Advanced Data Table */}
