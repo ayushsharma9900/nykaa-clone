@@ -248,6 +248,12 @@ export const fallbackCategories = [
 
 // Enhanced database-aware fallback data provider
 export const getFallbackData = async (query: string, params: any[] = []): Promise<any[]> => {
+  // Safety check for query parameter
+  if (!query || typeof query !== 'string') {
+    console.warn('⚠️ Invalid query provided to getFallbackData:', query);
+    return [];
+  }
+  
   const lowerQuery = query.toLowerCase();
   
   console.log('🔄 Using dynamic fallback system for query:', query.substring(0, 100) + '...');

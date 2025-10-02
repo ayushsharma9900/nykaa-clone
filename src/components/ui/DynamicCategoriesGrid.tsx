@@ -5,9 +5,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { Category } from '@/hooks/useCategories';
+import CategoryErrorBoundary from './CategoryErrorBoundary';
 
 // Helper function to get appropriate icon for each category
-function getCategoryIcon(categoryName: string): string {
+function getCategoryIcon(categoryName: string | undefined | null): string {
+  // Safety check for undefined, null, or non-string values
+  if (!categoryName || typeof categoryName !== 'string') {
+    return '💄'; // Default icon
+  }
+  
   const name = categoryName.toLowerCase();
   if (name.includes('makeup') || name.includes('cosmetic')) return '💄';
   if (name.includes('skin') || name.includes('face')) return '🧴';
@@ -119,17 +125,18 @@ export default function DynamicCategoriesGrid({
       {/* Categories grid */}
       <div className={`grid ${gridCols} gap-6`}>
         {displayCategories.map((category, index) => (
-          <Link
-            key={category._id || category.id || category.slug || `category-${index}`}
-            href={`/${category.slug}`}
-            className="group text-center transform transition-all duration-300 hover:scale-105"
-          >
+          <CategoryErrorBoundary key={`boundary-${category._id || category.id || category.slug || index}`} categoryName={category.name}>
+            <Link
+              key={category._id || category.id || category.slug || `category-${index}`}
+              href={`/${category.slug || '#'}`}
+              className="group text-center transform transition-all duration-300 hover:scale-105"
+            >
             <div className="relative">
               <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-full w-20 h-20 mx-auto mb-3 flex items-center justify-center group-hover:from-pink-100 group-hover:to-purple-100 transition-all duration-300 shadow-sm group-hover:shadow-lg">
                 {category.image && !imageErrors[category.id] ? (
                   <Image
                     src={category.image}
-                    alt={category.name}
+                    alt={category.name || 'Category'}
                     width={44}
                     height={44}
                     className="rounded-full object-cover"
@@ -144,7 +151,7 @@ export default function DynamicCategoriesGrid({
               
               {/* Category name */}
               <h3 className="font-medium text-gray-900 group-hover:text-pink-600 transition-colors text-sm leading-tight">
-                {category.name}
+                {category.name || 'Unnamed Category'}
               </h3>
               
               {/* Product count */}
@@ -161,7 +168,8 @@ export default function DynamicCategoriesGrid({
                 </span>
               </div>
             </div>
-          </Link>
+            </Link>
+          </CategoryErrorBoundary>
         ))}
       </div>
       
