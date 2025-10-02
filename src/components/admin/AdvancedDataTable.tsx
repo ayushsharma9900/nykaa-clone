@@ -120,7 +120,8 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
       result = result.filter(item =>
         columns.some(column => {
           const value = item[column.key as keyof T];
-          return String(value).toLowerCase().includes(searchQuery.toLowerCase());
+          const stringValue = value != null ? String(value) : '';
+          return stringValue.toLowerCase().includes(searchQuery.toLowerCase());
         })
       );
     }
@@ -133,7 +134,9 @@ export default function AdvancedDataTable<T extends { id: string | number }>({
           if (typeof value === 'boolean') {
             return Boolean(itemValue) === value;
           }
-          return String(itemValue).toLowerCase().includes(String(value).toLowerCase());
+          const itemStringValue = itemValue != null ? String(itemValue) : '';
+          const filterStringValue = value != null ? String(value) : '';
+          return itemStringValue.toLowerCase().includes(filterStringValue.toLowerCase());
         });
       }
     });

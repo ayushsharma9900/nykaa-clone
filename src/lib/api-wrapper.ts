@@ -38,7 +38,7 @@ export function withErrorHandler(
       }
       
       // Check if this is a database-related error
-      const isDatabaseError = error instanceof Error && (
+      const isDatabaseError = error instanceof Error && error.message && (
         error.message.includes('database') ||
         error.message.includes('sqlite') ||
         error.message.includes('postgres') ||

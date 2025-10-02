@@ -264,11 +264,14 @@ export default function MenuManager({ onAddItem }: MenuManagerProps) {
   }, []);
 
   // Filter items based on search
-  const filteredItems = menuItems.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredItems = menuItems.filter(item => {
+    const term = searchTerm.toLowerCase();
+    const name = (item.name || '').toLowerCase();
+    const description = (item.description || '').toLowerCase();
+    const slug = (item.slug || '').toLowerCase();
+    
+    return name.includes(term) || description.includes(term) || slug.includes(term);
+  });
 
   // Flatten items for display (including children)
   const flattenItems = (items: MenuItem[]): MenuItem[] => {

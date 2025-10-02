@@ -188,6 +188,10 @@ export function useImageManager(options: UseImageManagerOptions = {}) {
     ];
 
     return sizes.reduce((acc, size) => {
+      if (!baseUrl || typeof baseUrl !== 'string') {
+        acc[size.suffix.replace('_', '')] = '';
+        return acc;
+      }
       acc[size.suffix.replace('_', '')] = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}w=${size.width}&h=${size.height}&fit=crop&auto=format`;
       return acc;
     }, {} as Record<string, string>);
