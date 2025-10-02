@@ -28,18 +28,22 @@ class ApiService {
       defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
+    // Create timeout signal compatible with all browsers
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
     const config: RequestInit = {
       ...options,
       headers: {
         ...defaultHeaders,
         ...options.headers,
       },
-      // Add timeout
-      signal: AbortSignal.timeout(10000), // 10 second timeout
+      signal: controller.signal,
     };
 
     try {
       const response = await fetch(url, config);
+      clearTimeout(timeoutId); // Clear timeout on successful response
       
       // Check if response is ok
       if (!response.ok) {
@@ -72,6 +76,7 @@ class ApiService {
       const data = await response.json();
       return data;
     } catch (error) {
+      clearTimeout(timeoutId); // Clear timeout on error
       console.error('API request failed:', error);
       
       // Provide more specific error messages
