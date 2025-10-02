@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { useCategories } from '@/hooks/useCategories';
-import { apiService } from '@/lib/api';
 
 interface ImportResult {
   url: string;

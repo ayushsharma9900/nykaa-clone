@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
-import * as cheerio from 'cheerio';
 import { ensureDatabaseInitialized, runQuery, getAllQuery, generateId, generateSKU } from '@/lib/database';
+
+// Conditionally import scraping dependencies
+let axios: any;
+let cheerio: any;
+
+try {
+  axios = require('axios');
+  cheerio = require('cheerio');
+} catch (error) {
+  console.warn('Web scraping dependencies not available:', error.message);
+}
 
 interface ImportedProduct {
   name: string;
@@ -22,6 +31,10 @@ interface ImportedProduct {
 // Product scrapers for different platforms
 class ProductScraper {
   private static async fetchPage(url: string): Promise<string> {
+    if (!axios) {
+      throw new Error('Web scraping dependencies not available on this platform');
+    }
+    
     try {
       const response = await axios.get(url, {
         headers: {
@@ -42,6 +55,10 @@ class ProductScraper {
   }
 
   static async scrapeAmazon(url: string): Promise<ImportedProduct> {
+    if (!cheerio) {
+      throw new Error('Web scraping dependencies not available on this platform');
+    }
+    
     try {
       const html = await this.fetchPage(url);
       const $ = cheerio.load(html);
@@ -103,6 +120,10 @@ class ProductScraper {
   }
 
   static async scrapeFlipkart(url: string): Promise<ImportedProduct> {
+    if (!cheerio) {
+      throw new Error('Web scraping dependencies not available on this platform');
+    }
+    
     try {
       const html = await this.fetchPage(url);
       const $ = cheerio.load(html);
@@ -161,6 +182,10 @@ class ProductScraper {
   }
 
   static async scrapeNykaa(url: string): Promise<ImportedProduct> {
+    if (!cheerio) {
+      throw new Error('Web scraping dependencies not available on this platform');
+    }
+    
     try {
       const html = await this.fetchPage(url);
       const $ = cheerio.load(html);
@@ -234,7 +259,60 @@ export async function POST(request: NextRequest) {
     await ensureDatabaseInitialized();
     
     const body = await request.json();
-    const { url, category, customPrice } = body;
+    const { url, category, customPrice, manualEntry } = body;
+    
+    // If dependencies are not available, require manual entry
+    if (!axios || !cheerio) {
+      if (!manualEntry) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            message: 'Web scraping is not available on this platform. Please use manual entry mode.',
+            requiresManualEntry: true
+          },
+          { status: 400 }
+        );
+      }
+      
+      // Handle manual product entry
+      const { name, description, price, images } = manualEntry;
+      if (!name || !description || !price) {
+        return NextResponse.json(
+          { success: false, message: 'Manual entry requires name, description, and price' },
+          { status: 400 }
+        );
+      }
+      
+      // Create product from manual entry
+      const productId = generateId('prod');
+      const productSKU = generateSKU(name, category || 'Manual');
+      
+      await runQuery(`
+        INSERT INTO products (
+          id, name, description, category, price, costPrice, stock, sku, 
+          isActive, createdAt, updatedAt
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `, [
+        productId, name, description, category || 'Manual', price, price * 0.8, 
+        10, productSKU, 1, new Date().toISOString(), new Date().toISOString()
+      ]);
+      
+      // Add images if provided
+      if (images && Array.isArray(images)) {
+        for (let i = 0; i < images.length; i++) {
+          await runQuery(`
+            INSERT INTO product_images (productId, url, alt, sortOrder)
+            VALUES (?, ?, ?, ?)
+          `, [productId, images[i], name, i]);
+        }
+      }
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Product created manually',
+        data: { id: productId, name, price, category: category || 'Manual', source: 'manual', images: images?.length || 0 }
+      });
+    }
 
     if (!url) {
       return NextResponse.json(

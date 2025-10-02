@@ -3,7 +3,10 @@
   "regions": ["iad1"],
   "functions": {
     "src/app/api/**/*.ts": {
-      "maxDuration": 15
+      "maxDuration": 30
+    },
+    "src/app/api/import/**/*.ts": {
+      "maxDuration": 60
     }
   },
   "headers": [
