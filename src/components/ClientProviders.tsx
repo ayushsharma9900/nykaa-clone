@@ -1,20 +1,18 @@
 'use client';
 
-import Header from '@/components/layout/Header';
 import { CartProvider } from '@/contexts/CartContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 
-interface ClientWrapperProps {
+interface ClientProvidersProps {
   children: React.ReactNode;
 }
 
-export default function ClientWrapper({ children }: ClientWrapperProps) {
+export default function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <ToastProvider>
       <WishlistProvider>
         <CartProvider>
-          <Header />
           {children}
         </CartProvider>
       </WishlistProvider>
