@@ -28,29 +28,27 @@ export function useMenuItems() {
       setLoading(true);
       setError(null);
       
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
-      const response = await fetch(`${API_BASE_URL}/menu-management/menu-items`);
+      console.log('🔍 Fetching menu items from API...');
+      const response = await fetch('/api/menu-management/menu-items');
       
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ Menu API Error ${response.status}:`, errorText);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       const data = await response.json();
+      console.log('📊 Menu API Response:', data);
       
       if (data.success && Array.isArray(data.data)) {
-        // Filter only items that should be shown in menu and are active
-        const visibleMenuItems = data.data.filter((item: MenuItem) => 
-          item.showInMenu && item.isActive
-        );
+        // The API already filters for showInMenu and isActive, so we can use the data directly
+        const menuItems = data.data;
+        console.log(`✅ Found ${menuItems.length} menu items:`, menuItems.map((item: MenuItem) => item.name));
         
-        // Sort by menu order
-        const sortedItems = visibleMenuItems.sort((a: MenuItem, b: MenuItem) => 
-          a.menuOrder - b.menuOrder
-        );
-        
-        setMenuItems(sortedItems);
+        setMenuItems(menuItems);
       } else {
-        throw new Error('Invalid API response format');
+        console.error('❌ Invalid API response format:', data);
+        throw new Error(data.message || 'Invalid API response format');
       }
     } catch (err: any) {
       console.error('Failed to fetch menu items:', err);

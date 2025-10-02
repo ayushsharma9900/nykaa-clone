@@ -97,8 +97,8 @@ export const pool = {
 
 // Initialize database tables on first run
 export const initializeDatabase = async () => {
-  if (isInitialized && !isVercel) {
-    // Skip if already initialized (but always reinitialize on Vercel)
+  if (isInitialized) {
+    // Skip if already initialized in this function instance
     return;
   }
 
@@ -370,7 +370,8 @@ export const generateSKU = (name: string, category: string) => {
 
 // Helper function to ensure database is initialized before any operation
 export const ensureDatabaseInitialized = async () => {
-  if (isVercel || !isInitialized) {
+  // Always initialize on Vercel (in-memory database) or if not initialized locally
+  if (!isInitialized) {
     await initializeDatabase();
   }
 };

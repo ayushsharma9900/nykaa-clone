@@ -37,6 +37,7 @@ export default function DebugApiPage() {
     { name: 'Database Status', url: '/api/admin/init-db', method: 'GET' },
     { name: 'Initialize Database', url: '/api/admin/init-db', method: 'POST' },
     { name: 'Get Categories', url: '/api/categories', method: 'GET' },
+    { name: 'Get Menu Items', url: '/api/menu-management/menu-items', method: 'GET' },
     { name: 'Get Products', url: '/api/products', method: 'GET' },
     { name: 'Get Admin Products', url: '/api/products/admin/all', method: 'GET' },
   ];
@@ -82,8 +83,9 @@ export default function DebugApiPage() {
           <ol className="text-yellow-700 text-sm space-y-1">
             <li>1. First, test "Database Status" to see if the database is initialized</li>
             <li>2. If no tables found, run "Initialize Database" to set up the database</li>
-            <li>3. Then test "Get Categories" and "Get Products" to verify data is available</li>
-            <li>4. Check your main website to see if categories and products now appear</li>
+            <li>3. Test "Get Categories" and "Get Menu Items" to verify menu data is available</li>
+            <li>4. Test "Get Products" to verify products are loading</li>
+            <li>5. Check your main website to see if menu, categories and products now appear</li>
           </ol>
         </div>
 

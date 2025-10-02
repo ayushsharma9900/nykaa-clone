@@ -1,4 +1,8 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// Auto-detect API base URL based on environment
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
+  (typeof window !== 'undefined' 
+    ? `${window.location.protocol}//${window.location.host}/api`
+    : '/api');
 
 interface ApiResponse<T> {
   success: boolean;
