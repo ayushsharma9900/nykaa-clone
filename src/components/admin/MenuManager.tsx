@@ -216,8 +216,10 @@ export default function MenuManager({ onAddItem }: MenuManagerProps) {
     try {
       console.log('Starting category sync...');
       
-      // Use direct fetch instead of apiRequest to avoid any utility issues
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+      // Use dynamic API base URL that works for both local and Vercel
+      const API_BASE_URL = typeof window !== 'undefined' 
+        ? `${window.location.protocol}//${window.location.host}/api`
+        : '/api';
       const url = `${API_BASE_URL}/menu-management/sync-categories`;
       
       console.log('Sync URL:', url);
@@ -226,9 +228,7 @@ export default function MenuManager({ onAddItem }: MenuManagerProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        // Add credentials if needed for CORS
-        credentials: 'include'
+        }
       });
 
       console.log('Sync response:', response);

@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   description: "kaayalife is your destination for skincare, makeup, and beauty essentials. Shop top brands with exclusive offers.",
 };
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function RootLayout({
   children,
 }: Readonly<{

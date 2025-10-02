@@ -133,7 +133,8 @@ export function mapBackendToFrontend(backendProduct: BackendProduct): Product {
     : [generatePlaceholderImage(backendProduct.category)];
   
   return {
-    id: backendProduct.id, // Fixed: use 'id' not '_id'
+    id: backendProduct.id, // Backend uses 'id'
+    _id: backendProduct.id, // Frontend expects '_id' for admin
     name: backendProduct.name,
     description: backendProduct.description,
     price: backendProduct.price,

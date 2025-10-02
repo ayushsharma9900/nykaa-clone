@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/types';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useToast } from '@/contexts/ToastContext';
+import { useImageManager } from '@/hooks/useImageManager';
 import { HeartIcon, StarIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
@@ -18,27 +19,45 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart, isInCart, getItemQuantity } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
+  const { generateResponsiveUrls } = useImageManager();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [imageError, setImageError] = useState(false);
   
-  // Generate category-based fallback image
+  // Generate category-based fallback image using dynamic system
   const getFallbackImage = (category: string): string => {
     const fallbackMap: Record<string, string> = {
-      'Makeup': 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&auto=format',
-      'Skincare': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format',
-      'Hair Care': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format',
-      'Fragrance': 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&h=500&fit=crop&auto=format',
-      'Personal Care': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
-      "Men's Grooming": 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format',
-      'Wellness': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop&auto=format'
+      'Makeup': 'https://images.unsplash.com/photo-1596462502278-27bfdc403348',
+      'Skincare': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b',
+      'Hair Care': 'https://images.unsplash.com/photo-1522338242992-e1a54906a8da',
+      'Fragrance': 'https://images.unsplash.com/photo-1541643600914-78b084683601',
+      'Personal Care': 'https://images.unsplash.com/photo-1556228720-195a672e8a03',
+      "Men's Grooming": 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f',
+      'Wellness': 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528'
     };
-    return fallbackMap[category] || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&auto=format';
+    const baseUrl = fallbackMap[category] || 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136';
+    return `${baseUrl}?w=500&h=500&fit=crop&auto=format&t=${Date.now()}`;
   };
+  
+  // Get optimized image URLs using dynamic image manager
+  const imageUrls = useMemo(() => {
+    const primaryImage = product.image;
+    if (!primaryImage) {
+      return {
+        main: getFallbackImage(product.category),
+        responsive: {}
+      };
+    }
+    
+    return {
+      main: primaryImage,
+      responsive: generateResponsiveUrls(primaryImage)
+    };
+  }, [product.image, product.category, generateResponsiveUrls]);
   
   // Get the best available image source
   const getImageSource = (): string => {
-    if (!imageError && product.image) {
-      return product.image;
+    if (!imageError && imageUrls.main) {
+      return imageUrls.main;
     }
     // If primary image failed, try the first alternative image
     if (!imageError && product.images && product.images.length > 1) {
@@ -61,22 +80,64 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const wasAdded = toggleWishlist(product);
-    const action = wasAdded ? 'Added to' : 'Removed from';
-    showToast(`${action} wishlist: ${product.name}`);
+    
+    console.log('ProductCard - handleWishlistClick called for product:', product.name);
+    
+    // Validate product object
+    if (!product.id) {
+      console.error('Product missing ID:', product);
+      showToast('Invalid product data', 'error');
+      return;
+    }
+    
+    try {
+      console.log('Calling toggleWishlist with product:', {
+        id: product.id,
+        name: product.name
+      });
+      
+      const wasAdded = toggleWishlist(product);
+      const action = wasAdded ? 'Added to' : 'Removed from';
+      showToast(`${action} wishlist: ${product.name}`);
+      console.log('Successfully toggled wishlist via ProductCard:', { wasAdded });
+    } catch (error) {
+      console.error('Failed to toggle wishlist:', error);
+      showToast('Failed to update wishlist. Please try again.', 'error');
+    }
   };
   
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!product.inStock) return;
+    
+    console.log('ProductCard - handleAddToCart called for product:', product.name);
+    
+    if (!product.inStock) {
+      console.log('Product not in stock, aborting add to cart');
+      return;
+    }
+    
+    // Validate product object
+    if (!product.id) {
+      console.error('Product missing ID:', product);
+      showToast('Invalid product data', 'error');
+      return;
+    }
     
     setIsAddingToCart(true);
     
     try {
+      console.log('Calling addToCart with product:', {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        inStock: product.inStock
+      });
+      
       // Add to cart using context
       addToCart(product, 1);
       showToast(`Added ${product.name} to cart!`);
+      console.log('Successfully added to cart via ProductCard');
     } catch (error) {
       console.error('Failed to add product to cart:', error);
       showToast('Failed to add product to cart. Please try again.', 'error');

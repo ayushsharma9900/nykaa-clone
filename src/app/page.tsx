@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import ProductCard from '@/components/ui/ProductCard';
 import DynamicCategoriesGrid from '@/components/ui/DynamicCategoriesGrid';
 import { useCategories } from '@/hooks/useCategories';

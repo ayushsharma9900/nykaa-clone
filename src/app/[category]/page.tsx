@@ -1,7 +1,11 @@
 'use client';
 
-import { useState, useMemo, use, useEffect } from 'react';
-import { notFound, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useMemo, use, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import { useCategories } from '@/hooks/useCategories';
 import { usePagination } from '@/hooks/usePagination';
 import { apiService } from '@/lib/api';

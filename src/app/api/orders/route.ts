@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   try {
     // Ensure database is initialized (especially important for Vercel)
@@ -61,6 +65,42 @@ export async function GET(request: NextRequest) {
     const orders = await getAllQuery(sql, [...params, limit, offset]);
     console.log(`📊 Found ${orders.length} orders`);
     
+    // Transform orders to match expected structure with customer object
+    const transformedOrders = orders.map(order => ({
+      _id: order.id,
+      id: order.id,
+      invoiceNumber: order.invoiceNumber,
+      customer: {
+        _id: order.customerId,
+        name: order.customerName,
+        email: order.customerEmail,
+        phone: order.customerPhone
+      },
+      customerName: order.customerName,
+      items: [], // TODO: Implement order items if needed
+      subtotal: order.subtotal,
+      tax: order.tax,
+      shipping: order.shipping,
+      discount: order.discount,
+      total: order.total,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      paymentMethod: order.paymentMethod,
+      shippingAddress: typeof order.shippingAddress === 'string' 
+        ? {
+            street: order.shippingAddress,
+            city: '',
+            state: '',
+            zipCode: '',
+            country: ''
+          }
+        : order.shippingAddress,
+      notes: order.notes,
+      orderDate: order.orderDate,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt
+    }));
+    
     // Get total count for pagination
     const countSql = `SELECT COUNT(*) as total FROM orders ${whereClause}`;
     const [countResult] = await getAllQuery(countSql, params);
@@ -69,7 +109,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      data: orders,
+      data: transformedOrders,
       pagination: {
         currentPage: page,
         totalPages,

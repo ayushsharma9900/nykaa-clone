@@ -131,24 +131,38 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Load cart from localStorage on mount (with migration from legacy key)
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     const NEW_KEY = 'kaayalife-cart';
     const OLD_KEY = 'nykaa-cart';
-    const savedNew = localStorage.getItem(NEW_KEY);
-    const savedOld = localStorage.getItem(OLD_KEY);
-
+    
     try {
+      const savedNew = localStorage.getItem(NEW_KEY);
+      const savedOld = localStorage.getItem(OLD_KEY);
+
       if (savedNew) {
         const cartData = JSON.parse(savedNew);
-        dispatch({ type: 'LOAD_CART', payload: cartData });
+        // Validate cart data structure
+        if (cartData && typeof cartData === 'object' && Array.isArray(cartData.items)) {
+          console.log('Loading cart from localStorage:', cartData);
+          dispatch({ type: 'LOAD_CART', payload: cartData });
+        }
       } else if (savedOld) {
         const cartData = JSON.parse(savedOld);
-        dispatch({ type: 'LOAD_CART', payload: cartData });
-        // Migrate to new key
-        localStorage.setItem(NEW_KEY, savedOld);
-        localStorage.removeItem(OLD_KEY);
+        if (cartData && typeof cartData === 'object' && Array.isArray(cartData.items)) {
+          console.log('Migrating cart from old key:', cartData);
+          dispatch({ type: 'LOAD_CART', payload: cartData });
+          // Migrate to new key
+          localStorage.setItem(NEW_KEY, savedOld);
+          localStorage.removeItem(OLD_KEY);
+        }
       }
     } catch (error) {
       console.error('Error loading cart from localStorage:', error);
+      // Reset to initial state if there's an error
+      localStorage.removeItem('kaayalife-cart');
+      localStorage.removeItem('nykaa-cart');
     }
     
     // Mark initial load as complete
@@ -157,14 +171,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Save cart to localStorage whenever it changes (but not on initial load)
   useEffect(() => {
-    if (!isInitialLoad.current) {
+    if (!isInitialLoad.current && typeof window !== 'undefined') {
       const NEW_KEY = 'kaayalife-cart';
-      localStorage.setItem(NEW_KEY, JSON.stringify(state));
+      try {
+        localStorage.setItem(NEW_KEY, JSON.stringify(state));
+        console.log('Cart saved to localStorage:', state);
+      } catch (error) {
+        console.error('Failed to save cart to localStorage:', error);
+      }
     }
   }, [state]);
 
   const addToCart = (product: Product, quantity: number = 1) => {
-    dispatch({ type: 'ADD_TO_CART', payload: { product, quantity } });
+    console.log('Adding to cart:', { product: product.name, quantity });
+    try {
+      dispatch({ type: 'ADD_TO_CART', payload: { product, quantity } });
+      console.log('Successfully added to cart');
+    } catch (error) {
+      console.error('Error in addToCart:', error);
+      throw error;
+    }
   };
 
   const removeFromCart = (productId: string) => {

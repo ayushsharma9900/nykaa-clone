@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Admin credentials - in production, these should be in environment variables or database
 const ADMIN_CREDENTIALS = {
   email: 'admin@dashtar.com',

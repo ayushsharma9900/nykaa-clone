@@ -89,27 +89,36 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   // Load wishlist from localStorage on mount
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     const WISHLIST_KEY = 'kaayalife-wishlist';
-    const saved = localStorage.getItem(WISHLIST_KEY);
-
+    
     try {
+      const saved = localStorage.getItem(WISHLIST_KEY);
       if (saved) {
         const wishlistData = JSON.parse(saved);
-        // Restore dates from strings
-        const items = wishlistData.items.map((item: any) => ({
-          ...item,
-          addedAt: new Date(item.addedAt)
-        }));
-        dispatch({ 
-          type: 'LOAD_WISHLIST', 
-          payload: { 
-            ...wishlistData, 
-            items 
-          } 
-        });
+        // Validate wishlist data structure
+        if (wishlistData && typeof wishlistData === 'object' && Array.isArray(wishlistData.items)) {
+          // Restore dates from strings
+          const items = wishlistData.items.map((item: any) => ({
+            ...item,
+            addedAt: new Date(item.addedAt)
+          }));
+          console.log('Loading wishlist from localStorage:', { ...wishlistData, items });
+          dispatch({ 
+            type: 'LOAD_WISHLIST', 
+            payload: { 
+              ...wishlistData, 
+              items 
+            } 
+          });
+        }
       }
     } catch (error) {
       console.error('Error loading wishlist from localStorage:', error);
+      // Reset to initial state if there's an error
+      localStorage.removeItem('kaayalife-wishlist');
     }
     
     // Mark initial load as complete
@@ -118,14 +127,26 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   // Save wishlist to localStorage whenever it changes (but not on initial load)
   useEffect(() => {
-    if (!isInitialLoad.current) {
+    if (!isInitialLoad.current && typeof window !== 'undefined') {
       const WISHLIST_KEY = 'kaayalife-wishlist';
-      localStorage.setItem(WISHLIST_KEY, JSON.stringify(state));
+      try {
+        localStorage.setItem(WISHLIST_KEY, JSON.stringify(state));
+        console.log('Wishlist saved to localStorage:', state);
+      } catch (error) {
+        console.error('Failed to save wishlist to localStorage:', error);
+      }
     }
   }, [state]);
 
   const addToWishlist = (product: Product) => {
-    dispatch({ type: 'ADD_TO_WISHLIST', payload: { product } });
+    console.log('Adding to wishlist:', { product: product.name });
+    try {
+      dispatch({ type: 'ADD_TO_WISHLIST', payload: { product } });
+      console.log('Successfully added to wishlist');
+    } catch (error) {
+      console.error('Error in addToWishlist:', error);
+      throw error;
+    }
   };
 
   const removeFromWishlist = (productId: string) => {

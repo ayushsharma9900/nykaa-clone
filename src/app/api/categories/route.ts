@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery, runQuery, generateId, ensureDatabaseInitialized } from '@/lib/database';
+import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   // Parse query parameters outside try block for scope access in catch

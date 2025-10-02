@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
 import { mapBackendToFrontend } from '@/lib/dataMapper';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Helper function to get product images
 const getProductImages = async (productId: string): Promise<string[]> => {
   const images = await getAllQuery(

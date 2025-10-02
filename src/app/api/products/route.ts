@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery, runQuery, generateId, generateSKU, ensureDatabaseInitialized } from '@/lib/database';
+import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
 import { mapBackendToFrontend } from '@/lib/dataMapper';
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface DatabaseProduct {
   id: string;

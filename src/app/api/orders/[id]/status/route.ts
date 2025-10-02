@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runQuery, getQuery, ensureDatabaseInitialized } from '@/lib/database';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Ensure database is initialized (especially important for Vercel)
