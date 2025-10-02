@@ -91,6 +91,71 @@ export const fallbackProducts = [
   { id: 'prod-80', name: 'Biotique Bio Coconut Whitening & Brightening Cream', category: 'Personal Care', subcategory: 'Whitening Cream', brand: 'Biotique', price: 199, originalPrice: 225, discount: 12, image: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400', images: [{ url: 'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400', alt: 'Biotique Cream' }], inStock: true, stock: 89, rating: 4.0, reviewCount: 234, description: 'Natural whitening cream with coconut extracts.', tags: ['whitening cream', 'coconut', 'natural'], createdAt: new Date('2024-03-07').toISOString(), updatedAt: new Date('2024-03-07').toISOString() }
 ];
 
+// Fallback orders data
+export const fallbackOrders = [
+  {
+    id: 'ord-001',
+    invoiceNumber: 'INV-2024-001',
+    customerId: 'cust-001',
+    customerName: 'John Doe',
+    customerEmail: 'john@example.com',
+    customerPhone: '+1234567890',
+    subtotal: 1299.00,
+    tax: 129.90,
+    shipping: 50.00,
+    discount: 0,
+    total: 1478.90,
+    status: 'pending',
+    paymentStatus: 'pending',
+    paymentMethod: 'card',
+    shippingAddress: '123 Main St, City, State 12345',
+    notes: 'Customer requested express delivery',
+    orderDate: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'ord-002',
+    invoiceNumber: 'INV-2024-002',
+    customerId: 'cust-002',
+    customerName: 'Jane Smith',
+    customerEmail: 'jane@example.com',
+    subtotal: 799.00,
+    tax: 79.90,
+    shipping: 30.00,
+    discount: 50.00,
+    total: 858.90,
+    status: 'confirmed',
+    paymentStatus: 'paid',
+    paymentMethod: 'cash',
+    shippingAddress: '456 Oak Ave, City, State 67890',
+    orderDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 'ord-003',
+    invoiceNumber: 'INV-2024-003',
+    customerId: 'cust-003',
+    customerName: 'Mike Johnson',
+    customerEmail: 'mike@example.com',
+    customerPhone: '+1987654321',
+    subtotal: 2499.00,
+    tax: 249.90,
+    shipping: 0.00,
+    discount: 100.00,
+    total: 2648.90,
+    status: 'shipped',
+    paymentStatus: 'paid',
+    paymentMethod: 'credit',
+    shippingAddress: '789 Pine St, City, State 54321',
+    notes: 'Free shipping applied',
+    orderDate: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+    createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+  }
+];
+
 export const fallbackCategories = [
   {
     id: 'cat-skincare',
@@ -221,3 +286,118 @@ export const fallbackCategories = [
     updatedAt: new Date().toISOString()
   }
 ];
+
+// Intelligent fallback data provider
+export const getFallbackData = async (query: string, params: any[] = []): Promise<any[]> => {
+  const lowerQuery = query.toLowerCase();
+  
+  console.log('🔄 Using fallback data for query:', query.substring(0, 100) + '...');
+  
+  // Handle menu items / categories for menu management
+  if (lowerQuery.includes('categories') && (lowerQuery.includes('showinmenu') || lowerQuery.includes('menu'))) {
+    return fallbackCategories.map(cat => ({
+      _id: cat.id,
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+      image: cat.image,
+      isActive: Boolean(cat.isActive),
+      showInMenu: Boolean(cat.showInMenu),
+      menuOrder: cat.menuOrder || 0,
+      menuLevel: cat.menuLevel || 0,
+      parentId: cat.parentId,
+      productCount: cat.productCount || 0,
+      children: []
+    }));
+  }
+  
+  // Handle categories queries
+  if (lowerQuery.includes('select') && lowerQuery.includes('categories')) {
+    return fallbackCategories;
+  }
+  
+  // Handle products queries
+  if (lowerQuery.includes('select') && lowerQuery.includes('products')) {
+    let filteredProducts = [...fallbackProducts];
+    
+    // Apply category filter if present in params
+    if (params.length > 0) {
+      // Check for category parameter
+      const categoryParam = params.find((p, i) => {
+        const prevParam = query.split('?')[i - 1] || '';
+        return prevParam.toLowerCase().includes('category');
+      });
+      
+      if (categoryParam) {
+        filteredProducts = filteredProducts.filter(p => 
+          p.category.toLowerCase() === categoryParam.toLowerCase() ||
+          p.category.toLowerCase().replace(' ', '') === categoryParam.toLowerCase().replace('-', '')
+        );
+      }
+    }
+    
+    // Map to match expected structure
+    return filteredProducts.map(product => ({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      price: product.price,
+      costPrice: product.originalPrice || product.price * 0.7,
+      stock: product.stock,
+      sku: `SKU-${product.id}`,
+      isActive: product.inStock ? 1 : 0,
+      tags: product.tags ? product.tags.join(',') : '',
+      weight: 0,
+      dimensions: null,
+      totalSold: Math.floor(Math.random() * 100),
+      averageRating: product.rating,
+      reviewCount: product.reviewCount,
+      brand: product.brand,
+      rating: product.rating,
+      sourceUrl: null,
+      source: 'fallback',
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt
+    }));
+  }
+  
+  // Handle product images queries
+  if (lowerQuery.includes('product_images')) {
+    const productId = params[0];
+    const product = fallbackProducts.find(p => p.id === productId);
+    if (product && product.images) {
+      return product.images.map((img, index) => ({
+        id: index + 1,
+        productId: productId,
+        url: img.url,
+        alt: img.alt,
+        sortOrder: index,
+        createdAt: new Date().toISOString()
+      }));
+    }
+    return [];
+  }
+  
+  // Handle orders queries
+  if (lowerQuery.includes('orders')) {
+    return fallbackOrders;
+  }
+  
+  // Handle count queries
+  if (lowerQuery.includes('count(*)') || lowerQuery.includes('count') || lowerQuery.includes('total')) {
+    if (lowerQuery.includes('products')) {
+      return [{ 'COUNT(*)': fallbackProducts.length, count: fallbackProducts.length, total: fallbackProducts.length }];
+    } else if (lowerQuery.includes('categories')) {
+      return [{ 'COUNT(*)': fallbackCategories.length, count: fallbackCategories.length, total: fallbackCategories.length }];
+    } else if (lowerQuery.includes('orders')) {
+      return [{ 'COUNT(*)': fallbackOrders.length, count: fallbackOrders.length, total: fallbackOrders.length }];
+    }
+    return [{ 'COUNT(*)': 0, count: 0, total: 0 }];
+  }
+  
+  // Default empty response
+  console.log('⚠️ No fallback data found for query pattern');
+  return [];
+};

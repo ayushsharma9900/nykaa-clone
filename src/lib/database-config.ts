@@ -48,9 +48,10 @@ export const runQuery = async (query: string, params: any[] = []): Promise<any> 
     const result = await sql.query(finalQuery, params);
     return result;
   } else if (isServerless) {
-    // In serverless environment without PostgreSQL - throw error to trigger fallback
-    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL');
-    throw new Error('Database not configured for serverless environment');
+    // In serverless environment without PostgreSQL - use fallback data
+    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL, using fallback');
+    // Return empty result for serverless without DB
+    return { rows: [], rowCount: 0, insertId: null };
   } else {
     // SQLite for local development
     return new Promise((resolve, reject) => {
@@ -72,9 +73,11 @@ export const getAllQuery = async (query: string, params: any[] = []): Promise<an
     const result = await sql.query(finalQuery, params);
     return result.rows;
   } else if (isServerless) {
-    // In serverless environment without PostgreSQL - throw error to trigger fallback
-    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL');
-    throw new Error('Database not configured for serverless environment');
+    // In serverless environment without PostgreSQL - use fallback data
+    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL, using fallback');
+    // Import fallback data for serverless
+    const { getFallbackData } = await import('./fallback-data');
+    return getFallbackData(query, params);
   } else {
     // SQLite for local development
     return new Promise((resolve, reject) => {
@@ -96,9 +99,12 @@ export const getQuery = async (query: string, params: any[] = []): Promise<any> 
     const result = await sql.query(finalQuery, params);
     return result.rows[0] || null;
   } else if (isServerless) {
-    // In serverless environment without PostgreSQL - throw error to trigger fallback
-    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL');
-    throw new Error('Database not configured for serverless environment');
+    // In serverless environment without PostgreSQL - use fallback data
+    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL, using fallback');
+    // Import fallback data for serverless
+    const { getFallbackData } = await import('./fallback-data');
+    const results = await getFallbackData(query, params);
+    return results[0] || null;
   } else {
     // SQLite for local development
     return new Promise((resolve, reject) => {
