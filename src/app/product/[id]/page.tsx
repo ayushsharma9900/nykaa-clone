@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, use } from 'react';
-import { notFound } from 'next/navigation';
+import { useState } from 'react';
+import { useParams, notFound } from 'next/navigation';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -23,14 +23,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
-interface ProductPageProps {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
-export default function ProductPage({ params }: ProductPageProps) {
-  const { id } = use(params);
+export default function ProductPage() {
+  const { id } = useParams<{ id: string }>();
   const { products, loading } = useProducts();
   const { addToCart, isInCart, getItemQuantity } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -56,7 +50,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
   
-  const isWishlisted = isInWishlist(product.id);
+  const isWishlisted = isInWishlist(product!.id);
 
   // Get related products from same category
   const relatedProducts = products

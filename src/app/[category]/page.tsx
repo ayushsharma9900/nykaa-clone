@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo, use, Suspense } from 'react';
-import { useSearchParams, notFound } from 'next/navigation';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useParams, useSearchParams, notFound } from 'next/navigation';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -14,14 +14,8 @@ import ProductCard from '@/components/ui/ProductCard';
 import Pagination from '@/components/ui/Pagination';
 import { ChevronDownIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 
-interface CategoryPageProps {
-  params: Promise<{
-    category: string;
-  }>;
-}
-
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const { category } = use(params);
+export default function CategoryPage() {
+  const { category } = useParams<{ category: string }>();
   const searchParams = useSearchParams();
   
   const { categories } = useCategories();
@@ -53,7 +47,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       
       // Map frontend sort to backend sort
       let backendSortBy = 'createdAt';
-      let sortOrder = 'desc';
+      let sortOrder: 'asc' | 'desc' = 'desc';
       
       switch (sort) {
         case 'price-low':
@@ -83,7 +77,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         page,
         limit,
         sortBy: backendSortBy,
-        sortOrder: sortOrder as 'asc' | 'desc'
+        sortOrder
       });
       
       if (response.success && response.data) {
@@ -146,7 +140,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     // Filter by price range
     if (priceRange) {
       const [min, max] = priceRange.split('-').map(Number);
-      filtered = filtered.filter(product => {
+      filtered = filtered.filter((product: any) => {
         if (max) {
           return product.price >= min && product.price <= max;
         }
@@ -253,7 +247,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             {filteredProducts.length > 0 ? (
               <div className="space-y-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredProducts.map((product) => (
+                  {filteredProducts.map((product: any) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>

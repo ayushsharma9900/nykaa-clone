@@ -50,7 +50,15 @@ export async function GET(
 
     // Map backend product to frontend format
     if (responseData.success && responseData.data) {
-      const mappedProduct = mapBackendToFrontend(responseData.data as BackendProduct);
+      const raw = responseData.data as any;
+      const normalized = {
+        ...raw,
+        id: raw.id || raw._id,
+        images: Array.isArray(raw.images)
+          ? (typeof raw.images[0] === 'string' ? raw.images : raw.images.map((i: any) => i?.url).filter((u: any) => typeof u === 'string'))
+          : []
+      };
+      const mappedProduct = mapBackendToFrontend(normalized);
       return NextResponse.json({
         ...responseData,
         data: mappedProduct

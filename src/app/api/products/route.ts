@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
     // Map to frontend format
     const mappedProducts = productsWithImages.map(product => {
       const frontendProduct = mapBackendToFrontend({
-        _id: product.id,
+        id: product.id,
         name: product.name,
         description: product.description,
         category: product.category,
@@ -158,10 +158,10 @@ export async function GET(request: NextRequest) {
         averageRating: product.averageRating || 0,
         reviewCount: product.reviewCount || 0,
         tags: product.tags ? [product.tags] : [],
-        images: product.images ? product.images.map(url => ({ url, alt: product.name })) : [],
+        images: product.images || [],
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
-      });
+      } as any);
       
       return frontendProduct;
     });

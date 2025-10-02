@@ -112,7 +112,23 @@ export function mapFrontendToBackend(frontendProduct: Product): Partial<BackendP
 }
 
 // Backend to Frontend mapping
-export function mapBackendToFrontend(backendProduct: BackendProduct): Product {
+export function mapBackendToFrontend(backendProduct: any): Product {
+  // Normalize id and images from varied backends
+  const normalizedId: string = backendProduct.id || backendProduct._id;
+
+  // Normalize images to string[]
+  let normalizedImages: string[] = [];
+  if (Array.isArray(backendProduct.images) && backendProduct.images.length > 0) {
+    const first = backendProduct.images[0];
+    if (typeof first === 'string') {
+      normalizedImages = backendProduct.images as string[];
+    } else if (first && typeof first === 'object') {
+      normalizedImages = (backendProduct.images as any[])
+        .map((img) => (typeof img === 'string' ? img : img.url))
+        .filter((url: any) => typeof url === 'string' && url.length > 0);
+    }
+  }
+
   // Handle tags - MySQL might return as JSON string
   let tags: string[] = [];
   if (backendProduct.tags) {
@@ -122,19 +138,19 @@ export function mapBackendToFrontend(backendProduct: BackendProduct): Product {
       } catch (e) {
         tags = [backendProduct.tags]; // Fallback to single tag
       }
-    } else {
+    } else if (Array.isArray(backendProduct.tags)) {
       tags = backendProduct.tags;
     }
   }
 
   // Use images from backend if available, otherwise generate placeholder
-  const images = backendProduct.images && backendProduct.images.length > 0 
-    ? backendProduct.images 
+  const images = normalizedImages.length > 0 
+    ? normalizedImages 
     : [generatePlaceholderImage(backendProduct.category)];
   
   return {
-    id: backendProduct.id, // Backend uses 'id'
-    _id: backendProduct.id, // Frontend expects '_id' for admin
+    id: normalizedId, // Prefer normalized id
+    _id: normalizedId, // Frontend may expect '_id' for admin
     name: backendProduct.name,
     description: backendProduct.description,
     price: backendProduct.price,
@@ -147,10 +163,10 @@ export function mapBackendToFrontend(backendProduct: BackendProduct): Product {
     brand: extractBrandFromName(backendProduct.name) || 'Unknown',
     image: images[0], // Use first image as main image
     images: images, // Use actual images from backend
-    inStock: backendProduct.isActive && backendProduct.stock > 0,
-    stockCount: backendProduct.stock,
-    rating: backendProduct.averageRating || 0, // Use actual stored rating
-    reviewCount: backendProduct.reviewCount || 0, // Use actual stored review count
+    inStock: Boolean(backendProduct.isActive) && Number(backendProduct.stock) > 0,
+    stockCount: Number(backendProduct.stock) || 0,
+    rating: Number(backendProduct.averageRating) || 0, // Use actual stored rating
+    reviewCount: Number(backendProduct.reviewCount) || 0, // Use actual stored review count
     tags: tags,
     createdAt: new Date(backendProduct.createdAt),
     updatedAt: backendProduct.updatedAt ? new Date(backendProduct.updatedAt) : new Date(backendProduct.createdAt),
