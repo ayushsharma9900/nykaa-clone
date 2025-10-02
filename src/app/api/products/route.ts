@@ -47,7 +47,9 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status');
   
   try {
-    // Ensure database is initialized (especially important for Vercel)
+    console.log('🔍 Products API called with params:', { page, limit, category, search, status });
+    
+    // Initialize database safely (won't throw errors)
     await ensureDatabaseInitialized();
     
     console.log('🔍 Products API - Parameters:', { page, limit, category, search, status });
