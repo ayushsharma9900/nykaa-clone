@@ -1,70 +1,153 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAllQuery } from '@/lib/database';
 import { mapBackendToFrontend } from '@/lib/dataMapper';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
-
-interface BackendProduct {
-  _id: string;
-  name: string;
-  description: string;
-  category: string;
-  price: number;
-  costPrice: number;
-  stock: number;
-  sku: string;
-  isActive: boolean;
-  totalSold?: number;
-  averageRating?: number;
-  reviewCount?: number;
-  tags?: string[];
-  images?: Array<{ url: string; alt: string }>;
-  createdAt: string;
-  updatedAt: string;
-}
+// Helper function to get product images
+const getProductImages = async (productId: string): Promise<string[]> => {
+  const images = await getAllQuery(
+    'SELECT url FROM product_images WHERE productId = ? ORDER BY sortOrder ASC',
+    [productId]
+  );
+  return images.map((img: any) => img.url);
+};
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const queryString = searchParams.toString();
     
-    // Forward the request to the backend
-    const backendResponse = await fetch(
-      `${BACKEND_URL}/api/products/admin/all${queryString ? `?${queryString}` : ''}`,
-      {
-        method: 'GET',
-        headers: {
-          // Forward authorization header if present
-          ...(request.headers.get('authorization') && {
-            authorization: request.headers.get('authorization')!,
-          }),
-        },
-      }
+    // Parse query parameters (validation would go here in a real app)
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '25');
+    const offset = (page - 1) * limit;
+    const status = searchParams.get('status');
+    const search = searchParams.get('search');
+    const category = searchParams.get('category');
+    
+    console.log('🔍 Admin Products API - Parameters:', { page, limit, status, search, category });
+    
+    // Build WHERE clause
+    let whereClause = 'WHERE 1=1';
+    const params: any[] = [];
+    
+    if (status === 'active') {
+      whereClause += ' AND isActive = ?';
+      params.push(1);
+    } else if (status === 'inactive') {
+      whereClause += ' AND isActive = ?';
+      params.push(0);
+    }
+    
+    if (category) {
+      // Handle both category name and slug
+      const slugToNameMap: Record<string, string> = {
+        'makeup': 'Makeup',
+        'skincare': 'Skincare', 
+        'hair-care': 'Hair Care',
+        'haircare': 'Hair Care',
+        'fragrance': 'Fragrance',
+        'personal-care': 'Personal Care',
+        'mens-grooming': "Men's Grooming",
+        'baby-care': 'Baby Care',
+        'wellness': 'Wellness'
+      };
+      
+      const categoryName = slugToNameMap[category.toLowerCase()] || category;
+      whereClause += ' AND category = ?';
+      params.push(categoryName);
+    }
+    
+    if (search) {
+      whereClause += ' AND (name LIKE ? OR description LIKE ? OR sku LIKE ?)';
+      const searchTerm = `%${search}%`;
+      params.push(searchTerm, searchTerm, searchTerm);
+    }
+
+    // Get products
+    const sql = `
+      SELECT 
+        id,
+        name,
+        description,
+        category,
+        price,
+        costPrice,
+        stock,
+        sku,
+        isActive,
+        tags,
+        weight,
+        dimensions,
+        totalSold,
+        averageRating,
+        reviewCount,
+        createdAt,
+        updatedAt
+      FROM products 
+      ${whereClause}
+      ORDER BY createdAt DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const products = await getAllQuery(sql, [...params, limit, offset]);
+    console.log(`📊 Found ${products.length} admin products`);
+
+    // Get images for each product
+    const productsWithImages = await Promise.all(
+      products.map(async (product: any) => {
+        const images = await getProductImages(product.id);
+        return {
+          ...product,
+          images
+        };
+      })
     );
 
-    const responseData = await backendResponse.json();
+    // Get total count for pagination
+    const countSql = `SELECT COUNT(*) as total FROM products ${whereClause}`;
+    const [countResult] = await getAllQuery(countSql, params);
+    const totalProducts = countResult?.total || 0;
+    const totalPages = Math.ceil(totalProducts / limit);
 
-    if (!backendResponse.ok) {
-      return NextResponse.json(responseData, {
-        status: backendResponse.status,
+    // Map to frontend format
+    const mappedProducts = productsWithImages.map(product => {
+      return mapBackendToFrontend({
+        _id: product.id,
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        price: product.price,
+        costPrice: product.costPrice,
+        stock: product.stock,
+        sku: product.sku,
+        isActive: product.isActive,
+        totalSold: product.totalSold || 0,
+        averageRating: product.averageRating || 0,
+        reviewCount: product.reviewCount || 0,
+        tags: product.tags ? [product.tags] : [],
+        images: product.images ? product.images.map((url: string) => ({ url, alt: product.name })) : [],
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
       });
-    }
+    });
 
-    // Map backend products to frontend format
-    if (responseData.success && responseData.data) {
-      const mappedProducts = (responseData.data as BackendProduct[]).map(mapBackendToFrontend);
-      return NextResponse.json({
-        ...responseData,
-        data: mappedProducts
-      });
-    }
-
-    return NextResponse.json(responseData);
+    return NextResponse.json({
+      success: true,
+      data: mappedProducts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
   } catch (error) {
-    console.error('Error proxying admin products fetch request:', error);
+    console.error('❌ Error fetching admin products:', error);
     return NextResponse.json(
       {
         success: false,
-        message: 'Internal server error',
+        message: 'Failed to fetch products',
+        error: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
     );
