@@ -1,3 +1,5 @@
+import { getLocalStorageItem } from '@/hooks/useLocalStorage';
+
 // Auto-detect API base URL based on environment
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
   (typeof window !== 'undefined' 
@@ -23,7 +25,7 @@ class ApiService {
     };
 
     // Get token from localStorage if it exists
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = getLocalStorageItem('token');
     if (token) {
       defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
@@ -190,8 +192,8 @@ class ApiService {
         body: formData,
         headers: {
           // Don't set Content-Type for FormData - browser will set it with boundary
-          ...(typeof window !== 'undefined' && localStorage.getItem('token') 
-            ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
+          ...(getLocalStorageItem('token') 
+            ? { 'Authorization': `Bearer ${getLocalStorageItem('token')}` } 
             : {})
         }
       });
@@ -228,8 +230,8 @@ class ApiService {
         body: formData,
         headers: {
           // Don't set Content-Type for FormData - browser will set it with boundary
-          ...(typeof window !== 'undefined' && localStorage.getItem('token') 
-            ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
+          ...(getLocalStorageItem('token') 
+            ? { 'Authorization': `Bearer ${getLocalStorageItem('token')}` } 
             : {})
         }
       });
@@ -467,8 +469,8 @@ class ApiService {
         method: 'POST',
         body: formData,
         headers: {
-          ...(typeof window !== 'undefined' && localStorage.getItem('token') 
-            ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } 
+          ...(getLocalStorageItem('token') 
+            ? { 'Authorization': `Bearer ${getLocalStorageItem('token')}` } 
             : {})
         }
       });

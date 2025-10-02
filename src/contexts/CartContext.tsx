@@ -132,7 +132,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Load cart from localStorage on mount (with migration from legacy key)
   useEffect(() => {
     // Only run on client side
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !window.localStorage) return;
     
     const NEW_KEY = 'kaayalife-cart';
     const OLD_KEY = 'nykaa-cart';
@@ -171,7 +171,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Save cart to localStorage whenever it changes (but not on initial load)
   useEffect(() => {
-    if (!isInitialLoad.current && typeof window !== 'undefined') {
+    if (!isInitialLoad.current && typeof window !== 'undefined' && window.localStorage) {
       const NEW_KEY = 'kaayalife-cart';
       try {
         localStorage.setItem(NEW_KEY, JSON.stringify(state));

@@ -90,7 +90,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   // Load wishlist from localStorage on mount
   useEffect(() => {
     // Only run on client side
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !window.localStorage) return;
     
     const WISHLIST_KEY = 'kaayalife-wishlist';
     
@@ -127,7 +127,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
   // Save wishlist to localStorage whenever it changes (but not on initial load)
   useEffect(() => {
-    if (!isInitialLoad.current && typeof window !== 'undefined') {
+    if (!isInitialLoad.current && typeof window !== 'undefined' && window.localStorage) {
       const WISHLIST_KEY = 'kaayalife-wishlist';
       try {
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(state));

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useMenuItems } from '@/hooks/useMenuItems';
@@ -17,6 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function Header() {
+  const router = useRouter();
   const { state } = useCart();
   const { state: wishlistState } = useWishlist();
   const { menuItems, loading: menuLoading } = useMenuItems();
@@ -36,7 +38,7 @@ export default function Header() {
     e.preventDefault();
     if (searchQuery.trim()) {
       // Navigate to products page with search query
-      window.location.href = `/products?search=${encodeURIComponent(searchQuery.trim())}`;
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 

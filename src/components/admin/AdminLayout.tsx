@@ -44,7 +44,7 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
 
   useEffect(() => {
     // Check if user is authenticated
-    const token = localStorage.getItem('token');
+    const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('token') : null;
     if (!token) {
       router.push('/admin/login');
     } else {
@@ -54,8 +54,10 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
     router.push('/admin/login');
   };
 
@@ -75,7 +77,9 @@ export default function AdminLayout({ children, title = 'Admin Dashboard' }: Adm
   }
 
   const handleViewStore = () => {
-    window.open('/', '_blank');
+    if (typeof window !== 'undefined') {
+      window.open('/', '_blank');
+    }
   };
 
   return (
