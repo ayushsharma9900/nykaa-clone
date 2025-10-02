@@ -5,6 +5,7 @@ import path from 'path';
 // Determine database type based on environment
 const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
 const usePostgres = isVercel && process.env.POSTGRES_URL;
+const isServerless = isVercel; // Track if we're in serverless environment
 
 // SQLite setup for local development
 const DB_PATH = path.join(process.cwd(), 'database', 'kayaalife.db');
@@ -46,8 +47,12 @@ export const runQuery = async (query: string, params: any[] = []): Promise<any> 
     
     const result = await sql.query(finalQuery, params);
     return result;
+  } else if (isServerless) {
+    // In serverless environment without PostgreSQL - throw error to trigger fallback
+    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL');
+    throw new Error('Database not configured for serverless environment');
   } else {
-    // SQLite
+    // SQLite for local development
     return new Promise((resolve, reject) => {
       const database = getSQLiteDatabase();
       database.run(query, params, function(err) {
@@ -66,8 +71,12 @@ export const getAllQuery = async (query: string, params: any[] = []): Promise<an
     
     const result = await sql.query(finalQuery, params);
     return result.rows;
+  } else if (isServerless) {
+    // In serverless environment without PostgreSQL - throw error to trigger fallback
+    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL');
+    throw new Error('Database not configured for serverless environment');
   } else {
-    // SQLite
+    // SQLite for local development
     return new Promise((resolve, reject) => {
       const database = getSQLiteDatabase();
       database.all(query, params, (err, rows) => {
@@ -86,8 +95,12 @@ export const getQuery = async (query: string, params: any[] = []): Promise<any> 
     
     const result = await sql.query(finalQuery, params);
     return result.rows[0] || null;
+  } else if (isServerless) {
+    // In serverless environment without PostgreSQL - throw error to trigger fallback
+    console.warn('⚠️ Database not available in serverless environment without POSTGRES_URL');
+    throw new Error('Database not configured for serverless environment');
   } else {
-    // SQLite
+    // SQLite for local development
     return new Promise((resolve, reject) => {
       const database = getSQLiteDatabase();
       database.get(query, params, (err, row) => {

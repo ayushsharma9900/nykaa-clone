@@ -79,84 +79,43 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ Error fetching categories:', error);
     
-    // Fallback to static data for Vercel deployment
-    const fallbackCategories = [
-      {
-        id: 'cat-makeup',
-        name: 'Makeup',
-        slug: 'makeup',
-        description: 'Complete makeup collection including foundations, lipsticks, and more',
-        image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop',
-        isActive: 1,
-        sortOrder: 1,
-        menuOrder: 1,
-        showInMenu: 1,
-        menuLevel: 0,
-        parentId: null,
-        productCount: 15,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'cat-skincare',
-        name: 'Skincare',
-        slug: 'skincare',
-        description: 'Skincare products for all skin types',
-        image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop',
-        isActive: 1,
-        sortOrder: 2,
-        menuOrder: 2,
-        showInMenu: 1,
-        menuLevel: 0,
-        parentId: null,
-        productCount: 12,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'cat-fragrance',
-        name: 'Fragrance',
-        slug: 'fragrance',
-        description: 'Premium fragrances and perfumes',
-        image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop',
-        isActive: 1,
-        sortOrder: 3,
-        menuOrder: 3,
-        showInMenu: 1,
-        menuLevel: 0,
-        parentId: null,
-        productCount: 8,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'cat-haircare',
-        name: 'Hair Care',
-        slug: 'haircare',
-        description: 'Hair care products and treatments',
-        image: 'https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=400&h=400&fit=crop',
-        isActive: 1,
-        sortOrder: 4,
-        menuOrder: 4,
-        showInMenu: 1,
-        menuLevel: 0,
-        parentId: null,
-        productCount: 6,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
-    ];
+    // Import fallback data from static file
+    const { fallbackCategories } = await import('@/lib/fallback-data');
     
-    console.log('🔄 Using fallback categories data');
+    // Apply filters if specified
+    let filteredCategories = fallbackCategories;
+    
+    if (active !== undefined) {
+      const isActiveFilter = active === 'true';
+      filteredCategories = filteredCategories.filter(cat => 
+        Boolean(cat.isActive) === isActiveFilter
+      );
+    }
+    
+    if (search) {
+      const searchTerm = search.toLowerCase();
+      filteredCategories = filteredCategories.filter(cat => 
+        cat.name.toLowerCase().includes(searchTerm) ||
+        cat.description.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    // Apply pagination
+    const totalCategories = filteredCategories.length;
+    const totalPages = Math.ceil(totalCategories / limit);
+    const startIndex = (page - 1) * limit;
+    const paginatedCategories = filteredCategories.slice(startIndex, startIndex + limit);
+    
+    console.log(`🔄 Using fallback categories data: ${paginatedCategories.length} out of ${totalCategories} total`);
     return NextResponse.json({
       success: true,
-      data: fallbackCategories,
+      data: paginatedCategories,
       pagination: {
-        currentPage: 1,
-        totalPages: 1,
-        totalCategories: fallbackCategories.length,
-        hasNextPage: false,
-        hasPrevPage: false
+        currentPage: page,
+        totalPages,
+        totalCategories,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
       }
     });
   }
