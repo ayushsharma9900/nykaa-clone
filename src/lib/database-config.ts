@@ -1,6 +1,15 @@
 import { sql } from '@vercel/postgres';
-import sqlite3 from 'sqlite3';
 import path from 'path';
+
+// Optional SQLite import for local development only
+let sqlite3: any = null;
+try {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    sqlite3 = require('sqlite3');
+  }
+} catch (error) {
+  console.log('SQLite not available - running in production mode');
+}
 
 // Determine database type based on environment
 const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
@@ -9,11 +18,15 @@ const isServerless = isVercel; // Track if we're in serverless environment
 
 // SQLite setup for local development
 const DB_PATH = path.join(process.cwd(), 'database', 'kayaalife.db');
-let db: sqlite3.Database | null = null;
+let db: any = null;
 let isInitialized = false;
 
 // Database connection factory
-function getSQLiteDatabase(): sqlite3.Database {
+function getSQLiteDatabase(): any {
+  if (!sqlite3) {
+    throw new Error('SQLite not available in production environment');
+  }
+  
   if (!db) {
     // Ensure database directory exists for local development
     const fs = require('fs');
@@ -22,7 +35,7 @@ function getSQLiteDatabase(): sqlite3.Database {
       fs.mkdirSync(dbDir, { recursive: true });
     }
 
-    db = new sqlite3.Database(DB_PATH, (err) => {
+    db = new sqlite3.Database(DB_PATH, (err: any) => {
       if (err) {
         console.error('❌ Error opening SQLite database:', err);
       } else {
@@ -151,14 +164,27 @@ export const ensureDatabaseInitialized = async () => {
     return;
   }
 
+  // Skip database initialization in serverless mode without PostgreSQL
+  if (isServerless && !usePostgres) {
+    console.log('🔄 Serverless mode without PostgreSQL - skipping database initialization, using fallback data');
+    isInitialized = true;
+    return;
+  }
+
   try {
-    console.log(`🔧 Initializing database (Postgres: ${usePostgres})`);
+    console.log(`🔧 Initializing database (Postgres: ${usePostgres}, Serverless: ${isServerless})`);
     await createTables();
     await seedBasicData();
     isInitialized = true;
     console.log('✅ Database initialized successfully');
   } catch (error) {
     console.error('❌ Database initialization error:', error);
+    // In production, don't throw error - just use fallback data
+    if (isServerless) {
+      console.warn('⚠️ Database initialization failed in serverless mode, will use fallback data');
+      isInitialized = true;
+      return;
+    }
     throw error;
   }
 };

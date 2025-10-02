@@ -3,10 +3,16 @@
   "regions": ["iad1"],
   "functions": {
     "src/app/api/**/*.ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
     },
     "src/app/api/import/**/*.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "src/app/api/health/route.ts": {
+      "maxDuration": 10,
+      "memory": 512
     }
   },
   "headers": [
