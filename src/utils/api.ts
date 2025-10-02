@@ -1,7 +1,10 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 
+  (typeof window !== 'undefined' 
+    ? `${window.location.protocol}//${window.location.host}/api`
+    : '/api');
 
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('token');
+  const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('token') : null;
   
   const config: RequestInit = {
     headers: {

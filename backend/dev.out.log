@@ -1,0 +1,17 @@
+
+> dashtar-backend@1.0.0 dev
+> nodemon server.js
+
+[33m[nodemon] 3.1.10[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node server.js`[39m
+SQLite Connected: C:\Users\resale gallery\nykaa-clone\backend\kayaalife.db
+Database: kayaalife.db
+Server running in development mode on port 5001
+✅ SQLite tables created successfully
+✅ Database already has data, skipping seed
+
+SIGINT signal received.
+Terminate batch job (Y/N)? 

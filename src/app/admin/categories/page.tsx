@@ -261,11 +261,11 @@ export default function CategoriesPage() {
         case 'activate':
         case 'deactivate':
           const isActive = actionId === 'activate';
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/categories/bulk/status`, {
+          const response = await fetch('/api/categories/bulk/status', {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('token') : ''}`
             },
             body: JSON.stringify({ categoryIds, isActive })
           });
@@ -282,11 +282,11 @@ export default function CategoriesPage() {
             return;
           }
           
-          const deleteResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'}/categories/bulk`, {
+          const deleteResponse = await fetch('/api/categories/bulk', {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('token') : ''}`
             },
             body: JSON.stringify({ categoryIds })
           });

@@ -144,8 +144,8 @@ export default function SettingsPage() {
       setLoading(true);
       setError(null);
       
-      const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('adminToken') : null;
-      const response = await fetch('http://localhost:5001/api/settings', {
+      const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/settings', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -204,8 +204,8 @@ export default function SettingsPage() {
       setError(null);
       setSuccess(null);
       
-      const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('adminToken') : null;
-      const response = await fetch('http://localhost:5001/api/settings', {
+      const token = typeof window !== 'undefined' && window.localStorage ? localStorage.getItem('token') : null;
+      const response = await fetch('/api/settings', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
