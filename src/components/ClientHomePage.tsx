@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/ui/ProductCard';
@@ -11,12 +11,6 @@ import { useProducts } from '@/hooks/useProducts';
 export default function ClientHomePage() {
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  
-  // Handle client-side mounting
-  useEffect(() => {
-    setMounted(true);
-  }, []);
   
   // Fetch categories and products dynamically from API (only on client)
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
@@ -39,18 +33,6 @@ export default function ClientHomePage() {
       setIsSubscribing(false);
     }, 1000);
   };
-
-  // Show loading state while mounting or during initial load
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading beauty store...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
