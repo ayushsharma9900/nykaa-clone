@@ -155,6 +155,10 @@ const createTables = async () => {
         totalSold INTEGER DEFAULT 0,
         averageRating DECIMAL(3,2) DEFAULT 0,
         reviewCount INTEGER DEFAULT 0,
+        brand TEXT NULL,
+        rating DECIMAL(3,2) DEFAULT 0,
+        sourceUrl TEXT NULL,
+        source TEXT NULL,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
       )

@@ -14,7 +14,8 @@ import {
   TagIcon,
   Bars3Icon,
   XMarkIcon,
-  Bars3BottomLeftIcon
+  Bars3BottomLeftIcon,
+  ArrowDownOnSquareIcon
 } from '@heroicons/react/24/outline';
 
 interface AdminLayoutProps {
@@ -25,6 +26,7 @@ interface AdminLayoutProps {
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'Products', href: '/admin/products', icon: ShoppingBagIcon },
+  { name: 'Import Products', href: '/admin/import', icon: ArrowDownOnSquareIcon },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingCartIcon },
   { name: 'Customers', href: '/admin/customers', icon: UsersIcon },
   { name: 'Categories', href: '/admin/categories', icon: FolderIcon },
