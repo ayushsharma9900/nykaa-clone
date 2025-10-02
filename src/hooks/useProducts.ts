@@ -38,8 +38,8 @@ export function useProducts(initialFilters?: ProductFilters) {
       const response = await apiService.getProducts(currentFilters);
       
       if (response.success && response.data && Array.isArray(response.data)) {
-        const mappedProducts = response.data.map(mapBackendToFrontend);
-        setProducts(mappedProducts);
+        // Products are already mapped in the API route, no need to map again
+        setProducts(response.data);
         
         // Set pagination info if available
         if (response.pagination) {

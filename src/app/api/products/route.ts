@@ -341,18 +341,58 @@ export async function GET(request: NextRequest) {
     // Map to frontend format
     const mappedProducts = filteredProducts.map(product => {
       try {
-        return mapBackendToFrontend(product);
-      } catch {
-        // If mapping fails, return product as-is with required frontend fields
+        // Convert to backend format first for proper mapping
+        const backendProduct = {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          category: product.category,
+          price: product.price,
+          costPrice: product.costPrice || product.price * 0.8,
+          stock: product.stock,
+          sku: product.sku,
+          isActive: product.isActive,
+          totalSold: product.totalSold || 0,
+          averageRating: product.averageRating || product.rating || 0,
+          reviewCount: product.reviewCount || 0,
+          tags: Array.isArray(product.tags) ? product.tags : [],
+          images: Array.isArray(product.images) ? product.images.map(img => typeof img === 'string' ? img : img.url) : [],
+          createdAt: product.createdAt || new Date().toISOString(),
+          updatedAt: product.updatedAt || new Date().toISOString()
+        };
+        
+        return mapBackendToFrontend(backendProduct);
+      } catch (error) {
+        console.error('Mapping error for product:', product.name, error);
+        // If mapping fails, return product in a compatible format
         return {
-          ...product,
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          category: product.category,
           brand: 'kaayalife',
+          image: Array.isArray(product.images) && product.images.length > 0 
+            ? (typeof product.images[0] === 'string' ? product.images[0] : product.images[0].url)
+            : 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop',
+          images: Array.isArray(product.images) 
+            ? product.images.map(img => typeof img === 'string' ? img : img.url)
+            : ['https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop'],
+          inStock: product.isActive && product.stock > 0,
+          stockCount: product.stock,
+          rating: product.rating || product.averageRating || 0,
+          reviewCount: product.reviewCount || 0,
+          tags: Array.isArray(product.tags) ? product.tags : [],
+          createdAt: new Date(product.createdAt || Date.now()),
+          updatedAt: new Date(product.updatedAt || Date.now()),
           isFeatured: true,
           variants: [],
           specifications: {},
           seoTitle: product.name,
           seoDescription: product.description,
-          slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+          slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          subcategory: ''
         };
       }
     });
