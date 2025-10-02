@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
+import { getAllQuery, runQuery, ensureDatabaseInitialized, generateId } from '@/lib/database';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';

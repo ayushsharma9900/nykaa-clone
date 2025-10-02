@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
+import { getAllQuery, runQuery, ensureDatabaseInitialized, generateId, generateSKU } from '@/lib/database';
 import { mapBackendToFrontend } from '@/lib/dataMapper';
 
 // Force dynamic rendering
