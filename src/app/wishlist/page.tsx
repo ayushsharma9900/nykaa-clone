@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useWishlist } from '@/contexts/WishlistContext';
@@ -16,7 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon, StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 
-export default function WishlistPage() {
+function WishlistContent() {
   const { state: wishlistState, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { showToast } = useToast();
@@ -253,5 +253,26 @@ export default function WishlistPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function WishlistLoading() {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mr-3"></div>
+          <span>Loading wishlist...</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function WishlistPage() {
+  return (
+    <Suspense fallback={<WishlistLoading />}>
+      <WishlistContent />
+    </Suspense>
   );
 }

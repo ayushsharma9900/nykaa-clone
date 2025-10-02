@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdvancedDataTable, { Column, BulkAction } from '@/components/admin/AdvancedDataTable';
@@ -39,7 +39,7 @@ interface BackendProduct {
   updatedAt: string;
 }
 
-export default function EnhancedProductsPage() {
+function EnhancedProductsContent() {
   console.log('🚀 ENHANCED PRODUCTS PAGE LOADING');
   
   const searchParams = useSearchParams();
@@ -664,5 +664,26 @@ export default function EnhancedProductsPage() {
         product={selectedProduct}
       />
     </AdminLayout>
+  );
+}
+
+function EnhancedProductsLoading() {
+  return (
+    <AdminLayout title="Products Management">
+      <div className="space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mr-3"></div>
+          <span>Loading products...</span>
+        </div>
+      </div>
+    </AdminLayout>
+  );
+}
+
+export default function EnhancedProductsPage() {
+  return (
+    <Suspense fallback={<EnhancedProductsLoading />}>
+      <EnhancedProductsContent />
+    </Suspense>
   );
 }

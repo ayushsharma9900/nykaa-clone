@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { usePagination } from '@/hooks/usePagination';
@@ -120,7 +120,7 @@ interface Order {
 
 // Removed mock orders - will load from backend
 
-export default function OrdersPage() {
+function OrdersContent() {
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -918,5 +918,26 @@ export default function OrdersPage() {
         </div>
       )}
     </AdminLayout>
+  );
+}
+
+function OrdersLoading() {
+  return (
+    <AdminLayout title="Orders">
+      <div className="space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-2 border-pink-600 border-t-transparent rounded-full animate-spin mr-3"></div>
+          <span>Loading orders...</span>
+        </div>
+      </div>
+    </AdminLayout>
+  );
+}
+
+export default function OrdersPage() {
+  return (
+    <Suspense fallback={<OrdersLoading />}>
+      <OrdersContent />
+    </Suspense>
   );
 }
