@@ -2,19 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAllQuery, runQuery, generateId, ensureDatabaseInitialized } from '@/lib/database';
 
 export async function GET(request: NextRequest) {
+  // Parse query parameters outside try block for scope access in catch
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '20');
+  const offset = (page - 1) * limit;
+  const active = searchParams.get('active');
+  const search = searchParams.get('search');
+  const showAll = searchParams.get('showAll');
+  
   try {
     // Ensure database is initialized (especially important for Vercel)
     await ensureDatabaseInitialized();
-    
-    const { searchParams } = new URL(request.url);
-    
-    // Parse query parameters
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const offset = (page - 1) * limit;
-    const active = searchParams.get('active');
-    const search = searchParams.get('search');
-    const showAll = searchParams.get('showAll');
     
     console.log('🔍 Categories API - Parameters:', { page, limit, active, search, showAll });
     
@@ -22,7 +21,7 @@ export async function GET(request: NextRequest) {
     let whereClause = 'WHERE 1=1';
     const params: any[] = [];
     
-    if (active !== undefined) {
+    if (active !== null && active !== undefined) {
       whereClause += ' AND isActive = ?';
       params.push(active === 'true' ? 1 : 0);
     }
@@ -85,7 +84,7 @@ export async function GET(request: NextRequest) {
     // Apply filters if specified
     let filteredCategories = fallbackCategories;
     
-    if (active !== undefined) {
+    if (active !== null && active !== undefined) {
       const isActiveFilter = active === 'true';
       filteredCategories = filteredCategories.filter(cat => 
         Boolean(cat.isActive) === isActiveFilter

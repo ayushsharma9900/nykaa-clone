@@ -33,19 +33,18 @@ const getProductImages = async (productId: string): Promise<string[]> => {
 };
 
 export async function GET(request: NextRequest) {
+  // Parse query parameters outside try block for scope access in catch
+  const { searchParams } = new URL(request.url);
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '20');
+  const offset = (page - 1) * limit;
+  const category = searchParams.get('category');
+  const search = searchParams.get('search');
+  const status = searchParams.get('status');
+  
   try {
     // Ensure database is initialized (especially important for Vercel)
     await ensureDatabaseInitialized();
-    
-    const { searchParams } = new URL(request.url);
-    
-    // Parse query parameters
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const offset = (page - 1) * limit;
-    const category = searchParams.get('category');
-    const search = searchParams.get('search');
-    const status = searchParams.get('status');
     
     console.log('🔍 Products API - Parameters:', { page, limit, category, search, status });
     

@@ -167,14 +167,14 @@ const createTables = async () => {
         slug TEXT UNIQUE NOT NULL,
         description TEXT NOT NULL,
         image TEXT,
-        isActive BOOLEAN DEFAULT true,
+        isActive BOOLEAN DEFAULT ${usePostgres ? 'true' : '1'},
         sortOrder INTEGER DEFAULT 0,
         menuOrder INTEGER DEFAULT 0,
-        showInMenu BOOLEAN DEFAULT true,
+        showInMenu BOOLEAN DEFAULT ${usePostgres ? 'true' : '1'},
         menuLevel INTEGER DEFAULT 0,
         parentId TEXT,
-        createdAt TIMESTAMP DEFAULT NOW(),
-        updatedAt TIMESTAMP DEFAULT NOW()
+        createdAt TIMESTAMP DEFAULT ${usePostgres ? 'NOW()' : 'CURRENT_TIMESTAMP'},
+        updatedAt TIMESTAMP DEFAULT ${usePostgres ? 'NOW()' : 'CURRENT_TIMESTAMP'}
       )
     `);
     
@@ -189,7 +189,7 @@ const createTables = async () => {
         costPrice DECIMAL(10,2) NOT NULL,
         stock INTEGER NOT NULL DEFAULT 0,
         sku TEXT UNIQUE NOT NULL,
-        isActive BOOLEAN DEFAULT true,
+        isActive BOOLEAN DEFAULT ${usePostgres ? 'true' : '1'},
         tags TEXT,
         weight DECIMAL(8,2) DEFAULT 0,
         dimensions TEXT,
@@ -200,8 +200,8 @@ const createTables = async () => {
         rating DECIMAL(3,2) DEFAULT 0,
         sourceUrl TEXT,
         source TEXT,
-        createdAt TIMESTAMP DEFAULT NOW(),
-        updatedAt TIMESTAMP DEFAULT NOW()
+        createdAt TIMESTAMP DEFAULT ${usePostgres ? 'NOW()' : 'CURRENT_TIMESTAMP'},
+        updatedAt TIMESTAMP DEFAULT ${usePostgres ? 'NOW()' : 'CURRENT_TIMESTAMP'}
       )
     `);
     
@@ -278,7 +278,8 @@ const seedBasicData = async () => {
         : `INSERT OR IGNORE INTO categories (id, name, slug, description, isActive, sortOrder, showInMenu)
            VALUES (?, ?, ?, ?, ?, ?, ?)`;
       
-      await runQuery(insertQuery, [category.id, category.name, category.slug, category.description, true, 0, true]);
+      const booleanValue = usePostgres ? true : 1;
+      await runQuery(insertQuery, [category.id, category.name, category.slug, category.description, booleanValue, 0, booleanValue]);
     }
 
     // Seed sample products
@@ -361,10 +362,11 @@ const seedBasicData = async () => {
              isActive, brand, averageRating, reviewCount, createdAt, updatedAt
            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
       
+      const booleanValue = usePostgres ? true : 1;
       await runQuery(insertQuery, [
         product.id, product.name, product.description, product.category,
         product.price, product.costPrice, product.stock, product.sku,
-        true, product.brand, product.averageRating, product.reviewCount,
+        booleanValue, product.brand, product.averageRating, product.reviewCount,
         new Date().toISOString(), new Date().toISOString()
       ]);
     }
