@@ -1,28 +1,41 @@
 import sqlite3 from 'sqlite3';
 import path from 'path';
 
-// Use environment variable or fallback to local database
-const DB_PATH = process.env.DATABASE_URL || path.join(process.cwd(), 'database', 'kayaalife.db');
+// For Vercel, use in-memory database or temporary file
+const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+const DB_PATH = isVercel ? ':memory:' : path.join(process.cwd(), 'database', 'kayaalife.db');
 
 let db: sqlite3.Database | null = null;
+let isInitialized = false;
 
 // Initialize database connection (singleton pattern for serverless)
 function getDatabase(): sqlite3.Database {
   if (!db) {
-    // Ensure database directory exists
-    const fs = require('fs');
-    const dbDir = path.dirname(DB_PATH);
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });
-    }
-
-    db = new sqlite3.Database(DB_PATH, (err) => {
-      if (err) {
-        console.error('Error opening SQLite database:', err);
-      } else {
-        console.log('SQLite database connected:', DB_PATH);
+    if (isVercel) {
+      console.log('🚀 Creating in-memory SQLite database for Vercel');
+      db = new sqlite3.Database(':memory:', (err) => {
+        if (err) {
+          console.error('❌ Error creating in-memory database:', err);
+        } else {
+          console.log('✅ In-memory SQLite database created for Vercel');
+        }
+      });
+    } else {
+      // Ensure database directory exists for local development
+      const fs = require('fs');
+      const dbDir = path.dirname(DB_PATH);
+      if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
       }
-    });
+
+      db = new sqlite3.Database(DB_PATH, (err) => {
+        if (err) {
+          console.error('❌ Error opening SQLite database:', err);
+        } else {
+          console.log('✅ SQLite database connected:', DB_PATH);
+        }
+      });
+    }
   }
   return db;
 }
@@ -84,14 +97,22 @@ export const pool = {
 
 // Initialize database tables on first run
 export const initializeDatabase = async () => {
+  if (isInitialized && !isVercel) {
+    // Skip if already initialized (but always reinitialize on Vercel)
+    return;
+  }
+
   try {
+    console.log(`🔧 Initializing database (Vercel: ${isVercel})`);
     // Create tables if they don't exist
     await createTables();
     // Seed basic data
     await seedBasicData();
+    isInitialized = true;
     console.log('✅ Database initialized successfully');
   } catch (error) {
     console.error('❌ Database initialization error:', error);
+    throw error; // Re-throw to handle in calling code
   }
 };
 
@@ -347,8 +368,12 @@ export const generateSKU = (name: string, category: string) => {
   return `${nameCode}-${catCode}-${timestamp}`;
 };
 
-// Initialize database when module is imported
-if (process.env.NODE_ENV !== 'test') {
-  // Don't auto-initialize in test environment
-  initializeDatabase().catch(console.error);
-}
+// Helper function to ensure database is initialized before any operation
+export const ensureDatabaseInitialized = async () => {
+  if (isVercel || !isInitialized) {
+    await initializeDatabase();
+  }
+};
+
+// Don't auto-initialize on module import for serverless compatibility
+// Each API route should call ensureDatabaseInitialized() instead

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery, runQuery, generateId } from '@/lib/database';
+import { getAllQuery, runQuery, generateId, ensureDatabaseInitialized } from '@/lib/database';
 
 export async function GET(request: NextRequest) {
   try {
+    // Ensure database is initialized (especially important for Vercel)
+    await ensureDatabaseInitialized();
+    
     const { searchParams } = new URL(request.url);
     
     // Parse query parameters
@@ -88,6 +91,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Ensure database is initialized (especially important for Vercel)
+    await ensureDatabaseInitialized();
+    
     const body = await request.json();
     console.log('🚀 Creating new category:', body);
 

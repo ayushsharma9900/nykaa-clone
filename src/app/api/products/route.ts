@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery, runQuery, generateId, generateSKU } from '@/lib/database';
+import { getAllQuery, runQuery, generateId, generateSKU, ensureDatabaseInitialized } from '@/lib/database';
 import { mapBackendToFrontend } from '@/lib/dataMapper';
 
 interface DatabaseProduct {
@@ -34,6 +34,9 @@ const getProductImages = async (productId: string): Promise<string[]> => {
 
 export async function GET(request: NextRequest) {
   try {
+    // Ensure database is initialized (especially important for Vercel)
+    await ensureDatabaseInitialized();
+    
     const { searchParams } = new URL(request.url);
     
     // Parse query parameters
@@ -184,6 +187,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Ensure database is initialized (especially important for Vercel)
+    await ensureDatabaseInitialized();
+    
     const body = await request.json();
     console.log('🚀 Creating new product:', body);
 

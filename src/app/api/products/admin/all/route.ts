@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery } from '@/lib/database';
+import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
 import { mapBackendToFrontend } from '@/lib/dataMapper';
 
 // Helper function to get product images
@@ -13,6 +13,9 @@ const getProductImages = async (productId: string): Promise<string[]> => {
 
 export async function GET(request: NextRequest) {
   try {
+    // Ensure database is initialized (especially important for Vercel)
+    await ensureDatabaseInitialized();
+    
     const { searchParams } = new URL(request.url);
     
     // Parse query parameters (validation would go here in a real app)
