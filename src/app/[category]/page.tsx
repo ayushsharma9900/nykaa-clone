@@ -2,10 +2,6 @@
 
 import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useParams, useSearchParams, notFound } from 'next/navigation';
-
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 import { useCategories } from '@/hooks/useCategories';
 import { usePagination } from '@/hooks/usePagination';
 import { apiService } from '@/lib/api';
