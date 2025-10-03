@@ -1,7 +1,11 @@
 const express = require('express');
 const { body, validationResult, query } = require('express-validator');
 const { protect, authorize } = require('../middleware/auth');
-const { query: dbQuery } = require('../config/mysql-database');
+const { pool } = require('../config/sqlite-database');
+const dbQuery = async (sql, params = []) => {
+  const [rows] = await pool.execute(sql, params);
+  return rows;
+};
 
 const router = express.Router();
 

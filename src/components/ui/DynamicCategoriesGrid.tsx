@@ -50,7 +50,7 @@ export default function DynamicCategoriesGrid({
   
   // Filter only active categories and sort by sortOrder
   const activeCategories = categories
-    .filter(cat => cat.isActive)
+    .filter(cat => Boolean(cat.isActive))
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
     
   // Show limited or all categories based on state

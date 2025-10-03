@@ -45,7 +45,8 @@ export function useCategories() {
       if (response.success && response.data && Array.isArray(response.data)) {
         const mappedCategories = response.data.map((cat: any) => ({
           ...cat,
-          id: cat._id // Ensure we have both _id and id for compatibility
+          id: cat._id || cat.id, // Ensure we have both _id and id for compatibility
+          isActive: Boolean(cat.isActive) // Ensure isActive is always boolean
         }));
         setCategories(mappedCategories);
       } else {

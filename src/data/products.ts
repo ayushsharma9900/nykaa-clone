@@ -44,6 +44,18 @@ export const BRAND_POOLS: Record<string, string[]> = {
     'Dove', 'Nivea', 'Himalaya', 'Mamaearth', 'Pears',
     'Dettol', 'Lifebuoy', 'Palmolive', 'Colgate', 'Sensodyne',
     'Johnson\'s', 'Vaseline', 'Rexona', 'Listerine', 'Fiama', 'Biotique'
+  ],
+  "Men's Grooming": [
+    'Gillette', 'Old Spice', 'Axe', 'The Man Company', 'Ustraa',
+    'Beardo', 'Park Avenue', 'Wild Stone', 'Nivea Men', 'L\'Oreal Men Expert'
+  ],
+  'Baby Care': [
+    'Johnson\'s Baby', 'Himalaya Baby', 'Mamaearth', 'Sebamed Baby',
+    'Chicco', 'Pigeon', 'Mee Mee', 'Pampers'
+  ],
+  'Wellness': [
+    'Himalaya', 'Dabur', 'Patanjali', 'Baidyanath', 'Zandu',
+    'HealthKart', 'Neurobion', 'Revital', 'Centrum'
   ]
 };
 
@@ -53,7 +65,10 @@ export const SUBCATEGORY_POOLS: Record<string, string[]> = {
   'Makeup': ['Foundation','Concealer','Lipstick','Blush','Mascara','Eyeshadow','Brow','Highlighter','Kajal','Setting Spray'],
   'Hair Care': ['Shampoo','Conditioner','Hair Oil','Serum','Mask','Treatment','Styling'],
   'Fragrance': ['Eau de Parfum','Eau de Toilette','Body Mist'],
-  'Personal Care': ['Body Wash','Soap','Deodorant','Toothpaste','Mouthwash','Handwash','Body Lotion','Antiseptic']
+  'Personal Care': ['Body Wash','Soap','Deodorant','Toothpaste','Mouthwash','Handwash','Body Lotion','Antiseptic'],
+  "Men's Grooming": ['Razor','Shaving Cream','Aftershave','Face Wash','Beard Oil','Hair Gel','Deodorant'],
+  'Baby Care': ['Baby Lotion','Baby Shampoo','Baby Soap','Diaper','Baby Oil','Baby Powder'],
+  'Wellness': ['Multivitamin','Protein','Supplement','Ayurvedic','Health Drink','Immunity Booster']
 };
 
 // Dynamic image pools for fallback scenarios
@@ -84,6 +99,18 @@ export const IMAGE_POOLS: Record<string, string[]> = {
     'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
     'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400',
     'https://images.unsplash.com/photo-1570194065650-d99fb4bedf0a?w=400'
+  ],
+  "Men's Grooming": [
+    'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'
+  ],
+  'Baby Care': [
+    'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400',
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'
+  ],
+  'Wellness': [
+    'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=400',
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400'
   ]
 };
 
@@ -93,7 +120,10 @@ export const PRICE_RANGES: Record<string, { min: number; max: number }> = {
   'Makeup': { min: 199, max: 5000 },
   'Hair Care': { min: 149, max: 4000 },
   'Fragrance': { min: 999, max: 15000 },
-  'Personal Care': { min: 35, max: 800 }
+  'Personal Care': { min: 35, max: 800 },
+  "Men's Grooming": { min: 99, max: 2500 },
+  'Baby Care': { min: 49, max: 1500 },
+  'Wellness': { min: 199, max: 3000 }
 };
 
 // Dynamic product configuration utilities
