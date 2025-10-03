@@ -94,7 +94,10 @@ function EnhancedProductsContent() {
           pagination.updateTotalItems(mappedProducts.length);
         }
       } else {
-        throw new Error(response.message || 'Failed to fetch products');
+        console.error('Invalid API response:', response);
+        setError(response.message || 'Failed to fetch products');
+        setProducts([]);
+        pagination.updateTotalItems(0);
       }
     } catch (err) {
       console.error('Failed to fetch products:', err);

@@ -49,7 +49,9 @@ export function useCategories() {
         }));
         setCategories(mappedCategories);
       } else {
-        throw new Error('Invalid API response');
+        console.error('Invalid API response:', response);
+        setError(response.message || 'Invalid API response');
+        setCategories([]);
       }
     } catch (err: any) {
       console.error('Failed to fetch categories:', err);
