@@ -82,8 +82,8 @@ export default function Header() {
                 ))}
               </div>
             ) : (
-              navMenuItems.map((category) => (
-                <MegaDropdown key={category._id} category={category} />
+              navMenuItems.map((category, index) => (
+                <MegaDropdown key={category._id || category.id || index} category={category} />
               ))
             )}
           </nav>

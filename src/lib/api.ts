@@ -72,7 +72,11 @@ class ApiService {
           // If JSON parsing fails, use status text
           errorMessage = response.statusText || errorMessage;
         }
-        throw new Error(errorMessage);
+        return {
+          success: false,
+          message: errorMessage,
+          data: null
+        };
       }
       
       const data = await response.json();

@@ -3,9 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdvancedDataTable, { Column, BulkAction } from '@/components/admin/AdvancedDataTable';
 import { usePagination } from '@/hooks/usePagination';
