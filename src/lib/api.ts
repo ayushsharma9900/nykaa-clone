@@ -1,7 +1,7 @@
 import { getLocalStorageItem } from '@/hooks/useLocalStorage';
 
 // Auto-detect API base URL based on environment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5002/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 interface ApiResponse<T> {
   success: boolean;

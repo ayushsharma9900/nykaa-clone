@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { searchParams } = new URL(request.url);
-    const queryString = searchParams.toString();
-    
-    const response = await fetch(`${BACKEND_URL}/api/categories${queryString ? `?${queryString}` : ''}`, {
+    const response = await fetch(`${BACKEND_URL}/api/categories/${params.id}`, {
       headers: {
         'Authorization': request.headers.get('Authorization') || '',
         'Content-Type': 'application/json'
@@ -22,23 +18,42 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({
       success: false,
-      message: 'Failed to connect to backend',
-      data: []
+      message: 'Failed to connect to backend'
     }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const body = await request.json();
     
-    const response = await fetch(`${BACKEND_URL}/api/categories`, {
-      method: 'POST',
+    const response = await fetch(`${BACKEND_URL}/api/categories/${params.id}`, {
+      method: 'PUT',
       headers: {
         'Authorization': request.headers.get('Authorization') || '',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
+    });
+    
+    const data = await response.json();
+    return NextResponse.json(data, { status: response.status });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to connect to backend'
+    }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/categories/${params.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': request.headers.get('Authorization') || '',
+        'Content-Type': 'application/json'
+      }
     });
     
     const data = await response.json();

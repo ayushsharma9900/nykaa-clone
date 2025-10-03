@@ -331,6 +331,144 @@ router.get('/admin/all', authorize('manager', 'admin'), async (req, res, next) =
   }
 });
 
+// @desc    Update category
+// @route   PUT /api/categories/:id
+// @access  Private (admin and manager only)
+router.put('/:id', authorize('manager', 'admin'), [
+  body('name').optional().trim().notEmpty().withMessage('Category name cannot be empty'),
+  body('slug').optional().trim().notEmpty().withMessage('Category slug cannot be empty'),
+  body('description').optional().trim().notEmpty().withMessage('Description cannot be empty'),
+  body('isActive').optional().isBoolean().withMessage('isActive must be boolean'),
+  body('sortOrder').optional().isInt().withMessage('sortOrder must be integer')
+], async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const categoryId = req.params.id;
+    const updateFields = [];
+    const updateValues = [];
+
+    // Build dynamic update query
+    Object.keys(req.body).forEach(key => {
+      if (req.body[key] !== undefined) {
+        updateFields.push(`${key} = ?`);
+        updateValues.push(req.body[key]);
+      }
+    });
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No fields to update'
+      });
+    }
+
+    updateFields.push('updatedAt = ?');
+    updateValues.push(new Date().toISOString());
+    updateValues.push(categoryId);
+
+    const sql = `UPDATE categories SET ${updateFields.join(', ')} WHERE id = ?`;
+    await dbQuery(sql, updateValues);
+
+    // Get updated category
+    const [updatedCategory] = await dbQuery('SELECT * FROM categories WHERE id = ?', [categoryId]);
+
+    if (!updatedCategory) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Category updated successfully',
+      data: updatedCategory
+    });
+  } catch (error) {
+    console.error('Error updating category:', error);
+    next(error);
+  }
+});
+
+// @desc    Toggle category status
+// @route   PATCH /api/categories/:id/toggle-status
+// @access  Private (admin and manager only)
+router.patch('/:id/toggle-status', authorize('manager', 'admin'), async (req, res, next) => {
+  try {
+    const categoryId = req.params.id;
+    
+    // Get current status
+    const [category] = await dbQuery('SELECT isActive FROM categories WHERE id = ?', [categoryId]);
+    
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
+
+    const newStatus = !category.isActive;
+    await dbQuery('UPDATE categories SET isActive = ?, updatedAt = ? WHERE id = ?', 
+      [newStatus, new Date().toISOString(), categoryId]);
+
+    res.json({
+      success: true,
+      message: `Category ${newStatus ? 'activated' : 'deactivated'} successfully`,
+      data: { isActive: newStatus }
+    });
+  } catch (error) {
+    console.error('Error toggling category status:', error);
+    next(error);
+  }
+});
+
+// @desc    Delete category
+// @route   DELETE /api/categories/:id
+// @access  Private (admin and manager only)
+router.delete('/:id', authorize('manager', 'admin'), async (req, res, next) => {
+  try {
+    const categoryId = req.params.id;
+    
+    // Check if category has products
+    const [productCount] = await dbQuery(
+      'SELECT COUNT(*) as count FROM products WHERE category = (SELECT name FROM categories WHERE id = ?)',
+      [categoryId]
+    );
+
+    if (productCount.count > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot delete category. It contains ${productCount.count} products.`
+      });
+    }
+
+    const result = await dbQuery('DELETE FROM categories WHERE id = ?', [categoryId]);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Category deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    next(error);
+  }
+});
+
 // @desc    Get category statistics
 // @route   GET /api/categories/meta/stats
 // @access  Private
