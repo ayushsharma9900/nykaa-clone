@@ -117,13 +117,13 @@ async function gracefulShutdown(signal) {
     
     try {
       // Close database connection
-      const { closePool } = require('./config/mysql-database');
+      const { closePool } = require('./config/sqlite-database');
       await closePool();
-      console.log('MySQL connection pool closed.');
+      console.log('SQLite connection closed.');
       console.log('Server shutdown complete.');
       process.exit(0);
     } catch (error) {
-      console.error('Error closing MySQL connection:', error);
+      console.error('Error closing database connection:', error);
       process.exit(1);
     }
   });
