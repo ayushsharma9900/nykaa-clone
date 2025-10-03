@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { query: dbQuery } = require('../config/mysql-database');
+const { pool } = require('../config/sqlite-database');
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ router.post('/login', [
     const { email, password } = req.body;
 
     // Check if user exists
-    const users = await dbQuery('SELECT * FROM users WHERE email = ?', [email]);
+    const [users] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
     const user = users[0];
 
     if (!user) {
@@ -47,7 +47,7 @@ router.post('/login', [
     }
 
     // Update last login
-    await dbQuery('UPDATE users SET lastLogin = NOW() WHERE id = ?', [user.id]);
+    await pool.execute('UPDATE users SET lastLogin = datetime("now") WHERE id = ?', [user.id]);
 
     // Generate JWT token
     const token = jwt.sign(

@@ -75,6 +75,22 @@ const connectDB = async () => {
 
 const createTables = async () => {
   try {
+    // Users table
+    await runQuery(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT DEFAULT 'user',
+        isActive BOOLEAN DEFAULT 1,
+        avatar TEXT NULL,
+        lastLogin DATETIME NULL,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
     // Categories table
     await runQuery(`
       CREATE TABLE IF NOT EXISTS categories (
@@ -144,6 +160,16 @@ const seedBasicData = async () => {
       console.log('✅ Database already has data, skipping seed');
       return;
     }
+
+    // Import bcrypt for password hashing
+    const bcrypt = require('bcryptjs');
+    
+    // Seed admin user
+    const adminPassword = await bcrypt.hash('password123', 12);
+    await runQuery(
+      'INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)',
+      ['admin-1', 'Admin User', 'admin@dashtar.com', adminPassword, 'admin']
+    );
 
     // Seed categories
     const categories = [
