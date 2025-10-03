@@ -32,13 +32,15 @@ const generateFallbackProduct = (id: string, category: string, index: number) =>
   };
 };
 
-// Generate dynamic fallback products
+// Generate dynamic fallback products - 80 total products
 const generateFallbackProducts = () => {
   const products = [];
-  const categories = ['Skincare', 'Makeup', 'Hair Care', 'Fragrance', 'Personal Care'];
+  const categories = ['Skincare', 'Makeup', 'Hair Care', 'Fragrance', 'Personal Care', "Men's Grooming", 'Baby Care', 'Wellness'];
+  const productsPerCategory = [15, 15, 15, 10, 10, 8, 4, 3]; // Total = 80
   
   categories.forEach((category, catIndex) => {
-    for (let i = 0; i < 16; i++) {
+    const count = productsPerCategory[catIndex];
+    for (let i = 0; i < count; i++) {
       products.push(generateFallbackProduct(`${catIndex + 1}-${i + 1}`, category, i));
     }
   });
@@ -128,7 +130,7 @@ export const fallbackCategories = [
     showInMenu: 1,
     menuLevel: 0,
     parentId: null,
-    productCount: 16,
+    productCount: 15,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -144,7 +146,7 @@ export const fallbackCategories = [
     showInMenu: 1,
     menuLevel: 0,
     parentId: null,
-    productCount: 16,
+    productCount: 15,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -160,7 +162,7 @@ export const fallbackCategories = [
     showInMenu: 1,
     menuLevel: 0,
     parentId: null,
-    productCount: 16,
+    productCount: 15,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -176,7 +178,7 @@ export const fallbackCategories = [
     showInMenu: 1,
     menuLevel: 0,
     parentId: null,
-    productCount: 16,
+    productCount: 10,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -192,7 +194,7 @@ export const fallbackCategories = [
     showInMenu: 1,
     menuLevel: 0,
     parentId: null,
-    productCount: 16,
+    productCount: 10,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
@@ -240,7 +242,7 @@ export const fallbackCategories = [
     showInMenu: 1,
     menuLevel: 0,
     parentId: null,
-    productCount: 4,
+    productCount: 3,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }

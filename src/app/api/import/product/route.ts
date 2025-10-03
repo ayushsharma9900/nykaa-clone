@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ensureDatabaseInitialized, runQuery, getAllQuery, generateId, generateSKU } from '@/lib/database';
 
 // Conditionally import scraping dependencies
-let axios: any;
-let cheerio: any;
+let axios: unknown;
+let cheerio: unknown;
 
 try {
-  axios = require('axios');
-  cheerio = require('cheerio');
+  const axiosModule = await import('axios');
+  axios = axiosModule.default;
+  const cheerioModule = await import('cheerio');
+  cheerio = cheerioModule;
 } catch (error) {
-  console.warn('Web scraping dependencies not available:', error.message);
+  console.warn('Web scraping dependencies not available:', (error as Error).message);
 }
 
 interface ImportedProduct {

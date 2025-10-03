@@ -91,5 +91,5 @@ export interface PaginatedResponse<T> {
   data: T[];
   pagination: PaginationInfo;
   message?: string;
-  errors?: any[];
+  errors?: string[];
 }

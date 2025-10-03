@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+build/
+android/
+backend/
+scripts/
+*.js
+**/*.js
+.vercel/
+public/
+database/
+exports/
+sql-exports/

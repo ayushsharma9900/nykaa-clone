@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET(request: NextRequest) {
-  const checks: Record<string, any> = {};
+export async function GET(_request: NextRequest) {
+  const checks: Record<string, unknown> = {};
   const now = new Date().toISOString();
   
   try {

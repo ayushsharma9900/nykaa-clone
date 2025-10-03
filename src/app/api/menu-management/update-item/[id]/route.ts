@@ -5,12 +5,12 @@ import { runQuery, getQuery, ensureDatabaseInitialized } from '@/lib/database';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Ensure database is initialized (especially important for Vercel)
     await ensureDatabaseInitialized();
     
-    const itemId = params.id;
+    const { id: itemId } = await params;
     const body = await request.json();
     
     console.log(`🔄 Menu Management - Updating item ${itemId}:`, body);

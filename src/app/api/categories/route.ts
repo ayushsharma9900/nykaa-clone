@@ -6,110 +6,20 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
-  // Parse query parameters outside try block for scope access in catch
-  const { searchParams } = new URL(request.url);
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '20');
-  const offset = (page - 1) * limit;
-  const active = searchParams.get('active');
-  const search = searchParams.get('search');
-  const showAll = searchParams.get('showAll');
-  
   try {
-    // Ensure database is initialized (especially important for Vercel)
-    await ensureDatabaseInitialized();
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
     
-    console.log('🔍 Categories API - Parameters:', { page, limit, active, search, showAll });
-    
-    // Build WHERE clause
-    let whereClause = 'WHERE 1=1';
-    const params: any[] = [];
-    
-    if (active !== null && active !== undefined) {
-      whereClause += ' AND isActive = ?';
-      params.push(active === 'true' ? 1 : 0);
-    }
-    
-    if (search) {
-      whereClause += ' AND (name LIKE ? OR description LIKE ?)';
-      const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm);
-    }
-
-    // Get categories with product counts
-    const sql = `
-      SELECT 
-        id,
-        name,
-        slug,
-        description,
-        image,
-        isActive,
-        sortOrder,
-        menuOrder,
-        showInMenu,
-        menuLevel,
-        parentId,
-        createdAt,
-        updatedAt,
-        (SELECT COUNT(*) FROM products WHERE category = categories.name AND isActive = 1) as productCount
-      FROM categories 
-      ${whereClause}
-      ORDER BY sortOrder ASC, createdAt DESC
-      LIMIT ? OFFSET ?
-    `;
-
-    const categories = await getAllQuery(sql, [...params, limit, offset]);
-    console.log(`📊 Found ${categories.length} categories`);
-
-    // Get total count for pagination
-    const countSql = `SELECT COUNT(*) as total FROM categories ${whereClause}`;
-    const [countResult] = await getAllQuery(countSql, params);
-    const totalCategories = countResult?.total || 0;
-    const totalPages = Math.ceil(totalCategories / limit);
-
-    return NextResponse.json({
-      success: true,
-      data: categories,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalCategories,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error fetching categories:', error);
-    
-    // Import fallback data from static file
+    // Import fallback data directly
     const { fallbackCategories } = await import('@/lib/fallback-data');
     
-    // Apply filters if specified
-    let filteredCategories = fallbackCategories;
-    
-    if (active !== null && active !== undefined) {
-      const isActiveFilter = active === 'true';
-      filteredCategories = filteredCategories.filter(cat => 
-        Boolean(cat.isActive) === isActiveFilter
-      );
-    }
-    
-    if (search) {
-      const searchTerm = search.toLowerCase();
-      filteredCategories = filteredCategories.filter(cat => 
-        cat.name.toLowerCase().includes(searchTerm) ||
-        cat.description.toLowerCase().includes(searchTerm)
-      );
-    }
-    
-    // Apply pagination
-    const totalCategories = filteredCategories.length;
-    const totalPages = Math.ceil(totalCategories / limit);
+    // Simple pagination
     const startIndex = (page - 1) * limit;
-    const paginatedCategories = filteredCategories.slice(startIndex, startIndex + limit);
+    const paginatedCategories = fallbackCategories.slice(startIndex, startIndex + limit);
+    const totalCategories = fallbackCategories.length;
+    const totalPages = Math.ceil(totalCategories / limit);
     
-    console.log(`🔄 Using fallback categories data: ${paginatedCategories.length} out of ${totalCategories} total`);
     return NextResponse.json({
       success: true,
       data: paginatedCategories,
@@ -121,6 +31,15 @@ export async function GET(request: NextRequest) {
         hasPrevPage: page > 1
       }
     });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to fetch categories',
+      data: []
+    }, { status: 500 });
+  }
+}
+
   }
 }
 

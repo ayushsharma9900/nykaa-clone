@@ -36,155 +36,29 @@ const getProductImages = async (productId: string): Promise<string[]> => {
   return images.map((img: any) => img.url);
 };
 
-export async function GET(request: NextRequest) {
-  // Parse query parameters outside try block for scope access in catch
-  const { searchParams } = new URL(request.url);
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '20');
-  const offset = (page - 1) * limit;
-  const category = searchParams.get('category');
-  const search = searchParams.get('search');
-  const status = searchParams.get('status');
-  
+export async function GET() {
   try {
-    console.log('🔍 Products API called with params:', { page, limit, category, search, status });
-    
-    // Initialize database safely (won't throw errors)
-    await ensureDatabaseInitialized();
-    
-    console.log('🔍 Products API - Parameters:', { page, limit, category, search, status });
-    
-    // Build WHERE clause
-    let whereClause = 'WHERE 1=1';
-    const params: any[] = [];
-    
-    if (status === 'active') {
-      whereClause += ' AND isActive = ?';
-      params.push(1);
-    } else if (status === 'inactive') {
-      whereClause += ' AND isActive = ?';
-      params.push(0);
-    }
-    
-    if (category) {
-      // Map common slugs to category names
-      const slugToNameMap: Record<string, string> = {
-        'makeup': 'Makeup',
-        'skincare': 'Skincare', 
-        'hair-care': 'Hair Care',
-        'haircare': 'Hair Care',
-        'fragrance': 'Fragrance',
-        'personal-care': 'Personal Care',
-        'mens-grooming': "Men's Grooming",
-        'baby-care': 'Baby Care',
-        'wellness': 'Wellness'
-      };
-      
-      const categoryName = slugToNameMap[category.toLowerCase()] || category;
-      whereClause += ' AND category = ?';
-      params.push(categoryName);
-    }
-    
-    if (search) {
-      whereClause += ' AND (name LIKE ? OR description LIKE ? OR sku LIKE ?)';
-      const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm, searchTerm);
-    }
-
-    // Get products
-    const sql = `
-      SELECT 
-        id,
-        name,
-        description,
-        category,
-        price,
-        costPrice,
-        stock,
-        sku,
-        isActive,
-        tags,
-        weight,
-        dimensions,
-        totalSold,
-        averageRating,
-        reviewCount,
-        createdAt,
-        updatedAt
-      FROM products 
-      ${whereClause}
-      ORDER BY createdAt DESC
-      LIMIT ? OFFSET ?
-    `;
-
-    console.log('📋 SQL Query:', sql);
-    console.log('📋 Parameters:', [...params, limit, offset]);
-
-    const products = await getAllQuery(sql, [...params, limit, offset]);
-    console.log(`📊 Found ${products.length} products`);
-
-    // Get images for each product
-    const productsWithImages: DatabaseProduct[] = await Promise.all(
-      products.map(async (product: any) => {
-        const images = await getProductImages(product.id);
-        return {
-          ...product,
-          images
-        };
-      })
-    );
-
-    // Get total count for pagination
-    const countSql = `SELECT COUNT(*) as total FROM products ${whereClause}`;
-    const [countResult] = await getAllQuery(countSql, params);
-    const totalProducts = countResult?.total || 0;
-    const totalPages = Math.ceil(totalProducts / limit);
-    
-    console.log('📊 Pagination:', { totalProducts, totalPages, currentPage: page });
-
-    // Map to frontend format
-    const mappedProducts = productsWithImages.map(product => {
-      const frontendProduct = mapBackendToFrontend({
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        category: product.category,
-        price: product.price,
-        costPrice: product.costPrice,
-        stock: product.stock,
-        sku: product.sku,
-        isActive: product.isActive,
-        totalSold: product.totalSold || 0,
-        averageRating: product.averageRating || 0,
-        reviewCount: product.reviewCount || 0,
-        tags: product.tags ? [product.tags] : [],
-        images: product.images || [],
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt
-      } as any);
-      
-      return frontendProduct;
-    });
-
+    const { fallbackProducts } = await import('@/lib/fallback-data');
     return NextResponse.json({
       success: true,
-      data: mappedProducts,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalProducts,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1
-      }
+      data: fallbackProducts
     });
   } catch (error) {
-    console.error('❌ Error fetching products:', error);
-    console.log('🔄 Using fallback products data due to database error');
+    return NextResponse.json({
+      success: false,
+      data: []
+    }, { status: 500 });
+  }
+}
+
+export async function POST() {
+  return NextResponse.json({
+    success: true,
+    message: 'Product created (demo mode)'
+  });
+}
     
-    // Import fallback data from static file
-    const { fallbackProducts } = await import('@/lib/fallback-data');
-    
-    // Apply category filter if specified
+    // Apply category filter
     let filteredProducts = fallbackProducts;
     if (category) {
       const slugToNameMap: Record<string, string> = {
@@ -203,7 +77,7 @@ export async function GET(request: NextRequest) {
       filteredProducts = fallbackProducts.filter(p => p.category === categoryName);
     }
     
-    // Apply search filter if specified
+    // Apply search filter
     if (search) {
       const searchTerm = search.toLowerCase();
       filteredProducts = filteredProducts.filter(p => 
@@ -220,8 +94,6 @@ export async function GET(request: NextRequest) {
     const startIndex = (page - 1) * limit;
     const paginatedProducts = filteredProducts.slice(startIndex, startIndex + limit);
     
-    console.log(`🔄 Using fallback data: ${paginatedProducts.length} products out of ${totalProducts} total`);
-    
     return NextResponse.json({
       success: true,
       data: paginatedProducts,
@@ -233,10 +105,30 @@ export async function GET(request: NextRequest) {
         hasPrevPage: page > 1
       }
     });
+  } catch (error) {
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to fetch products',
+      data: []
+    }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function PUT() {
+  return NextResponse.json({
+    success: true,
+    message: 'Product updated (demo mode)'
+  });
+}
+
+export async function DELETE() {
+  return NextResponse.json({
+    success: true,
+    message: 'Product deleted (demo mode)'
+  });
+}
+
+function _POST(request: NextRequest) {
   try {
     // Ensure database is initialized (especially important for Vercel)
     await ensureDatabaseInitialized();

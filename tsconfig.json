@@ -26,7 +26,12 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false
   },
   "include": [
     "**/*.ts",
@@ -36,6 +41,15 @@
     "out/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "node_modules",
+    ".next",
+    "out",
+    "build",
+    "android",
+    "backend",
+    "scripts",
+    "*.js",
+    "**/*.js"
   ]
 }

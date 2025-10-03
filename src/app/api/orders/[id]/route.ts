@@ -5,12 +5,12 @@ import { getQuery, runQuery, ensureDatabaseInitialized } from '@/lib/database';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Ensure database is initialized (especially important for Vercel)
     await ensureDatabaseInitialized();
     
-    const orderId = params.id;
+    const { id: orderId } = await params;
     console.log(`🔍 Orders API - Fetching order ${orderId}`);
     
     // Get specific order
@@ -105,12 +105,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Ensure database is initialized (especially important for Vercel)
     await ensureDatabaseInitialized();
     
-    const orderId = params.id;
+    const { id: orderId } = await params;
     const body = await request.json();
     
     console.log(`🔄 Orders API - Updating order ${orderId}:`, body);

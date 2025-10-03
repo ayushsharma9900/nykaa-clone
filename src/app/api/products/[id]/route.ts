@@ -24,10 +24,10 @@ interface BackendProduct {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id;
+    const { id: productId } = await params;
 
     // Forward the request to the backend
     const backendResponse = await fetch(`${BACKEND_URL}/api/products/${productId}`, {
@@ -80,11 +80,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
-    const productId = params.id;
+    const { id: productId } = await params;
 
     // If this is frontend product data, map it to backend format
     let backendData = body;
@@ -138,10 +138,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = params.id;
+    const { id: productId } = await params;
 
     // Forward the request to the backend
     const backendResponse = await fetch(`${BACKEND_URL}/api/products/${productId}`, {

@@ -20,7 +20,7 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     const url = `${API_BASE_URL}${endpoint}`;
     
-    const defaultHeaders = {
+    const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
     };
 
@@ -50,24 +50,24 @@ class ApiService {
       // Check if response is ok
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}`;
-        let detailedErrors: any[] = [];
+        let detailedErrors: string[] = [];
         try {
           const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-          detailedErrors = errorData.errors || [];
-          
-          // For validation errors, provide more detail
-          if (response.status === 400 && detailedErrors.length > 0) {
-            const validationDetails = detailedErrors.map(err => `${err.path}: ${err.msg}`).join(', ');
-            errorMessage = `${errorMessage} - Details: ${validationDetails}`;
+          if (errorData && typeof errorData === 'object') {
+            errorMessage = errorData.message || errorMessage;
+            detailedErrors = errorData.errors || [];
+            
+            // For validation errors, provide more detail
+            if (response.status === 400 && detailedErrors.length > 0) {
+              const validationDetails = detailedErrors.map(err => `${err.path}: ${err.msg}`).join(', ');
+              errorMessage = `${errorMessage} - Details: ${validationDetails}`;
+            }
+            
+            // Log error details only in development
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(`API Error ${response.status}:`, errorData.message);
+            }
           }
-          
-          console.error('API Error Details:', {
-            status: response.status,
-            message: errorData.message,
-            errors: detailedErrors,
-            url: url
-          });
         } catch {
           // If JSON parsing fails, use status text
           errorMessage = response.statusText || errorMessage;
@@ -84,10 +84,12 @@ class ApiService {
       // Provide more specific error messages
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new Error('Backend server is not running or unreachable');
-      } else if (error.name === 'AbortError') {
+      } else if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('Request timeout - server took too long to respond');
-      } else {
+      } else if (error instanceof Error) {
         throw error;
+      } else {
+        throw new Error('Unknown error occurred');
       }
     }
   }

@@ -1,7 +1,7 @@
 // Safe imports with error handling
-let sql: any = null;
-let sqlite3: any = null;
-let path: any = null;
+let sql: unknown = null;
+let sqlite3: unknown = null;
+let path: unknown = null;
 
 // Import dependencies with fallbacks
 try {
@@ -62,7 +62,7 @@ function getSQLiteDatabase(): any {
   if (!db) {
     // Ensure database directory exists for local development
     const fs = require('fs');
-    const dbDir = path.dirname(DB_PATH);
+    const dbDir = (path as any).dirname(DB_PATH);
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
     }

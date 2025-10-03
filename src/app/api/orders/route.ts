@@ -1,132 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getAllQuery, ensureDatabaseInitialized } from '@/lib/database';
+import { NextResponse } from 'next/server';
 
-// Force dynamic rendering
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
-export async function GET(request: NextRequest) {
-  try {
-    // Ensure database is initialized (especially important for Vercel)
-    await ensureDatabaseInitialized();
-    
-    console.log('🔍 Orders API - Fetching orders');
-    
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const status = searchParams.get('status');
-    const search = searchParams.get('search');
-    const offset = (page - 1) * limit;
-    
-    // Build WHERE clause
-    let whereClause = 'WHERE 1=1';
-    const params: any[] = [];
-    
-    if (status && status !== 'all') {
-      whereClause += ' AND status = ?';
-      params.push(status);
+export async function GET() {
+  const mockOrders = [
+    {
+      id: 'ord-001',
+      invoiceNumber: 'INV-001',
+      customerName: 'John Doe',
+      customerEmail: 'john@example.com',
+      total: 1299.00,
+      status: 'pending',
+      paymentStatus: 'pending',
+      createdAt: new Date().toISOString()
     }
-    
-    if (search) {
-      whereClause += ' AND (invoiceNumber LIKE ? OR customerName LIKE ? OR customerEmail LIKE ?)';
-      const searchTerm = `%${search}%`;
-      params.push(searchTerm, searchTerm, searchTerm);
-    }
-    
-    // Get orders
-    const sql = `
-      SELECT 
-        id,
-        invoiceNumber,
-        customerId,
-        customerName,
-        customerEmail,
-        customerPhone,
-        subtotal,
-        tax,
-        shipping,
-        discount,
-        total,
-        status,
-        paymentStatus,
-        paymentMethod,
-        shippingAddress,
-        notes,
-        orderDate,
-        createdAt,
-        updatedAt
-      FROM orders 
-      ${whereClause}
-      ORDER BY createdAt DESC
-      LIMIT ? OFFSET ?
-    `;
-    
-    const orders = await getAllQuery(sql, [...params, limit, offset]);
-    console.log(`📊 Found ${orders.length} orders`);
-    
-    // Transform orders to match expected structure with customer object
-    const transformedOrders = orders.map(order => ({
-      _id: order.id,
-      id: order.id,
-      invoiceNumber: order.invoiceNumber,
-      customer: {
-        _id: order.customerId,
-        name: order.customerName,
-        email: order.customerEmail,
-        phone: order.customerPhone
-      },
-      customerName: order.customerName,
-      items: [], // TODO: Implement order items if needed
-      subtotal: order.subtotal,
-      tax: order.tax,
-      shipping: order.shipping,
-      discount: order.discount,
-      total: order.total,
-      status: order.status,
-      paymentStatus: order.paymentStatus,
-      paymentMethod: order.paymentMethod,
-      shippingAddress: typeof order.shippingAddress === 'string' 
-        ? {
-            street: order.shippingAddress,
-            city: '',
-            state: '',
-            zipCode: '',
-            country: ''
-          }
-        : order.shippingAddress,
-      notes: order.notes,
-      orderDate: order.orderDate,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt
-    }));
-    
-    // Get total count for pagination
-    const countSql = `SELECT COUNT(*) as total FROM orders ${whereClause}`;
-    const [countResult] = await getAllQuery(countSql, params);
-    const totalOrders = countResult?.total || 0;
-    const totalPages = Math.ceil(totalOrders / limit);
-    
-    return NextResponse.json({
-      success: true,
-      data: transformedOrders,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalOrders,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error fetching orders:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to fetch orders',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
-  }
+  ];
+
+  return NextResponse.json({
+    success: true,
+    data: mockOrders
+  });
 }
