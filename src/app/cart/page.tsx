@@ -3,10 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 import { useCart } from '@/contexts/CartContext';
 import { 
   TrashIcon, 

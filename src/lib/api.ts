@@ -11,6 +11,14 @@ interface ApiResponse<T> {
   data?: T;
   message?: string;
   errors?: any[];
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalProducts?: number;
+    totalCategories?: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
 }
 
 class ApiService {
@@ -59,7 +67,11 @@ class ApiService {
             
             // For validation errors, provide more detail
             if (response.status === 400 && detailedErrors.length > 0) {
-              const validationDetails = detailedErrors.map(err => `${err.path}: ${err.msg}`).join(', ');
+              const validationDetails = detailedErrors.map((err: any) => 
+                typeof err === 'object' && err.path && err.msg 
+                  ? `${err.path}: ${err.msg}` 
+                  : String(err)
+              ).join(', ');
               errorMessage = `${errorMessage} - Details: ${validationDetails}`;
             }
             
@@ -75,7 +87,7 @@ class ApiService {
         return {
           success: false,
           message: errorMessage,
-          data: null
+          data: undefined
         };
       }
       
@@ -85,16 +97,21 @@ class ApiService {
       clearTimeout(timeoutId); // Clear timeout on error
       console.error('API request failed:', error);
       
-      // Provide more specific error messages
+      // Return error response instead of throwing
+      let errorMessage = 'Unknown error occurred';
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error('Backend server is not running or unreachable');
+        errorMessage = 'Backend server is not running or unreachable';
       } else if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timeout - server took too long to respond');
+        errorMessage = 'Request timeout - server took too long to respond';
       } else if (error instanceof Error) {
-        throw error;
-      } else {
-        throw new Error('Unknown error occurred');
+        errorMessage = error.message;
       }
+      
+      return {
+        success: false,
+        message: errorMessage,
+        data: undefined
+      };
     }
   }
 
